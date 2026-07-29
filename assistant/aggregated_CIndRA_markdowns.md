@@ -1061,7 +1061,7 @@ Rainfall and air-temperature share this one setup notebook (both variables are p
 - `force_redownload` — default `False`; bypasses the per-station cache.
 
 ### Workflow
-1. **Area of interest** — load the Pacific EEZ polygons (`load_pacific_eez` from `functions/rainfall_regional.py`, shapefile at `<data_dir>/Pacific_EEZs/*.shp`), buffered outward by `EEZ_BUFFER_DEG` so real coastal stations aren't excluded by coordinate-rounding/coastline-simplification artifacts.
+1. **Area of interest** — load the Pacific EEZ polygons (`load_pacific_eez` from `functions/rainfall_regional.py`, shapefile at `data/regional/Pacific_EEZs/*.shp` — this repo's own copy, not an external folder), buffered outward by `EEZ_BUFFER_DEG` so real coastal stations aren't excluded by coordinate-rounding/coastline-simplification artifacts.
 2. **Catalog + spatial filter** — download the full GHCN station list and inventory (same source as the National setup), keep only stations whose coordinates fall inside a buffered EEZ polygon (`geopandas.sjoin(..., predicate="intersects")`), tag each with its `eez_country`.
 3. **Metadata pre-filter** — drop stations that clearly won't pass before downloading any daily data: must report at least one `vars_of_interest` variable and have at least `min_years_before_download` years of combined record (`GHCN.summarize_record_years`).
 4. **Download, clean, filter every candidate in parallel** — for each candidate: download the variables it reports, derive `TMEAN`/`diff` when both `TMIN`/`TMAX` are present, apply `filter_by_time_completeness`, keep only if at least `min_years_after_filter` years survive. A station whose processing raises an error is recorded as rejected (with the error as reason) rather than stopping the batch. Raw per-station downloads are cached at `data/regional/<region_key>/GHCN_<station_id>.pkl` so re-running after tweaking filters doesn't re-hit NOAA.
@@ -1373,7 +1373,7 @@ Used by `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` and `
 **Station-only maps** (no ERA5)
 - `RegionalMapConfig(variable, metric="trend"|"mean", period_start, period_end, min_years=2, cmap, vmin, vmax, color_label, ...)` — `min_years` guards against an unstable few-point regression (e.g. 2 valid years) dominating a map's colour scale; the regional notebooks set it to 20.
 - `build_sites_map_dataframe(dict_lon_lat, config, annual_data=...)` → one row per station: `value`, `p_value`, `n_years`, `significant`.
-- `plot_annual_regional_map(dict_lon_lat, annual_data, data_dir, config, variable_labels=...)` → `(fig, ax, sites_df)`. `data_dir` here is the shared PICCM `data/` folder (one level above this repo) that holds `Pacific_EEZs/*.shp` — not this repo's own `data/`.
+- `plot_annual_regional_map(dict_lon_lat, annual_data, data_dir, config, variable_labels=...)` → `(fig, ax, sites_df)`. `data_dir` here is this repo's own `data/regional/` folder, which holds `Pacific_EEZs/*.shp`.
 - `create_pacific_base_map(data_dir, ...)` → `(fig, ax, eez_gdf)`, the shared EEZ + land base map both regional notebooks build on.
 
 **ERA5-background maps** — only for indicators reconstructable from *monthly* ERA5 fields (annual accumulated rainfall, annual mean temperature); anything needing daily data (dry-day counts, hot/cold days, diurnal range) has no ERA5 counterpart.

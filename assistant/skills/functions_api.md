@@ -167,7 +167,7 @@ Used by `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` and `
 **Station-only maps** (no ERA5)
 - `RegionalMapConfig(variable, metric="trend"|"mean", period_start, period_end, min_years=2, cmap, vmin, vmax, color_label, ...)` — `min_years` guards against an unstable few-point regression (e.g. 2 valid years) dominating a map's colour scale; the regional notebooks set it to 20.
 - `build_sites_map_dataframe(dict_lon_lat, config, annual_data=...)` → one row per station: `value`, `p_value`, `n_years`, `significant`.
-- `plot_annual_regional_map(dict_lon_lat, annual_data, data_dir, config, variable_labels=...)` → `(fig, ax, sites_df)`. `data_dir` here is the shared PICCM `data/` folder (one level above this repo) that holds `Pacific_EEZs/*.shp` — not this repo's own `data/`.
+- `plot_annual_regional_map(dict_lon_lat, annual_data, data_dir, config, variable_labels=...)` → `(fig, ax, sites_df)`. `data_dir` here is this repo's own `data/regional/` folder, which holds `Pacific_EEZs/*.shp`.
 - `create_pacific_base_map(data_dir, ...)` → `(fig, ax, eez_gdf)`, the shared EEZ + land base map both regional notebooks build on.
 
 **ERA5-background maps** — only for indicators reconstructable from *monthly* ERA5 fields (annual accumulated rainfall, annual mean temperature); anything needing daily data (dry-day counts, hot/cold days, diurnal range) has no ERA5 counterpart.
