@@ -1,2 +1,2 @@
 # PICCM_atmosphere_sealevel
-atmosphere and sea level indicators for the pacific
+Atmosphere (rainfall and air temperature) and sea level indicators for the Pacific.
