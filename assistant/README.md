@@ -22,6 +22,10 @@ This folder holds the instructions used to train an external assistant — **CIn
 | `anomaly_analysis.md` | `National/sea_level/b_sea_level_anomaly.ipynb` |
 | `flood_frequency.md` | `National/sea_level/c_sea_level_ff.ipynb` |
 | `rankings.md` | `National/sea_level/d_sea_level_rankings.ipynb` |
+| `regional_setup.md` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
+| `regional_rainfall.md` | `Regional/rainfall/regional_indicators.ipynb` |
+| `regional_temperature.md` | `Regional/air_temperature/regional_indicators.ipynb` |
+| `regional_sea_level.md` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
 | `functions_api.md` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
 | `output_conventions.md` | Figure / table naming and folders (all domains) |
 | `data_sources.md` | GHCN-Daily, UHSLC, CMEMS, ONI, units, citations (all domains) |

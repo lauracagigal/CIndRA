@@ -145,9 +145,26 @@ Sea level has no `plot_bar_probs` equivalent — use the dedicated helpers in `s
 
 ## CIndRA Regional Workflows
 
-- **Rainfall and air temperature** have a Regional counterpart of the National single-site workflow: `Regional/00_regional_setup.ipynb` scans every GHCN station inside the Pacific EEZ boundaries (via `load_pacific_eez` in `functions/rainfall_regional.py`), filters by quality/completeness, and saves the accepted stations' cleaned data to `data/regional/<region_key>_stations.pkl` (`region_key` defaults to `"pacific"`). `Regional/rainfall/regional_indicators.ipynb` and `Regional/air_temperature/regional_indicators.ipynb` then reproduce the same per-station formulas as the National `a`/`b`/`c` notebooks (`compute_regional_rainfall_indicators`, `compute_regional_temperature_indicators` in `rainfall_regional.py`) across every station at once, and build Pacific EEZ maps (`create_pacific_base_map`, `plot_annual_regional_map`) with an optional ERA5 gridded background (`load_or_compute_era5_annual_rainfall`/`temperature`, cached under `data/regional/era5_cache/`).
-- **Sea level has no Regional workflow yet.** `notebooks/historical/Regional/regional_plots.ipynb` is an empty placeholder (0 bytes) and `functions/cindra_regional_plotting_helpers.py` holds two draft plotting helpers prepared for it, but neither is wired up. Do not claim a regional sea-level map exists — if asked for one, say it needs to be built (starting point: `cindra_regional_plotting_helpers.py`, following the same EEZ-map pattern as `rainfall_regional.py`).
-- Regional notebooks use `min_years` (the setup notebooks call it `min_years_after_filter`; the indicator notebooks call the map-config field `min_years`) to guard against an unstable trend fit from very few valid years dominating a map's colour scale — the regional notebooks set it to 20.
+The Regional workflow scans **many** stations across the Pacific EEZ area at once (as opposed to the National workflow's one interactively-picked site) and builds Pacific-wide maps/time series. Coverage is currently uneven across the three domains — documented here domain-by-domain, at equal depth, precisely so the sea-level gap stays visible instead of being glossed over:
+
+### Regional rainfall — built
+- Setup: `Regional/00_regional_setup.ipynb` (shared with air temperature — see next section). See `assistant/skills/regional_setup.md`.
+- Indicators/maps: `Regional/rainfall/regional_indicators.ipynb` reproduces the National `a_Total_rainfall.ipynb`/`b_Consecutive_dry_days.ipynb`/`c_Heavy_rainfall.ipynb` formulas per station (`compute_regional_rainfall_indicators` in `functions/rainfall_regional.py`), builds one Pacific EEZ trend map per indicator (`plot_annual_regional_map`), plus an ERA5-background mean/trend map for `total_annual_mm` only. See `assistant/skills/regional_rainfall.md`.
+
+### Regional air temperature — built
+- Setup: `Regional/00_regional_setup.ipynb` (same notebook as rainfall — it downloads both `TMIN`/`TMAX` and `PRCP` per station in one pass). See `assistant/skills/regional_setup.md`.
+- Indicators/maps: `Regional/air_temperature/regional_indicators.ipynb` reproduces the National `a_mean_temperature.ipynb`/`b_min_max_temperature.ipynb`/`c_hot_cold_days.ipynb` formulas per station (`compute_regional_temperature_indicators` in `functions/rainfall_regional.py`), a regional-mean anomaly time series (station-average and, separately, an ERA5 EEZ area-weighted version), one trend map per indicator, plus an ERA5-background mean/trend map for `tmean_annual` only. See `assistant/skills/regional_temperature.md`.
+
+### Regional sea level — not built yet
+- No regional setup notebook exists for sea level (no multi-station UHSLC scan analogous to `Regional/00_regional_setup.ipynb`'s GHCN scan).
+- `notebooks/historical/Regional/regional_plots.ipynb` is an empty placeholder (0 bytes) — not valid JSON, no cells.
+- `functions/cindra_regional_plotting_helpers.py` holds two **draft/experimental** plotting helpers prepared for this workflow (`plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview`) but neither is imported by any notebook.
+- Do not claim a regional sea-level map or indicator exists, and do not improvise one from the National single-site sea-level helpers as if they already generalized to many stations. See `assistant/skills/regional_sea_level.md` for exactly what exists to build this from and what's still missing.
+
+### Shared conventions (rainfall/air-temperature; would apply to sea level once built)
+- `region_key` (default `"pacific"`) names every regional output file/folder.
+- `min_years` (the setup notebook calls it `min_years_after_filter`; the indicator notebooks call the map-config field `min_years`) guards against an unstable trend fit from very few valid years dominating a map's colour scale — set to 20 in both existing domains.
+- ERA5 gridded backgrounds only cover the one indicator reconstructable from a **monthly** field (`total_annual_mm` for rainfall, `tmean_annual` for temperature); every other indicator needs daily data and has no ERA5 counterpart.
 
 ---
 
@@ -398,6 +415,10 @@ For step-by-step notebook workflows, see:
 - `assistant/skills/anomaly_analysis.md` — `sea_level/b_sea_level_anomaly.ipynb`
 - `assistant/skills/flood_frequency.md` — `sea_level/c_sea_level_ff.ipynb`
 - `assistant/skills/rankings.md` — `sea_level/d_sea_level_rankings.ipynb`
+- `assistant/skills/regional_setup.md` — `Regional/00_regional_setup.ipynb` (shared by regional rainfall and air temperature)
+- `assistant/skills/regional_rainfall.md` — `Regional/rainfall/regional_indicators.ipynb`
+- `assistant/skills/regional_temperature.md` — `Regional/air_temperature/regional_indicators.ipynb`
+- `assistant/skills/regional_sea_level.md` — documents what's missing for a regional sea-level workflow (none exists yet)
 - `assistant/skills/functions_api.md` — full function reference and discovery workflow
 - `assistant/skills/data_sources.md` — sources, units, citations
 - `assistant/skills/output_conventions.md` — figure names and folders
