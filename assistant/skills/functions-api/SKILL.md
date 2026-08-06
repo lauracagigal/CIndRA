@@ -1,3 +1,8 @@
+---
+name: functions-api
+description: Full reference of callable functions across functions/site_common.py, rainfall.py, air_temp.py, temp_func.py, data_downloaders.py, rainfall_regional.py, sea_level.py, sea_level_plotting.py, and the external indicators_setup package, plus the function-discovery workflow. Use before writing any analysis or plotting code, to find and reuse an existing function instead of reimplementing it inline.
+---
+
 ## Skill: Functions API Reference (`functions/site_common.py` + `functions/rainfall.py` + `functions/air_temp.py` + `functions/temp_func.py` + `functions/data_downloaders.py` + `functions/rainfall_regional.py` + `functions/sea_level.py` + `functions/sea_level_plotting.py` + `indicators_setup`)
 
 Single source of truth for what the assistant is allowed to call, across the rainfall, air-temperature, and sea-level workflows. If something is missing, add a function to `functions/` — do not inline it in notebooks.

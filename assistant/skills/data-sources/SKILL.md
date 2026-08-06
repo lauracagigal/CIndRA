@@ -1,3 +1,8 @@
+---
+name: data-sources
+description: Documents every external data source used in this repository (GHCN-Daily, NOAA ONI, UHSLC tide gauges, CMEMS satellite altimetry), their URLs, units, sentinels, and citations, plus reference-period conventions. Use when downloading new data, citing a data source, or converting units.
+---
+
 ## Skill: Data Sources & Attribution
 
 ### Daily precipitation and temperature — GHCN-Daily (NOAA NCEI)

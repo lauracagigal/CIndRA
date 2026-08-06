@@ -1,3 +1,8 @@
+---
+name: trend-analysis
+description: Compare absolute (CMEMS altimetry) and relative (UHSLC tide gauge) sea-level trends at a site and quantify ENSO modulation. Use when working on notebooks/historical/National/sea_level/a_sea_level_trend.ipynb or answering questions about sea-level rise rates in mm/yr.
+---
+
 ## Skill: Trend Analysis (notebook `a_sea_level_trend.ipynb`)
 
 ### Purpose

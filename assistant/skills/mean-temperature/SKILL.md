@@ -1,3 +1,8 @@
+---
+name: mean-temperature
+description: Compute annual mean surface temperature trend, anomaly versus the 1961-1990 reference period, top-10 warmest years, and ENSO sensitivity. Use when working on notebooks/historical/National/air_temperature/a_mean_temperature.ipynb or answering questions about mean or average temperature trends.
+---
+
 ## Skill: Mean Temperature (notebook `notebooks/historical/National/air_temperature/a_mean_temperature.ipynb`)
 
 ### Purpose

@@ -1,3 +1,8 @@
+---
+name: flood-frequency
+description: Quantify minor (nuisance/high-tide) flood-day and flood-hour frequency at a tide gauge (30 cm above MHHW threshold) and its ENSO relationship. Use when working on notebooks/historical/National/sea_level/c_sea_level_ff.ipynb or answering questions about nuisance flooding or high-tide flooding frequency.
+---
+
 ## Skill: Flood Frequency (notebook `c_sea_level_ff.ipynb`)
 
 ### Purpose

@@ -1,3 +1,8 @@
+---
+name: sea-level-site-setup
+description: Set up the sea-level analysis site (currently a single hardcoded Palau site) by resolving the UHSLC tide-gauge station, pre-downloading/caching UHSLC and CMEMS data, and saving the site config JSON. Use when starting sea-level analysis or before running any National sea-level notebook (notebooks/historical/National/sea_level/0_site_setup.ipynb).
+---
+
 ## Skill: Sea-Level Site Setup (notebook `sea_level/0_site_setup.ipynb`)
 
 ### Purpose
@@ -25,7 +30,7 @@ In principle, the same shape of inputs as the atmosphere setup (site name, coord
 3. `save_site_config(site_config, Path('../../../../data/sites/palau.json'))` — writes the **fixed filename** `palau.json`, not a `site_config_filename(site_key)`-derived one like the atmosphere workflow.
 
 ### Output contract
-- JSON at `data/sites/palau.json` with all the fields listed above plus the fields `prepare_site_data` adds (`selected_uhslc_id`, `station`, `country`, `station_lon`, `station_lat`, `station_distance_km`, `cmems_path`, `cmems_filename`).
+- JSON at `data/sites/palau.json` with all the fields listed above plus the fields `prepare_site_data` adds (`selected_uhslc_id`, `station`, `country`, `station_lon`, `station_lat`, `station_distance_km`, `cmems_path`, `cmems_filename`). See [assets/site_config_template.json](assets/site_config_template.json) for the **input** schema (the dict you construct before calling `prepare_site_data` -- the saved file has the extra derived fields added on top).
 - Cached UHSLC NetCDF at `data/sea_level/d<uhslc_id>.nc` (daily) and `data/sea_level/h<uhslc_id>.nc` (hourly), zero-padded to 3 digits.
 - Cached CMEMS NetCDF at `data/sea_level/cmems_L4_SSH_0.125deg_<start_year>_<end_year>.nc`.
 

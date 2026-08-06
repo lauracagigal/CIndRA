@@ -1,3 +1,8 @@
+---
+name: rankings
+description: Identify and contextualize the 10 highest and 10 lowest hourly sea-level events at a tide gauge, joined with the ENSO state at each event. Use when working on notebooks/historical/National/sea_level/d_sea_level_rankings.ipynb or answering questions about record-high or record-low sea-level events.
+---
+
 ## Skill: Top-10 Rankings (notebook `d_sea_level_rankings.ipynb`)
 
 ### Purpose

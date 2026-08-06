@@ -1,3 +1,8 @@
+---
+name: consecutive-dry-days
+description: Compute annual dry-day counts and maximum/mean consecutive dry-day spells (a drought indicator) using the 1 mm threshold. Use when working on notebooks/historical/National/rainfall/b_Consecutive_dry_days.ipynb or answering questions about dry spells, drought, or consecutive dry days.
+---
+
 ## Skill: Consecutive Dry Days (notebook `notebooks/historical/National/rainfall/b_Consecutive_dry_days.ipynb`)
 
 ### Purpose
@@ -32,7 +37,7 @@ Month/year completeness filtering is applied **once**, in the shared `00_site_se
 6. **Summary table**: `table_rain_22` via `style_matrix`. Persist via `persist_dry_days_outputs`.
 
 ### Function discovery
-Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions_api.md`.
+Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions-api/SKILL.md`.
 
 ### Persisted figures
 - `F6a_Number_dry.png` — annual number of dry days (< 1 mm).

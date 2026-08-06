@@ -1,6 +1,13 @@
+---
+name: output-conventions
+description: Defines the site-tag, filename, and folder conventions for every persisted figure/table/JSON across rainfall, air-temperature, and sea-level notebooks, so multi-site outputs never collide. Use whenever saving a new figure, table, or metrics file, or when asked where a given output file lives.
+---
+
 ## Skill: Output Conventions
 
 All persisted artifacts (figures, tables, structured results) MUST follow this convention so multi-site analyses never collide. The site-tag/filename scheme applies to **all three** domains (rainfall, air-temperature, sea level); the folder layout differs slightly for sea level (see below).
+
+See [assets/example_output_tree.txt](assets/example_output_tree.txt) for a real, already-run example of every folder/filename pattern below side by side (rainfall+temperature site, sea-level site, and regional).
 
 ### Site tag
 
@@ -35,7 +42,7 @@ outputs/<site_tag>/         # figures AND tables together, no figures/tables spl
 ```
 
 - `site_output_dir = Path('../../../../outputs') / build_site_tag(site_name, site_lon, site_lat)`, created with `site_output_dir.mkdir(parents=True, exist_ok=True)`.
-- Site config (input): `data/sites/palau.json` (fixed filename, see `assistant/skills/sea_level_site_setup.md`).
+- Site config (input): `data/sites/palau.json` (fixed filename, see `assistant/skills/sea-level-site-setup/SKILL.md`).
 - UHSLC/CMEMS cache (input): `data/sea_level/d<uhslc_id>.nc`, `h<uhslc_id>.nc`, `cmems_L4_SSH_0.125deg_<start_year>_<end_year>.nc`.
 
 ### Canonical figure filenames — rainfall (`notebooks/historical/National/rainfall/`)

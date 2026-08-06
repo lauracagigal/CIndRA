@@ -1,3 +1,8 @@
+---
+name: site-setup
+description: Set up a new rainfall/air-temperature analysis site by picking a GHCN-Daily station, downloading and cleaning daily TMIN/TMAX/PRCP, and saving a reusable site config JSON. Use when starting analysis for a new Pacific Island site, or before running any National rainfall or air-temperature notebook (notebooks/historical/National/00_site_setup.ipynb).
+---
+
 ## Skill: Site Setup (notebook `notebooks/historical/National/00_site_setup.ipynb`)
 
 ### Purpose
@@ -33,7 +38,7 @@ This notebook is the **shared entry point** for both the rainfall and air-temper
 Before asking the user to pick a `country`/station, or before setting `site_key` in a downstream notebook, call `list_available_sites(sites_dir)` (from `air_temp.py` or `rainfall.py` — identical implementation in both) and show the result. It returns one row per existing `data/sites/*.json` with `site_key` (the value to pass to `site_config_filename()`), `site_name`, `country`, `ghcn_station_id`, `ghcn_station_name`, `vars_interest`. This lets the user reuse an already-downloaded site instead of re-running Step 5–9.
 
 ### Output contract
-- JSON at `data/sites/<site_key>.json` (filename = `site_config_filename(site_name)`, a lowercase/underscore slug of `site_name`) with: `site_name`, `site_lon`, `site_lat`, `country`, `ghcn_station_id`, `ghcn_station_name`, `vars_interest`, `reference_period_start`, `reference_period_end`, `completeness_threshold`.
+- JSON at `data/sites/<site_key>.json` (filename = `site_config_filename(site_name)`, a lowercase/underscore slug of `site_name`) with: `site_name`, `site_lon`, `site_lat`, `country`, `ghcn_station_id`, `ghcn_station_name`, `vars_interest`, `reference_period_start`, `reference_period_end`, `completeness_threshold`. See [assets/site_config_template.json](assets/site_config_template.json) for the exact schema with placeholder values.
 - Cleaned pickle at `data/air_temp/GHCN_<ghcn_station_id>.pkl` (if `TMIN`/`TMAX` requested and available) — DataFrame indexed by `DatetimeIndex`, columns `TMIN`, `TMAX`, `TMEAN`, `diff`, all in **°C**.
 - Cleaned pickle at `data/rainfall/GHCN_<ghcn_station_id>.pkl` (if `PRCP` requested and available) — DataFrame indexed by `DatetimeIndex`, column `PRCP` in **mm**.
 

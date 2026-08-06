@@ -1,3 +1,8 @@
+---
+name: total-rainfall
+description: Compute annual accumulated rainfall, daily/seasonal rainfall, top-10 wettest years, and ENSO-modulated rainfall anomalies for a site. Use when working on notebooks/historical/National/rainfall/a_Total_rainfall.ipynb or answering questions about total or accumulated rainfall trends.
+---
+
 ## Skill: Total Rainfall (notebook `notebooks/historical/National/rainfall/a_Total_rainfall.ipynb`)
 
 ### Purpose
@@ -38,7 +43,7 @@ Quantify annual accumulated precipitation, daily extremes, seasonal totals, and 
 9. **Summary table**: `table_rain_21` via `style_matrix`. Persist via `persist_total_rainfall_outputs`.
 
 ### Function discovery
-Before writing custom matplotlib for bar charts, import `plot_bar_probs` from `ind_setup.plotting`. If missing, search locally or clone `https://github.com/lauracagigal/indicators_setup` into `external/indicators_setup` and add to `sys.path`. See `functions_api.md`.
+Before writing custom matplotlib for bar charts, import `plot_bar_probs` from `ind_setup.plotting`. If missing, search locally or clone `https://github.com/lauracagigal/indicators_setup` into `external/indicators_setup` and add to `sys.path`. See `functions-api/SKILL.md`.
 
 ### Persisted figures (under `outputs/figures/<site_tag>/`)
 - `F5_Rain_accum.png` — accumulated annual rainfall styled with `plot_bar_probs`.

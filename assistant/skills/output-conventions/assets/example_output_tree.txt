@@ -1,0 +1,158 @@
+Real example output tree, captured from three already-run sites in this repo:
+  - Atmosphere (rainfall + air temperature) site: palau_psw00040309_lat7p337_lon134p477
+  - Sea level site:                              palau_lat7p340_lon134p620
+  - Regional (rainfall + air temperature):       region_key = "pacific"
+
+Use this as a quick visual reference for "what does a fully-run site actually
+write to disk", grouped by the notebook that produced each file. Filenames are
+real, not fabricated -- but a real repo will only have the sites/notebooks
+that have actually been run.
+
+outputs/
+├── figures/
+│   └── palau_psw00040309_lat7p337_lon134p477/          # rainfall + air-temperature figures, same folder
+│       │
+│       │  # --- National/air_temperature/a_mean_temperature.ipynb ---
+│       ├── F2_ST_Mean_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F2_ST_Annomalies_top10_palau_psw00040309_lat7p337_lon134p477.png
+│       │
+│       │  # --- National/air_temperature/b_min_max_temperature.ipynb ---
+│       ├── F3_ST_min_palau_psw00040309_lat7p337_lon134p477.html
+│       ├── F3_ST_max_palau_psw00040309_lat7p337_lon134p477.html
+│       ├── F3_ST_min_max_palau_psw00040309_lat7p337_lon134p477.html
+│       ├── F3_ST_min_max_palau_psw00040309_lat7p337_lon134p477.png
+│       │
+│       │  # --- National/air_temperature/c_hot_cold_days.ipynb ---
+│       ├── F4_ST_hot_cold_palau_psw00040309_lat7p337_lon134p477.html
+│       ├── F4_ST_hot_cold_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F4_ST_hot_cold_percentiles_palau_psw00040309_lat7p337_lon134p477.html
+│       ├── F4_ST_hot_cold_percentiles_palau_psw00040309_lat7p337_lon134p477.png
+│       │
+│       │  # --- National/rainfall/a_Total_rainfall.ipynb ---
+│       ├── F5_Rain_daily_palau_psw00040309_lat7p337_lon134p477.html
+│       ├── F5_Rain_annual_max_palau_psw00040309_lat7p337_lon134p477.html
+│       ├── F5_Rain_accum_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F5_Rain_anom_top10_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F5_Rain_mean_ONI_daily_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F5_Rain_mean_ONI_accum_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F6a_Rain_dry_season_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F6a_Rain_wet_season_palau_psw00040309_lat7p337_lon134p477.png
+│       │
+│       │  # --- National/rainfall/b_Consecutive_dry_days.ipynb ---
+│       ├── F6a_Wet_dry_distribution_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F6a_Number_dry_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F6b_Mean_consecutive_dry_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F6b_Consecutive_dry_palau_psw00040309_lat7p337_lon134p477.png
+│       │
+│       │  # --- National/rainfall/c_Heavy_rainfall.ipynb ---
+│       ├── F7a_Wet_dry_distribution_palau_psw00040309_lat7p337_lon134p477.png
+│       ├── F7a_Wet_days_1mm_palau_psw00040309_lat7p337_lon134p477.png
+│       └── F7b_Wet_days_95p_palau_psw00040309_lat7p337_lon134p477.png
+│   │
+│   └── regional_pacific/                               # region_key = "pacific"
+│       │  # --- Regional/rainfall/regional_indicators.ipynb ---
+│       ├── R_regional_total_annual_mm_trend_pacific.png
+│       ├── R_regional_total_annual_mm_mean_era5_pacific.png
+│       ├── R_regional_total_annual_mm_trend_era5_pacific.png
+│       ├── R_regional_dry_days_trend_pacific.png
+│       ├── R_regional_wet_days_trend_pacific.png
+│       ├── R_regional_max_consecutive_dry_days_trend_pacific.png
+│       ├── R_regional_mean_consecutive_dry_days_trend_pacific.png
+│       ├── R_regional_heavy_days_trend_pacific.png
+│       │
+│       │  # --- Regional/air_temperature/regional_indicators.ipynb ---
+│       ├── T_regional_tmean_annual_trend_pacific.png
+│       ├── T_regional_tmean_annual_mean_era5_pacific.png
+│       ├── T_regional_tmean_annual_trend_era5_pacific.png
+│       ├── T_regional_tmin_annual_trend_pacific.png
+│       ├── T_regional_tmax_annual_trend_pacific.png
+│       ├── T_regional_diff_annual_trend_pacific.png
+│       ├── T_regional_hot_days_pct_trend_pacific.png
+│       ├── T_regional_cold_nights_pct_trend_pacific.png
+│       ├── T_regional_mean_anomaly_timeseries_pacific.png
+│       └── T_regional_mean_anomaly_timeseries_era5_pacific.png
+│
+├── tables/
+│   └── palau_psw00040309_lat7p337_lon134p477/
+│       │  # --- a_mean_temperature.ipynb ---
+│       ├── T_mean_annual_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_mean_summary_table_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_mean_top10_warmest_years_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_mean_ONI_annual_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── ENSO_temperature_summary_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_mean_summary_metrics_palau_psw00040309_lat7p337_lon134p477.json
+│       │
+│       │  # --- b_min_max_temperature.ipynb ---
+│       ├── T_minmax_annual_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_minmax_summary_table_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_minmax_summary_metrics_palau_psw00040309_lat7p337_lon134p477.json
+│       │
+│       │  # --- c_hot_cold_days.ipynb ---
+│       ├── T_hot_days_per_year_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_cold_nights_per_year_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_hot_cold_summary_table_etccdi_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_hot_cold_summary_table_percentiles_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── T_hot_cold_summary_metrics_palau_psw00040309_lat7p337_lon134p477.json
+│       │
+│       │  # --- a_Total_rainfall.ipynb ---
+│       ├── R_mean_annual_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_mean_summary_table_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_top10_wettest_years_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_dry_season_annual_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_wet_season_annual_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_ONI_annual_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_mean_summary_metrics_palau_psw00040309_lat7p337_lon134p477.json
+│       │
+│       │  # --- b_Consecutive_dry_days.ipynb ---
+│       ├── R_dry_days_per_year_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_consecutive_dry_max_per_year_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_consecutive_dry_mean_per_year_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_dry_summary_table_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_dry_summary_metrics_palau_psw00040309_lat7p337_lon134p477.json
+│       │
+│       │  # --- c_Heavy_rainfall.ipynb ---
+│       ├── R_wet_days_per_year_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_heavy_days_per_year_palau_psw00040309_lat7p337_lon134p477.csv
+│       ├── R_heavy_summary_table_palau_psw00040309_lat7p337_lon134p477.csv
+│       └── R_heavy_summary_metrics_palau_psw00040309_lat7p337_lon134p477.json
+│
+└── palau_lat7p340_lon134p620/                          # sea level: no figures/tables split, everything in one folder
+    │  # --- a_sea_level_trend.ipynb ---
+    ├── F10_SeaLevel_map_palau_lat7p340_lon134p620.png
+    ├── F10_SeaLevel_trends_palau_lat7p340_lon134p620.png
+    ├── SL_magnitude_map_palau_lat7p340_lon134p620.png
+    ├── SL_magnitude_timeseries_palau_lat7p340_lon134p620.png
+    ├── SL_magnitude_results_palau_lat7p340_lon134p620.csv
+    ├── SL_trend_summary_metrics_palau_lat7p340_lon134p620.json
+    ├── SL_ONI_scatter_palau_lat7p340_lon134p620.png
+    ├── ENSO_SL_influence_summary_palau_lat7p340_lon134p620.csv
+    │
+    │  # --- b_sea_level_anomaly.ipynb ---
+    ├── 1_2_2_SL_anomaly_annual_map_decadal_palau_lat7p340_lon134p620.png
+    ├── SL_anomaly_yearly_mean_palau_lat7p340_lon134p620.csv
+    ├── SL_anomaly_monthly_series_palau_lat7p340_lon134p620.csv
+    ├── SL_anomaly_summary_metrics_palau_lat7p340_lon134p620.json
+    │
+    │  # --- c_sea_level_ff.ipynb ---
+    ├── F11_Minor_flood_matrix_palau_lat7p340_lon134p620.png
+    ├── SL_FloodFrequency_threshold_counts_days_palau_lat7p340_lon134p620.png
+    ├── SL_FloodFrequency_threshold_counts_heatmap_palau_lat7p340_lon134p620.png
+    ├── SL_flood_days_per_year_palau_lat7p340_lon134p620.csv
+    ├── SL_flood_hours_per_year_palau_lat7p340_lon134p620.csv
+    ├── SL_flood_frequency_summary_metrics_palau_lat7p340_lon134p620.json
+    │
+    │  # --- d_sea_level_rankings.ipynb ---
+    ├── SL_rankings_Malakal_palau_lat7p340_lon134p620.png
+    ├── SL_top_10_table_palau_lat7p340_lon134p620.csv
+    └── SL_top_10_table_palau_lat7p340_lon134p620.json
+
+Key pattern differences to notice:
+  - Rainfall/air-temperature: figures and tables/JSON are split into
+    outputs/figures/<site_tag>/ and outputs/tables/<site_tag>/, and every
+    filename is suffixed with _<site_tag> via build_output_filename().
+  - Sea level: everything (PNG, HTML, CSV, JSON) lands directly in
+    outputs/<site_tag>/, and filenames are NOT suffixed with _<site_tag>
+    (no build_output_filename() call) -- the per-site folder is what
+    prevents collisions instead.
+  - Regional: no per-site folder at all -- one shared outputs/figures/regional_<region_key>/
+    folder, filenames suffixed with _<region_key> instead of a site tag.

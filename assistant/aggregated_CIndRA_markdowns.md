@@ -1,6 +1,6 @@
 # CIndRA — Aggregated Training Material
 
-Single-file concatenation of all CIndRA assistant markdowns. Generated on 2026-07-29. Source files live in `assistant/` and `assistant/skills/`; regenerate with `python assistant/build_aggregated_CIndRA.py`.
+Single-file concatenation of all CIndRA assistant markdowns. Generated on 2026-07-31. Source files live in `assistant/` and `assistant/skills/`; regenerate with `python assistant/build_aggregated_CIndRA.py`.
 
 ---
 
@@ -46,7 +46,7 @@ For **rainfall and air-temperature** plotting/styling, look for and use function
 
 For **sea level**, plotting/styling is entirely **repository-local** — do not look for it in `indicators_setup`. Every sea-level figure comes from `functions/sea_level_plotting.py` (maps, trend timeseries, anomaly maps, flood-frequency panels, rankings figures); every sea-level calculation comes from `functions/sea_level.py`. If a new sea-level chart type is needed, add it to `sea_level_plotting.py` first.
 
-See `assistant/skills/functions_api.md` for the full function-discovery workflow and import list.
+See `assistant/skills/functions-api/SKILL.md` for the full function-discovery workflow and import list.
 
 ---
 
@@ -80,21 +80,21 @@ For annual mean temperature, use the same pattern with `y` in °C and `y_label` 
 
 If a p-value or additional regression statistics are needed and not returned by the plotting function, compute those separately only for reporting, while preserving the repository-generated figure style.
 
-Sea level has no `plot_bar_probs` equivalent — use the dedicated helpers in `sea_level_plotting.py` (see `assistant/skills/trend_analysis.md`, `anomaly_analysis.md`, `flood_frequency.md`, `rankings.md`).
+Sea level has no `plot_bar_probs` equivalent — use the dedicated helpers in `sea_level_plotting.py` (see `assistant/skills/trend-analysis/SKILL.md`, `anomaly-analysis/SKILL.md`, `flood-frequency/SKILL.md`, `rankings/SKILL.md`).
 
 ---
 
 ## CIndRA Repository Layout (PICCM_atmosphere_sealevel)
 
 - Canonical repository: **[PICCM_atmosphere_sealevel](https://github.com/lauracagigal/PICCM_atmosphere_sealevel)** (merged from the former `PICCM_Atmosphere` and `PICCM_SeaLevel` repositories). All paths below are relative to that repository root.
-- `notebooks/historical/National/00_site_setup.ipynb` — **shared** site setup for rainfall and air temperature, one level above `air_temperature/` and `rainfall/` (not inside either). Station choice, GHCN download and completeness filtering for both `TMIN`/`TMAX` and `PRCP`; produces one `data/sites/<site_key>.json` plus `data/rainfall/GHCN_<ghcn_station_id>.pkl` and/or `data/air_temp/GHCN_<ghcn_station_id>.pkl`, whichever the station reports. See `assistant/skills/site_setup.md`.
+- `notebooks/historical/National/00_site_setup.ipynb` — **shared** site setup for rainfall and air temperature, one level above `air_temperature/` and `rainfall/` (not inside either). Station choice, GHCN download and completeness filtering for both `TMIN`/`TMAX` and `PRCP`; produces one `data/sites/<site_key>.json` plus `data/rainfall/GHCN_<ghcn_station_id>.pkl` and/or `data/air_temp/GHCN_<ghcn_station_id>.pkl`, whichever the station reports. See `assistant/skills/site-setup/SKILL.md`.
 - `notebooks/historical/National/rainfall/a_Total_rainfall.ipynb` — total rainfall, anomalies, seasonal rainfall, ENSO modulation.
 - `notebooks/historical/National/rainfall/b_Consecutive_dry_days.ipynb` — dry-day counts and consecutive dry spells.
 - `notebooks/historical/National/rainfall/c_Heavy_rainfall.ipynb` — wet-day counts and heavy-rainfall days.
 - `notebooks/historical/National/air_temperature/a_mean_temperature.ipynb` — annual mean temperature, trend, anomaly vs reference period, ENSO modulation (ONI).
 - `notebooks/historical/National/air_temperature/b_min_max_temperature.ipynb` — annual minimum/maximum temperature and diurnal range (`diff = TMAX − TMIN`).
 - `notebooks/historical/National/air_temperature/c_hot_cold_days.ipynb` — hot days (TX90p) and cold nights (TN10p) using 1961–1990 percentile thresholds, plus simple percentile counts.
-- `notebooks/historical/National/sea_level/0_site_setup.ipynb` — sea level's own site setup (not shared with rainfall/air-temperature). Currently a single hardcoded Palau site; see `assistant/skills/sea_level_site_setup.md`.
+- `notebooks/historical/National/sea_level/0_site_setup.ipynb` — sea level's own site setup (not shared with rainfall/air-temperature). Currently a single hardcoded Palau site; see `assistant/skills/sea-level-site-setup/SKILL.md`.
 - `notebooks/historical/National/sea_level/a_sea_level_trend.ipynb` — absolute (altimetry) vs relative (tide gauge) sea-level trends and ENSO sensitivity.
 - `notebooks/historical/National/sea_level/b_sea_level_anomaly.ipynb` — annual/monthly sea-level anomalies and decadal anomaly maps.
 - `notebooks/historical/National/sea_level/c_sea_level_ff.ipynb` — minor flood-day/flood-hour frequency and ENSO context.
@@ -117,7 +117,7 @@ Sea level has no `plot_bar_probs` equivalent — use the dedicated helpers in `s
 - `data/air_temp/` — cached cleaned GHCN temperature pickles.
 - `data/sea_level/` — cached UHSLC (`d<id>.nc`/`h<id>.nc`) and CMEMS (`cmems_L4_SSH_*.nc`) files.
 - `data/regional/` — multi-station pickles and summaries from `00_regional_setup.ipynb`, plus `data/regional/era5_cache/` for cached ERA5 fields.
-- `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` — per-site generated figures and tables (rainfall, air-temperature, and sea-level alike; sea level uses `outputs/<site_tag>/` directly rather than the `figures/`/`tables/` split — see `assistant/skills/output_conventions.md`).
+- `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` — per-site generated figures and tables (rainfall, air-temperature, and sea-level alike; sea level uses `outputs/<site_tag>/` directly rather than the `figures/`/`tables/` split — see `assistant/skills/output-conventions/SKILL.md`).
 - `outputs/figures/regional_pacific/` — regional Pacific-wide maps.
 
 ---
@@ -156,18 +156,18 @@ Sea level has no `plot_bar_probs` equivalent — use the dedicated helpers in `s
 The Regional workflow scans **many** stations across the Pacific EEZ area at once (as opposed to the National workflow's one interactively-picked site) and builds Pacific-wide maps/time series. Coverage is currently uneven across the three domains — documented here domain-by-domain, at equal depth, precisely so the sea-level gap stays visible instead of being glossed over:
 
 ### Regional rainfall — built
-- Setup: `Regional/00_regional_setup.ipynb` (shared with air temperature — see next section). See `assistant/skills/regional_setup.md`.
-- Indicators/maps: `Regional/rainfall/regional_indicators.ipynb` reproduces the National `a_Total_rainfall.ipynb`/`b_Consecutive_dry_days.ipynb`/`c_Heavy_rainfall.ipynb` formulas per station (`compute_regional_rainfall_indicators` in `functions/rainfall_regional.py`), builds one Pacific EEZ trend map per indicator (`plot_annual_regional_map`), plus an ERA5-background mean/trend map for `total_annual_mm` only. See `assistant/skills/regional_rainfall.md`.
+- Setup: `Regional/00_regional_setup.ipynb` (shared with air temperature — see next section). See `assistant/skills/regional-setup/SKILL.md`.
+- Indicators/maps: `Regional/rainfall/regional_indicators.ipynb` reproduces the National `a_Total_rainfall.ipynb`/`b_Consecutive_dry_days.ipynb`/`c_Heavy_rainfall.ipynb` formulas per station (`compute_regional_rainfall_indicators` in `functions/rainfall_regional.py`), builds one Pacific EEZ trend map per indicator (`plot_annual_regional_map`), plus an ERA5-background mean/trend map for `total_annual_mm` only. See `assistant/skills/regional-rainfall/SKILL.md`.
 
 ### Regional air temperature — built
-- Setup: `Regional/00_regional_setup.ipynb` (same notebook as rainfall — it downloads both `TMIN`/`TMAX` and `PRCP` per station in one pass). See `assistant/skills/regional_setup.md`.
-- Indicators/maps: `Regional/air_temperature/regional_indicators.ipynb` reproduces the National `a_mean_temperature.ipynb`/`b_min_max_temperature.ipynb`/`c_hot_cold_days.ipynb` formulas per station (`compute_regional_temperature_indicators` in `functions/rainfall_regional.py`), a regional-mean anomaly time series (station-average and, separately, an ERA5 EEZ area-weighted version), one trend map per indicator, plus an ERA5-background mean/trend map for `tmean_annual` only. See `assistant/skills/regional_temperature.md`.
+- Setup: `Regional/00_regional_setup.ipynb` (same notebook as rainfall — it downloads both `TMIN`/`TMAX` and `PRCP` per station in one pass). See `assistant/skills/regional-setup/SKILL.md`.
+- Indicators/maps: `Regional/air_temperature/regional_indicators.ipynb` reproduces the National `a_mean_temperature.ipynb`/`b_min_max_temperature.ipynb`/`c_hot_cold_days.ipynb` formulas per station (`compute_regional_temperature_indicators` in `functions/rainfall_regional.py`), a regional-mean anomaly time series (station-average and, separately, an ERA5 EEZ area-weighted version), one trend map per indicator, plus an ERA5-background mean/trend map for `tmean_annual` only. See `assistant/skills/regional-temperature/SKILL.md`.
 
 ### Regional sea level — not built yet
 - No regional setup notebook exists for sea level (no multi-station UHSLC scan analogous to `Regional/00_regional_setup.ipynb`'s GHCN scan).
 - `notebooks/historical/Regional/regional_plots.ipynb` is an empty placeholder (0 bytes) — not valid JSON, no cells.
 - `functions/cindra_regional_plotting_helpers.py` holds two **draft/experimental** plotting helpers prepared for this workflow (`plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview`) but neither is imported by any notebook.
-- Do not claim a regional sea-level map or indicator exists, and do not improvise one from the National single-site sea-level helpers as if they already generalized to many stations. See `assistant/skills/regional_sea_level.md` for exactly what exists to build this from and what's still missing.
+- Do not claim a regional sea-level map or indicator exists, and do not improvise one from the National single-site sea-level helpers as if they already generalized to many stations. See `assistant/skills/regional-sea-level/SKILL.md` for exactly what exists to build this from and what's still missing.
 
 ### Shared conventions (rainfall/air-temperature; would apply to sea level once built)
 - `region_key` (default `"pacific"`) names every regional output file/folder.
@@ -179,7 +179,7 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 ## CIndRA Output Naming Convention
 
 - Build the site tag via `build_site_tag(site_name, site_lon, site_lat)`. Example: `palau_PSW00040309` at 7.3367°N, 134.4769°E → `palau_psw00040309_lat7p337_lon134p477`.
-- Figures go to `outputs/figures/<site_tag>/` via `build_site_figures_dir(Path('../../../../outputs'), ...)` (rainfall/air-temperature) or the equivalent sea-level output directory (see `assistant/skills/output_conventions.md` for the exact sea-level path, which is not split into `figures/`/`tables/`).
+- Figures go to `outputs/figures/<site_tag>/` via `build_site_figures_dir(Path('../../../../outputs'), ...)` (rainfall/air-temperature) or the equivalent sea-level output directory (see `assistant/skills/output-conventions/SKILL.md` for the exact sea-level path, which is not split into `figures/`/`tables/`).
 - Tables go to `outputs/tables/<site_tag>/` via `build_site_tables_dir` / `persist_*_outputs` (rainfall/air-temperature).
 - Canonical filenames — **rainfall** (`R_*` tables/JSON, `F5`/`F6`/`F7` figures), in `notebooks/historical/National/rainfall/`:
   - `a_Total_rainfall.ipynb`: `F5_Rain_accum.png`, `F5_Rain_anom_top10.png`, `F5_Rain_mean_ONI_daily.png`, `F5_Rain_mean_ONI_accum.png`, `F6a_Rain_dry_season.png`, `F6a_Rain_wet_season.png`.
@@ -270,20 +270,20 @@ When plotting: (1) load the cleaned pickle; (2) compute normalised annual accumu
 ### Sea level `a_sea_level_trend.ipynb` — Trend analysis
 - Altimetry (absolute) trend from CMEMS subset to the nearest grid point; tide-gauge (relative) trend from UHSLC after datum adjustment. Both via `process_trend_with_nan`. Report in **mm/yr** and **Δ cm** over the window.
 - ENSO sensitivity of the tide-gauge series vs ONI via `plot_enso_scatter` → slope (m/°C), r, p.
-- See `assistant/skills/trend_analysis.md` for the full workflow.
+- See `assistant/skills/trend-analysis/SKILL.md` for the full workflow.
 
 ### Sea level `b_sea_level_anomaly.ipynb` — Anomaly analysis
 - Tide-gauge series detrended (`process_trend_single_series`), monthly climatology subtracted to get anomalies. "Storm year" convention: May–April, labeled by the starting year.
 - Decadal SLA composite maps and annual/monthly anomaly figures with ENSO shading, all via `sea_level_plotting`.
-- See `assistant/skills/anomaly_analysis.md`.
+- See `assistant/skills/anomaly-analysis/SKILL.md`.
 
 ### Sea level `c_sea_level_ff.ipynb` — Flood frequency
 - Minor flood day/hour: hourly water level ≥ 30 cm above MHHW (referenced via `get_uhslc_datum(uhslc_id, 'MHHW')`). Storm-year aggregation, ENSO-joined via `detect_enso_events` + `get_dominant_enso`.
-- See `assistant/skills/flood_frequency.md`.
+- See `assistant/skills/flood-frequency/SKILL.md`.
 
 ### Sea level `d_sea_level_rankings.ipynb` — Rankings
 - Top-10 highest/lowest hourly events at least 3 days apart (`get_top_ten`), joined with the nearest-month ONI state.
-- See `assistant/skills/rankings.md`.
+- See `assistant/skills/rankings/SKILL.md`.
 
 ### Trends
 - Rainfall/temperature: use `plot_bar_probs` from `ind_setup.plotting` (rainfall, and annual-mean temperature bar plots); it returns `(fig, ax, trend)` when `return_trend=True`. Use `plot_timeseries_interactive` from `ind_setup.plotting_int` (TMIN/TMAX/diurnal range, hot days/cold nights) — returns `(fig, TRENDS)` for multi-series plots. Report rates in **mm/decade** or **days/decade** (rainfall) or **°C/decade** (temperature) — slope × 10. State the analysis window and p-value when available.
@@ -357,7 +357,7 @@ When plotting: (1) load the cleaned pickle; (2) compute normalised annual accumu
 - `ind_setup.tables`: `style_matrix`, `table_rain_21`, `table_rain_22`, `table_rain_23`, `table_temp_11`, `table_temp_12`, `table_temp_13`, `table_temp_13b`
 - `ind_setup.colors`: `get_df_col`
 
-See `assistant/skills/functions_api.md` for full signatures and the function-discovery workflow.
+See `assistant/skills/functions-api/SKILL.md` for full signatures and the function-discovery workflow.
 
 ---
 
@@ -388,7 +388,7 @@ Examples:
 
 > Altimetry trend at Malakal, Palau (CMEMS L4, 1993–2022): `+4.6 mm/yr` (Δ +13.3 cm). Tide-gauge (UHSLC 007) trend over the same window: `+3.1 mm/yr` (Δ +9.0 cm).
 
-- Reference saved figures/tables by filename under `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` (rainfall/air-temperature), or the sea-level output directory (`assistant/skills/output_conventions.md`).
+- Reference saved figures/tables by filename under `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` (rainfall/air-temperature), or the sea-level output directory (`assistant/skills/output-conventions/SKILL.md`).
 - Default reporting language: English. Mirror the user's language when they write in another language.
 
 ---
@@ -411,29 +411,34 @@ Examples:
 
 For step-by-step notebook workflows, see:
 
-- `assistant/skills/site_setup.md` — `notebooks/historical/National/00_site_setup.ipynb` (shared by rainfall and air temperature)
-- `assistant/skills/total_rainfall.md` — `rainfall/a_Total_rainfall.ipynb`
-- `assistant/skills/consecutive_dry_days.md` — `rainfall/b_Consecutive_dry_days.ipynb`
-- `assistant/skills/heavy_rainfall.md` — `rainfall/c_Heavy_rainfall.ipynb`
-- `assistant/skills/mean_temperature.md` — `air_temperature/a_mean_temperature.ipynb`
-- `assistant/skills/min_max_temperature.md` — `air_temperature/b_min_max_temperature.ipynb`
-- `assistant/skills/hot_cold_days.md` — `air_temperature/c_hot_cold_days.ipynb`
-- `assistant/skills/sea_level_site_setup.md` — `sea_level/0_site_setup.ipynb`
-- `assistant/skills/trend_analysis.md` — `sea_level/a_sea_level_trend.ipynb`
-- `assistant/skills/anomaly_analysis.md` — `sea_level/b_sea_level_anomaly.ipynb`
-- `assistant/skills/flood_frequency.md` — `sea_level/c_sea_level_ff.ipynb`
-- `assistant/skills/rankings.md` — `sea_level/d_sea_level_rankings.ipynb`
-- `assistant/skills/regional_setup.md` — `Regional/00_regional_setup.ipynb` (shared by regional rainfall and air temperature)
-- `assistant/skills/regional_rainfall.md` — `Regional/rainfall/regional_indicators.ipynb`
-- `assistant/skills/regional_temperature.md` — `Regional/air_temperature/regional_indicators.ipynb`
-- `assistant/skills/regional_sea_level.md` — documents what's missing for a regional sea-level workflow (none exists yet)
-- `assistant/skills/functions_api.md` — full function reference and discovery workflow
-- `assistant/skills/data_sources.md` — sources, units, citations
-- `assistant/skills/output_conventions.md` — figure names and folders
+- `assistant/skills/site-setup/SKILL.md` — `notebooks/historical/National/00_site_setup.ipynb` (shared by rainfall and air temperature)
+- `assistant/skills/total-rainfall/SKILL.md` — `rainfall/a_Total_rainfall.ipynb`
+- `assistant/skills/consecutive-dry-days/SKILL.md` — `rainfall/b_Consecutive_dry_days.ipynb`
+- `assistant/skills/heavy-rainfall/SKILL.md` — `rainfall/c_Heavy_rainfall.ipynb`
+- `assistant/skills/mean-temperature/SKILL.md` — `air_temperature/a_mean_temperature.ipynb`
+- `assistant/skills/min-max-temperature/SKILL.md` — `air_temperature/b_min_max_temperature.ipynb`
+- `assistant/skills/hot-cold-days/SKILL.md` — `air_temperature/c_hot_cold_days.ipynb`
+- `assistant/skills/sea-level-site-setup/SKILL.md` — `sea_level/0_site_setup.ipynb`
+- `assistant/skills/trend-analysis/SKILL.md` — `sea_level/a_sea_level_trend.ipynb`
+- `assistant/skills/anomaly-analysis/SKILL.md` — `sea_level/b_sea_level_anomaly.ipynb`
+- `assistant/skills/flood-frequency/SKILL.md` — `sea_level/c_sea_level_ff.ipynb`
+- `assistant/skills/rankings/SKILL.md` — `sea_level/d_sea_level_rankings.ipynb`
+- `assistant/skills/regional-setup/SKILL.md` — `Regional/00_regional_setup.ipynb` (shared by regional rainfall and air temperature)
+- `assistant/skills/regional-rainfall/SKILL.md` — `Regional/rainfall/regional_indicators.ipynb`
+- `assistant/skills/regional-temperature/SKILL.md` — `Regional/air_temperature/regional_indicators.ipynb`
+- `assistant/skills/regional-sea-level/SKILL.md` — documents what's missing for a regional sea-level workflow (none exists yet)
+- `assistant/skills/functions-api/SKILL.md` — full function reference and discovery workflow
+- `assistant/skills/data-sources/SKILL.md` — sources, units, citations
+- `assistant/skills/output-conventions/SKILL.md` — figure names and folders
 
 ---
 
-<!-- SOURCE: assistant/skills/site_setup.md -->
+<!-- SOURCE: assistant/skills/site-setup/SKILL.md -->
+
+---
+name: site-setup
+description: Set up a new rainfall/air-temperature analysis site by picking a GHCN-Daily station, downloading and cleaning daily TMIN/TMAX/PRCP, and saving a reusable site config JSON. Use when starting analysis for a new Pacific Island site, or before running any National rainfall or air-temperature notebook (notebooks/historical/National/00_site_setup.ipynb).
+---
 
 ## Skill: Site Setup (notebook `notebooks/historical/National/00_site_setup.ipynb`)
 
@@ -470,7 +475,7 @@ This notebook is the **shared entry point** for both the rainfall and air-temper
 Before asking the user to pick a `country`/station, or before setting `site_key` in a downstream notebook, call `list_available_sites(sites_dir)` (from `air_temp.py` or `rainfall.py` — identical implementation in both) and show the result. It returns one row per existing `data/sites/*.json` with `site_key` (the value to pass to `site_config_filename()`), `site_name`, `country`, `ghcn_station_id`, `ghcn_station_name`, `vars_interest`. This lets the user reuse an already-downloaded site instead of re-running Step 5–9.
 
 ### Output contract
-- JSON at `data/sites/<site_key>.json` (filename = `site_config_filename(site_name)`, a lowercase/underscore slug of `site_name`) with: `site_name`, `site_lon`, `site_lat`, `country`, `ghcn_station_id`, `ghcn_station_name`, `vars_interest`, `reference_period_start`, `reference_period_end`, `completeness_threshold`.
+- JSON at `data/sites/<site_key>.json` (filename = `site_config_filename(site_name)`, a lowercase/underscore slug of `site_name`) with: `site_name`, `site_lon`, `site_lat`, `country`, `ghcn_station_id`, `ghcn_station_name`, `vars_interest`, `reference_period_start`, `reference_period_end`, `completeness_threshold`. See [assets/site_config_template.json](assets/site_config_template.json) for the exact schema with placeholder values.
 - Cleaned pickle at `data/air_temp/GHCN_<ghcn_station_id>.pkl` (if `TMIN`/`TMAX` requested and available) — DataFrame indexed by `DatetimeIndex`, columns `TMIN`, `TMAX`, `TMEAN`, `diff`, all in **°C**.
 - Cleaned pickle at `data/rainfall/GHCN_<ghcn_station_id>.pkl` (if `PRCP` requested and available) — DataFrame indexed by `DatetimeIndex`, column `PRCP` in **mm**.
 
@@ -490,7 +495,12 @@ Before asking the user to pick a `country`/station, or before setting `site_key`
 
 ---
 
-<!-- SOURCE: assistant/skills/total_rainfall.md -->
+<!-- SOURCE: assistant/skills/total-rainfall/SKILL.md -->
+
+---
+name: total-rainfall
+description: Compute annual accumulated rainfall, daily/seasonal rainfall, top-10 wettest years, and ENSO-modulated rainfall anomalies for a site. Use when working on notebooks/historical/National/rainfall/a_Total_rainfall.ipynb or answering questions about total or accumulated rainfall trends.
+---
 
 ## Skill: Total Rainfall (notebook `notebooks/historical/National/rainfall/a_Total_rainfall.ipynb`)
 
@@ -532,7 +542,7 @@ Quantify annual accumulated precipitation, daily extremes, seasonal totals, and 
 9. **Summary table**: `table_rain_21` via `style_matrix`. Persist via `persist_total_rainfall_outputs`.
 
 ### Function discovery
-Before writing custom matplotlib for bar charts, import `plot_bar_probs` from `ind_setup.plotting`. If missing, search locally or clone `https://github.com/lauracagigal/indicators_setup` into `external/indicators_setup` and add to `sys.path`. See `functions_api.md`.
+Before writing custom matplotlib for bar charts, import `plot_bar_probs` from `ind_setup.plotting`. If missing, search locally or clone `https://github.com/lauracagigal/indicators_setup` into `external/indicators_setup` and add to `sys.path`. See `functions-api/SKILL.md`.
 
 ### Persisted figures (under `outputs/figures/<site_tag>/`)
 - `F5_Rain_accum.png` — accumulated annual rainfall styled with `plot_bar_probs`.
@@ -559,7 +569,12 @@ Always include: station ID and name, data source (GHCN-Daily), analysis window, 
 
 ---
 
-<!-- SOURCE: assistant/skills/consecutive_dry_days.md -->
+<!-- SOURCE: assistant/skills/consecutive-dry-days/SKILL.md -->
+
+---
+name: consecutive-dry-days
+description: Compute annual dry-day counts and maximum/mean consecutive dry-day spells (a drought indicator) using the 1 mm threshold. Use when working on notebooks/historical/National/rainfall/b_Consecutive_dry_days.ipynb or answering questions about dry spells, drought, or consecutive dry days.
+---
 
 ## Skill: Consecutive Dry Days (notebook `notebooks/historical/National/rainfall/b_Consecutive_dry_days.ipynb`)
 
@@ -595,7 +610,7 @@ Month/year completeness filtering is applied **once**, in the shared `00_site_se
 6. **Summary table**: `table_rain_22` via `style_matrix`. Persist via `persist_dry_days_outputs`.
 
 ### Function discovery
-Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions_api.md`.
+Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions-api/SKILL.md`.
 
 ### Persisted figures
 - `F6a_Number_dry.png` — annual number of dry days (< 1 mm).
@@ -615,7 +630,12 @@ Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Imp
 
 ---
 
-<!-- SOURCE: assistant/skills/heavy_rainfall.md -->
+<!-- SOURCE: assistant/skills/heavy-rainfall/SKILL.md -->
+
+---
+name: heavy-rainfall
+description: Compute annual wet-day counts (>=1 mm) and heavy-rainfall day counts (above the station's own 95th percentile). Use when working on notebooks/historical/National/rainfall/c_Heavy_rainfall.ipynb or answering questions about wet days or extreme/heavy rainfall.
+---
 
 ## Skill: Heavy Rainfall (notebook `notebooks/historical/National/rainfall/c_Heavy_rainfall.ipynb`)
 
@@ -646,7 +666,7 @@ Month/year completeness filtering is applied **once**, in the shared `00_site_se
 5. **Summary table**: `table_rain_23` via `style_matrix`. Persist via `persist_heavy_rainfall_outputs`.
 
 ### Function discovery
-Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions_api.md`.
+Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions-api/SKILL.md`.
 
 ### Persisted figures
 - `F7a_Wet_days_1mm.png` — annual wet-day count (> 1 mm).
@@ -665,7 +685,12 @@ Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Imp
 
 ---
 
-<!-- SOURCE: assistant/skills/mean_temperature.md -->
+<!-- SOURCE: assistant/skills/mean-temperature/SKILL.md -->
+
+---
+name: mean-temperature
+description: Compute annual mean surface temperature trend, anomaly versus the 1961-1990 reference period, top-10 warmest years, and ENSO sensitivity. Use when working on notebooks/historical/National/air_temperature/a_mean_temperature.ipynb or answering questions about mean or average temperature trends.
+---
 
 ## Skill: Mean Temperature (notebook `notebooks/historical/National/air_temperature/a_mean_temperature.ipynb`)
 
@@ -714,7 +739,12 @@ Quantify the trend and reference-period anomaly of the annual mean surface tempe
 
 ---
 
-<!-- SOURCE: assistant/skills/min_max_temperature.md -->
+<!-- SOURCE: assistant/skills/min-max-temperature/SKILL.md -->
+
+---
+name: min-max-temperature
+description: Compute annual minimum and maximum temperature trends and the diurnal temperature range (TMAX minus TMIN). Use when working on notebooks/historical/National/air_temperature/b_min_max_temperature.ipynb or answering questions about TMIN/TMAX trends or diurnal range.
+---
 
 ## Skill: Min / Max Temperature (notebook `notebooks/historical/National/air_temperature/b_min_max_temperature.ipynb`)
 
@@ -758,7 +788,12 @@ Quantify and visualize the annual minimum (`TMIN`) and maximum (`TMAX`) temperat
 
 ---
 
-<!-- SOURCE: assistant/skills/hot_cold_days.md -->
+<!-- SOURCE: assistant/skills/hot-cold-days/SKILL.md -->
+
+---
+name: hot-cold-days
+description: Compute hot-day (TX90p) and cold-night (TN10p) ETCCDI exceedance counts plus a simpler fixed-percentile variant. Use when working on notebooks/historical/National/air_temperature/c_hot_cold_days.ipynb or answering questions about extreme heat/cold days, TX90p, or TN10p.
+---
 
 ## Skill: Hot Days & Cold Nights (notebook `notebooks/historical/National/air_temperature/c_hot_cold_days.ipynb`)
 
@@ -824,7 +859,12 @@ Quantify the annual count and percentage anomaly of **hot days** (TX90p — `TMA
 
 ---
 
-<!-- SOURCE: assistant/skills/sea_level_site_setup.md -->
+<!-- SOURCE: assistant/skills/sea-level-site-setup/SKILL.md -->
+
+---
+name: sea-level-site-setup
+description: Set up the sea-level analysis site (currently a single hardcoded Palau site) by resolving the UHSLC tide-gauge station, pre-downloading/caching UHSLC and CMEMS data, and saving the site config JSON. Use when starting sea-level analysis or before running any National sea-level notebook (notebooks/historical/National/sea_level/0_site_setup.ipynb).
+---
 
 ## Skill: Sea-Level Site Setup (notebook `sea_level/0_site_setup.ipynb`)
 
@@ -853,7 +893,7 @@ In principle, the same shape of inputs as the atmosphere setup (site name, coord
 3. `save_site_config(site_config, Path('../../../../data/sites/palau.json'))` — writes the **fixed filename** `palau.json`, not a `site_config_filename(site_key)`-derived one like the atmosphere workflow.
 
 ### Output contract
-- JSON at `data/sites/palau.json` with all the fields listed above plus the fields `prepare_site_data` adds (`selected_uhslc_id`, `station`, `country`, `station_lon`, `station_lat`, `station_distance_km`, `cmems_path`, `cmems_filename`).
+- JSON at `data/sites/palau.json` with all the fields listed above plus the fields `prepare_site_data` adds (`selected_uhslc_id`, `station`, `country`, `station_lon`, `station_lat`, `station_distance_km`, `cmems_path`, `cmems_filename`). See [assets/site_config_template.json](assets/site_config_template.json) for the **input** schema (the dict you construct before calling `prepare_site_data` -- the saved file has the extra derived fields added on top).
 - Cached UHSLC NetCDF at `data/sea_level/d<uhslc_id>.nc` (daily) and `data/sea_level/h<uhslc_id>.nc` (hourly), zero-padded to 3 digits.
 - Cached CMEMS NetCDF at `data/sea_level/cmems_L4_SSH_0.125deg_<start_year>_<end_year>.nc`.
 
@@ -870,7 +910,12 @@ In principle, the same shape of inputs as the atmosphere setup (site name, coord
 
 ---
 
-<!-- SOURCE: assistant/skills/trend_analysis.md -->
+<!-- SOURCE: assistant/skills/trend-analysis/SKILL.md -->
+
+---
+name: trend-analysis
+description: Compare absolute (CMEMS altimetry) and relative (UHSLC tide gauge) sea-level trends at a site and quantify ENSO modulation. Use when working on notebooks/historical/National/sea_level/a_sea_level_trend.ipynb or answering questions about sea-level rise rates in mm/yr.
+---
 
 ## Skill: Trend Analysis (notebook `a_sea_level_trend.ipynb`)
 
@@ -914,7 +959,12 @@ Compare absolute sea level (CMEMS altimetry, SLA) and relative sea level (UHSLC 
 
 ---
 
-<!-- SOURCE: assistant/skills/anomaly_analysis.md -->
+<!-- SOURCE: assistant/skills/anomaly-analysis/SKILL.md -->
+
+---
+name: anomaly-analysis
+description: Quantify and visualize sea-level anomalies at regional (CMEMS SLA) and local (UHSLC tide gauge) scale, including decadal composite maps and annual/monthly variability with ENSO context. Use when working on notebooks/historical/National/sea_level/b_sea_level_anomaly.ipynb or answering questions about sea-level anomalies.
+---
 
 ## Skill: Anomaly Analysis (notebook `b_sea_level_anomaly.ipynb`)
 
@@ -954,7 +1004,12 @@ Quantify and visualize sea level anomalies at regional (CMEMS SLA) and local (UH
 
 ---
 
-<!-- SOURCE: assistant/skills/flood_frequency.md -->
+<!-- SOURCE: assistant/skills/flood-frequency/SKILL.md -->
+
+---
+name: flood-frequency
+description: Quantify minor (nuisance/high-tide) flood-day and flood-hour frequency at a tide gauge (30 cm above MHHW threshold) and its ENSO relationship. Use when working on notebooks/historical/National/sea_level/c_sea_level_ff.ipynb or answering questions about nuisance flooding or high-tide flooding frequency.
+---
 
 ## Skill: Flood Frequency (notebook `c_sea_level_ff.ipynb`)
 
@@ -1001,7 +1056,12 @@ Quantify minor (nuisance / high-tide) flooding frequency at the tide gauge and i
 
 ---
 
-<!-- SOURCE: assistant/skills/rankings.md -->
+<!-- SOURCE: assistant/skills/rankings/SKILL.md -->
+
+---
+name: rankings
+description: Identify and contextualize the 10 highest and 10 lowest hourly sea-level events at a tide gauge, joined with the ENSO state at each event. Use when working on notebooks/historical/National/sea_level/d_sea_level_rankings.ipynb or answering questions about record-high or record-low sea-level events.
+---
 
 ## Skill: Top-10 Rankings (notebook `d_sea_level_rankings.ipynb`)
 
@@ -1041,14 +1101,19 @@ Identify and contextualize the 10 highest and 10 lowest hourly sea level events 
 
 ---
 
-<!-- SOURCE: assistant/skills/regional_setup.md -->
+<!-- SOURCE: assistant/skills/regional-setup/SKILL.md -->
+
+---
+name: regional-setup
+description: Scan every GHCN-Daily station inside the Pacific EEZ area, quality-filter each one, and collect accepted stations' cleaned daily data into one dictionary for regional rainfall/air-temperature analysis. Use when working on notebooks/historical/Regional/00_regional_setup.ipynb or before any regional (multi-station, Pacific-wide) rainfall/temperature indicator or map.
+---
 
 ## Skill: Regional Site Setup (notebook `notebooks/historical/Regional/00_regional_setup.ipynb`)
 
 ### Purpose
 Scan **every** GHCN-Daily station inside the Pacific EEZ area of interest, quality-filter each one, and collect the stations that pass — together with their cleaned daily data — into a single dictionary. This is the multi-station counterpart of the single-site `notebooks/historical/National/00_site_setup.ipynb`: that notebook sets up **one** station picked interactively; this one sets up **many** at once so `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` and `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb` can build multi-station/regional maps without repeating the single-site workflow by hand.
 
-Rainfall and air-temperature share this one setup notebook (both variables are pulled from the same GHCN daily record per station). **Sea level has no regional setup notebook** — see `assistant/skills/regional_sea_level.md` for what that would take.
+Rainfall and air-temperature share this one setup notebook (both variables are pulled from the same GHCN daily record per station). **Sea level has no regional setup notebook** — see `assistant/skills/regional-sea-level/SKILL.md` for what that would take.
 
 ### Required inputs / parameters
 - `region_key` — short name used in every output filename (e.g. `"pacific"`).
@@ -1084,7 +1149,12 @@ Rainfall and air-temperature share this one setup notebook (both variables are p
 
 ---
 
-<!-- SOURCE: assistant/skills/regional_rainfall.md -->
+<!-- SOURCE: assistant/skills/regional-rainfall/SKILL.md -->
+
+---
+name: regional-rainfall
+description: Compute per-station regional rainfall indicators (total annual rainfall, dry/wet days, consecutive dry days, heavy rainfall) across every station in a region and build Pacific EEZ trend maps, with an optional ERA5 background for total annual rainfall. Use when working on notebooks/historical/Regional/rainfall/regional_indicators.ipynb or answering questions about Pacific-wide/regional rainfall maps or trends.
+---
 
 ## Skill: Regional Rainfall Indicators (notebook `notebooks/historical/Regional/rainfall/regional_indicators.ipynb`)
 
@@ -1125,7 +1195,12 @@ For every station saved by `Regional/00_regional_setup.ipynb`, compute the **sam
 
 ---
 
-<!-- SOURCE: assistant/skills/regional_temperature.md -->
+<!-- SOURCE: assistant/skills/regional-temperature/SKILL.md -->
+
+---
+name: regional-temperature
+description: Compute per-station regional air-temperature indicators (mean/min/max annual temperature, diurnal range, hot days, cold nights) across every station in a region, build Pacific EEZ trend maps and a regional-mean anomaly time series, with an optional ERA5 background for mean annual temperature. Use when working on notebooks/historical/Regional/air_temperature/regional_indicators.ipynb or answering questions about Pacific-wide/regional temperature maps or trends.
+---
 
 ## Skill: Regional Air-Temperature Indicators (notebook `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb`)
 
@@ -1170,16 +1245,21 @@ For every station saved by `Regional/00_regional_setup.ipynb`, compute the **sam
 
 ---
 
-<!-- SOURCE: assistant/skills/regional_sea_level.md -->
+<!-- SOURCE: assistant/skills/regional-sea-level/SKILL.md -->
+
+---
+name: regional-sea-level
+description: Explains that no regional (multi-station, Pacific-wide) sea-level workflow exists yet, what draft pieces are available to build one (functions/cindra_regional_plotting_helpers.py), and what's still missing. Use when asked for a regional/Pacific-wide sea-level map or indicator, so the gap is stated accurately instead of improvising one.
+---
 
 ## Skill: Regional Sea Level (notebook `notebooks/historical/Regional/regional_plots.ipynb` — not yet built)
 
 ### Status
-**This workflow does not exist yet.** It is documented here, in the same structure as `regional_rainfall.md` and `regional_temperature.md`, specifically so the gap is visible and tracked with the same weight as the other two domains — not so an assistant can pretend the capability is already there. If a user asks for a regional/Pacific-wide sea-level map or a multi-station sea-level indicator, say plainly that it isn't built yet and point at what already exists to build it from (below), rather than improvising an ad-hoc figure or reusing the National single-site helpers as if they already generalized to many stations.
+**This workflow does not exist yet.** It is documented here, in the same structure as `regional-rainfall/SKILL.md` and `regional-temperature/SKILL.md`, specifically so the gap is visible and tracked with the same weight as the other two domains — not so an assistant can pretend the capability is already there. If a user asks for a regional/Pacific-wide sea-level map or a multi-station sea-level indicator, say plainly that it isn't built yet and point at what already exists to build it from (below), rather than improvising an ad-hoc figure or reusing the National single-site helpers as if they already generalized to many stations.
 
 Concretely, as of this repository merge:
 - `notebooks/historical/Regional/regional_plots.ipynb` is a **0-byte placeholder** — not valid JSON, no cells, nothing to run.
-- There is **no** `Regional/00_regional_setup.ipynb` equivalent for sea level — no notebook scans multiple UHSLC stations the way `Regional/00_regional_setup.ipynb` scans multiple GHCN stations. The National sea-level setup (`sea_level/0_site_setup.ipynb`) configures exactly one hardcoded site (see `assistant/skills/sea_level_site_setup.md`).
+- There is **no** `Regional/00_regional_setup.ipynb` equivalent for sea level — no notebook scans multiple UHSLC stations the way `Regional/00_regional_setup.ipynb` scans multiple GHCN stations. The National sea-level setup (`sea_level/0_site_setup.ipynb`) configures exactly one hardcoded site (see `assistant/skills/sea-level-site-setup/SKILL.md`).
 - `functions/cindra_regional_plotting_helpers.py` holds two **draft/experimental** plotting helpers clearly aimed at this future workflow, but neither is imported by any notebook.
 
 ### What already exists to build this from
@@ -1202,7 +1282,12 @@ Outline the missing pieces rather than faking output:
 
 ---
 
-<!-- SOURCE: assistant/skills/functions_api.md -->
+<!-- SOURCE: assistant/skills/functions-api/SKILL.md -->
+
+---
+name: functions-api
+description: Full reference of callable functions across functions/site_common.py, rainfall.py, air_temp.py, temp_func.py, data_downloaders.py, rainfall_regional.py, sea_level.py, sea_level_plotting.py, and the external indicators_setup package, plus the function-discovery workflow. Use before writing any analysis or plotting code, to find and reuse an existing function instead of reimplementing it inline.
+---
 
 ## Skill: Functions API Reference (`functions/site_common.py` + `functions/rainfall.py` + `functions/air_temp.py` + `functions/temp_func.py` + `functions/data_downloaders.py` + `functions/rainfall_regional.py` + `functions/sea_level.py` + `functions/sea_level_plotting.py` + `indicators_setup`)
 
@@ -1452,11 +1537,18 @@ Two regional sea-level plotting helpers prepared ahead of a not-yet-built region
 
 ---
 
-<!-- SOURCE: assistant/skills/output_conventions.md -->
+<!-- SOURCE: assistant/skills/output-conventions/SKILL.md -->
+
+---
+name: output-conventions
+description: Defines the site-tag, filename, and folder conventions for every persisted figure/table/JSON across rainfall, air-temperature, and sea-level notebooks, so multi-site outputs never collide. Use whenever saving a new figure, table, or metrics file, or when asked where a given output file lives.
+---
 
 ## Skill: Output Conventions
 
 All persisted artifacts (figures, tables, structured results) MUST follow this convention so multi-site analyses never collide. The site-tag/filename scheme applies to **all three** domains (rainfall, air-temperature, sea level); the folder layout differs slightly for sea level (see below).
+
+See [assets/example_output_tree.txt](assets/example_output_tree.txt) for a real, already-run example of every folder/filename pattern below side by side (rainfall+temperature site, sea-level site, and regional).
 
 ### Site tag
 
@@ -1491,7 +1583,7 @@ outputs/<site_tag>/         # figures AND tables together, no figures/tables spl
 ```
 
 - `site_output_dir = Path('../../../../outputs') / build_site_tag(site_name, site_lon, site_lat)`, created with `site_output_dir.mkdir(parents=True, exist_ok=True)`.
-- Site config (input): `data/sites/palau.json` (fixed filename, see `assistant/skills/sea_level_site_setup.md`).
+- Site config (input): `data/sites/palau.json` (fixed filename, see `assistant/skills/sea-level-site-setup/SKILL.md`).
 - UHSLC/CMEMS cache (input): `data/sea_level/d<uhslc_id>.nc`, `h<uhslc_id>.nc`, `cmems_L4_SSH_0.125deg_<start_year>_<end_year>.nc`.
 
 ### Canonical figure filenames — rainfall (`notebooks/historical/National/rainfall/`)
@@ -1611,7 +1703,12 @@ Sea-level filenames are **not** suffixed with `_<site_tag>` the way rainfall/air
 
 ---
 
-<!-- SOURCE: assistant/skills/data_sources.md -->
+<!-- SOURCE: assistant/skills/data-sources/SKILL.md -->
+
+---
+name: data-sources
+description: Documents every external data source used in this repository (GHCN-Daily, NOAA ONI, UHSLC tide gauges, CMEMS satellite altimetry), their URLs, units, sentinels, and citations, plus reference-period conventions. Use when downloading new data, citing a data source, or converting units.
+---
 
 ## Skill: Data Sources & Attribution
 
@@ -1685,31 +1782,31 @@ This folder holds the instructions used to train an external assistant — **CIn
 
 ## How to use
 
-- **`CIndRA_role.md`** — paste the contents into the "Instructions" / system prompt of the assistant. Defines CIndRA's identity, scope (rainfall + air temperature + sea level + regional), conventions, data sources, analysis rules, plotting rules, output naming, and error handling for all domains.
-- **`aggregated_CIndRA_markdowns.md`** — single file with **all** markdowns below concatenated (role + skills + this README). Use when the assistant platform accepts one large knowledge file instead of separate uploads. Regenerate after any source change: `python assistant/build_aggregated_CIndRA.py`.
-- **`skills/`** — modular workflow-specific instructions. Attach each file as a separate knowledge document, or use `aggregated_CIndRA_markdowns.md` for a single upload:
+- **`CIndRA_role.md`** — paste the contents into the "Instructions" / system prompt of the assistant. Defines CIndRA's identity, scope (rainfall + air temperature + sea level + regional), conventions, data sources, analysis rules, plotting rules, output naming, and error handling for all domains. This is background context CIndRA always has, not something conditionally "activated" — it does not follow the Agent Skills format below.
+- **`aggregated_CIndRA_markdowns.md`** — single file with **all** markdowns below concatenated (role + skills + this README). Use when the assistant platform accepts one large knowledge file instead of separate uploads (e.g. a ChatGPT custom GPT's knowledge base). Regenerate after any source change: `python assistant/build_aggregated_CIndRA.py`.
+- **`skills/`** — one workflow-specific [Agent Skill](https://github.com/anthropics/skills) per notebook/topic: `skills/<name>/SKILL.md`, each with `name`/`description` YAML frontmatter per the [Agent Skills spec](https://agentskills.io/specification). In Claude Code / other Agent-Skills-aware clients, drop this whole `skills/` folder somewhere the client discovers skills from (e.g. `.claude/skills/`) and each one loads on demand. For a ChatGPT custom GPT (which has no skill-activation mechanism), instead upload each `SKILL.md` as a knowledge file, or use `aggregated_CIndRA_markdowns.md` for a single upload:
 
-| File | Notebook / scope |
+| Skill name | Notebook / scope |
 |---|---|
-| `site_setup.md` | `notebooks/historical/National/00_site_setup.ipynb` — shared entry point for rainfall + air temperature; not under `rainfall/` or `air_temperature/` |
-| `total_rainfall.md` | `National/rainfall/a_Total_rainfall.ipynb` |
-| `consecutive_dry_days.md` | `National/rainfall/b_Consecutive_dry_days.ipynb` |
-| `heavy_rainfall.md` | `National/rainfall/c_Heavy_rainfall.ipynb` |
-| `mean_temperature.md` | `National/air_temperature/a_mean_temperature.ipynb` |
-| `min_max_temperature.md` | `National/air_temperature/b_min_max_temperature.ipynb` |
-| `hot_cold_days.md` | `National/air_temperature/c_hot_cold_days.ipynb` |
-| `sea_level_site_setup.md` | `National/sea_level/0_site_setup.ipynb` — sea level's own entry point, not shared with the other two domains |
-| `trend_analysis.md` | `National/sea_level/a_sea_level_trend.ipynb` |
-| `anomaly_analysis.md` | `National/sea_level/b_sea_level_anomaly.ipynb` |
-| `flood_frequency.md` | `National/sea_level/c_sea_level_ff.ipynb` |
-| `rankings.md` | `National/sea_level/d_sea_level_rankings.ipynb` |
-| `regional_setup.md` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
-| `regional_rainfall.md` | `Regional/rainfall/regional_indicators.ipynb` |
-| `regional_temperature.md` | `Regional/air_temperature/regional_indicators.ipynb` |
-| `regional_sea_level.md` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
-| `functions_api.md` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
-| `output_conventions.md` | Figure / table naming and folders (all domains) |
-| `data_sources.md` | GHCN-Daily, UHSLC, CMEMS, ONI, units, citations (all domains) |
+| `site-setup` | `notebooks/historical/National/00_site_setup.ipynb` — shared entry point for rainfall + air temperature; not under `rainfall/` or `air_temperature/` |
+| `total-rainfall` | `National/rainfall/a_Total_rainfall.ipynb` |
+| `consecutive-dry-days` | `National/rainfall/b_Consecutive_dry_days.ipynb` |
+| `heavy-rainfall` | `National/rainfall/c_Heavy_rainfall.ipynb` |
+| `mean-temperature` | `National/air_temperature/a_mean_temperature.ipynb` |
+| `min-max-temperature` | `National/air_temperature/b_min_max_temperature.ipynb` |
+| `hot-cold-days` | `National/air_temperature/c_hot_cold_days.ipynb` |
+| `sea-level-site-setup` | `National/sea_level/0_site_setup.ipynb` — sea level's own entry point, not shared with the other two domains |
+| `trend-analysis` | `National/sea_level/a_sea_level_trend.ipynb` |
+| `anomaly-analysis` | `National/sea_level/b_sea_level_anomaly.ipynb` |
+| `flood-frequency` | `National/sea_level/c_sea_level_ff.ipynb` |
+| `rankings` | `National/sea_level/d_sea_level_rankings.ipynb` |
+| `regional-setup` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
+| `regional-rainfall` | `Regional/rainfall/regional_indicators.ipynb` |
+| `regional-temperature` | `Regional/air_temperature/regional_indicators.ipynb` |
+| `regional-sea-level` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
+| `functions-api` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
+| `output-conventions` | Figure / table naming and folders (all domains) |
+| `data-sources` | GHCN-Daily, UHSLC, CMEMS, ONI, units, citations (all domains) |
 
 ## Repository quick map
 
@@ -1723,12 +1820,13 @@ This folder holds the instructions used to train an external assistant — **CIn
 - `data/sea_level/` — cached UHSLC NetCDF (`d<id>.nc`/`h<id>.nc`) and CMEMS NetCDF (`cmems_L4_SSH_*.nc`).
 - `data/regional/` — multi-station pickles/summaries from `00_regional_setup.ipynb`, plus an `era5_cache/` subfolder.
 - `data/sites/` — per-site config JSON files. `<country_slug>_<ghcn_station_id>.json` for rainfall/air-temperature (shared between both); a fixed `palau.json` for sea level.
-- `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` — per-site figure/table outputs (rainfall, air-temperature; PNG/HTML and CSV/JSON respectively). Sea level persists to its own output directory — see `skills/output_conventions.md`.
+- `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` — per-site figure/table outputs (rainfall, air-temperature; PNG/HTML and CSV/JSON respectively). Sea level persists to its own output directory — see `skills/output-conventions/SKILL.md`.
 
 ## Updating the assistant
 
-- When you add or rename a function in `functions/` or change `indicators_setup` usage, update `skills/functions_api.md` and the **Functions API** section of `CIndRA_role.md` in the same PR.
-- When you introduce a new persisted artifact (figure / CSV / JSON), document it in `skills/output_conventions.md`.
-- When a new analysis notebook is added, mirror its workflow in a new `skills/<name>.md`, extend `CIndRA_role.md`, and add the file to `SOURCE_FILES` in `build_aggregated_CIndRA.py`.
+- When you add or rename a function in `functions/` or change `indicators_setup` usage, update `skills/functions-api/SKILL.md` and the **Functions API** section of `CIndRA_role.md` in the same PR.
+- When you introduce a new persisted artifact (figure / CSV / JSON), document it in `skills/output-conventions/SKILL.md`.
+- When a new analysis notebook is added, mirror its workflow in a new `skills/<name>/SKILL.md` (kebab-case `name` matching the directory, `description` stating what it does *and* when to use it — see the [Agent Skills spec](https://agentskills.io/specification)), extend `CIndRA_role.md`, and add the new `SKILL.md` path to `SOURCE_FILES` in `build_aggregated_CIndRA.py`.
+- Validate a skill's frontmatter with the [skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference tool: `skills-ref validate assistant/skills/<name>`.
 - When `Regional/regional_plots.ipynb` gets real content, or a regional sea-level workflow is built, update the [Regional Workflows](CIndRA_role.md#cindra-regional-workflows) section of `CIndRA_role.md` and stop describing them as empty/unbuilt.
 - After editing any markdown in `assistant/` or `assistant/skills/`, run `python assistant/build_aggregated_CIndRA.py` to refresh `aggregated_CIndRA_markdowns.md`.

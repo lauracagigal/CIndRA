@@ -1,3 +1,8 @@
+---
+name: anomaly-analysis
+description: Quantify and visualize sea-level anomalies at regional (CMEMS SLA) and local (UHSLC tide gauge) scale, including decadal composite maps and annual/monthly variability with ENSO context. Use when working on notebooks/historical/National/sea_level/b_sea_level_anomaly.ipynb or answering questions about sea-level anomalies.
+---
+
 ## Skill: Anomaly Analysis (notebook `b_sea_level_anomaly.ipynb`)
 
 ### Purpose

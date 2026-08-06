@@ -1,0 +1,14 @@
+{
+  "site_name": "<Site name, e.g. 'Palau' -- freely chosen here, unlike the atmosphere workflow>",
+  "site_lon": 0.0,
+  "site_lat": 0.0,
+  "station_country_filter": "<Country name used to filter UHSLC candidate stations, e.g. 'Palau'>",
+  "selected_uhslc_id": null,
+  "selected_station_name": null,
+  "site_eez_shapefile": "<relative path to the site's EEZ shapefile, e.g. '../../../../data/Palau_EEZ/pw_eez_pol_april2022.shp'>",
+  "start_date": "1993-01-01",
+  "end_date": "2022-12-31",
+  "cmems_bbox_override": null,
+  "cmems_start_datetime": "1993-01-01T00:00:00",
+  "cmems_end_datetime": "2025-04-30T23:59:59"
+}

@@ -1,3 +1,8 @@
+---
+name: min-max-temperature
+description: Compute annual minimum and maximum temperature trends and the diurnal temperature range (TMAX minus TMIN). Use when working on notebooks/historical/National/air_temperature/b_min_max_temperature.ipynb or answering questions about TMIN/TMAX trends or diurnal range.
+---
+
 ## Skill: Min / Max Temperature (notebook `notebooks/historical/National/air_temperature/b_min_max_temperature.ipynb`)
 
 ### Purpose

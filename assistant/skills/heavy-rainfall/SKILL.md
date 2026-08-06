@@ -1,3 +1,8 @@
+---
+name: heavy-rainfall
+description: Compute annual wet-day counts (>=1 mm) and heavy-rainfall day counts (above the station's own 95th percentile). Use when working on notebooks/historical/National/rainfall/c_Heavy_rainfall.ipynb or answering questions about wet days or extreme/heavy rainfall.
+---
+
 ## Skill: Heavy Rainfall (notebook `notebooks/historical/National/rainfall/c_Heavy_rainfall.ipynb`)
 
 ### Purpose
@@ -27,7 +32,7 @@ Month/year completeness filtering is applied **once**, in the shared `00_site_se
 5. **Summary table**: `table_rain_23` via `style_matrix`. Persist via `persist_heavy_rainfall_outputs`.
 
 ### Function discovery
-Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions_api.md`.
+Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions-api/SKILL.md`.
 
 ### Persisted figures
 - `F7a_Wet_days_1mm.png` — annual wet-day count (> 1 mm).

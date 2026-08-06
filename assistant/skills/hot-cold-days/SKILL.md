@@ -1,3 +1,8 @@
+---
+name: hot-cold-days
+description: Compute hot-day (TX90p) and cold-night (TN10p) ETCCDI exceedance counts plus a simpler fixed-percentile variant. Use when working on notebooks/historical/National/air_temperature/c_hot_cold_days.ipynb or answering questions about extreme heat/cold days, TX90p, or TN10p.
+---
+
 ## Skill: Hot Days & Cold Nights (notebook `notebooks/historical/National/air_temperature/c_hot_cold_days.ipynb`)
 
 ### Purpose
