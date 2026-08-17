@@ -237,7 +237,7 @@ The sea-level equivalent of `indicators_setup`: **every** published sea-level fi
 
 ## `functions/cindra_regional_plotting_helpers.py` — draft, not wired into any notebook
 
-Two regional sea-level plotting helpers prepared ahead of a not-yet-built regional sea-level workflow: `plot_regional_altimetry_trend_map_filled_tide_gauges` (gridded absolute altimetry trend + optional filled tide-gauge markers) and `plot_regional_flood_frequency_overview` (station-year flood-day heatmap + regional annual totals). The module docstring marks them "Draft / Experimental"; `grep` confirms no notebook imports them. `notebooks/historical/Regional/regional_plots.ipynb` is the presumed future consumer, but it is currently an empty file (0 bytes). Do not present output from these two functions as a published/repo-styled figure until they are actually wired into a notebook and reviewed — treat a request to use them the same as "the helper doesn't exist yet."
+Two regional sea-level plotting helpers prepared ahead of a not-yet-built regional sea-level workflow: `plot_regional_altimetry_trend_map_filled_tide_gauges` (gridded absolute altimetry trend + optional filled tide-gauge markers) and `plot_regional_flood_frequency_overview` (station-year flood-day heatmap + regional annual totals). The module docstring marks them "Draft / Experimental"; `grep` confirms no notebook imports them. `notebooks/historical/Regional/regional_plots.ipynb` is a markdown-only Jupyter Book placeholder. Do not present output from these helpers as published/repo-styled figures until they are wired into a reviewed analysis.
 
 ---
 

@@ -105,7 +105,7 @@ Sea level has no `plot_bar_probs` equivalent — use the dedicated helpers in `s
 - `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` — regional rainfall indicators and Pacific EEZ maps, computed station-by-station from `00_regional_setup.ipynb`'s output.
 - `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb` — regional air-temperature indicators and Pacific EEZ maps, same pattern.
 - `notebooks/historical/Regional/tropical_cyclones/regional_indicators.ipynb` — independent all-basin IBTrACS Pacific-subregion workflow; it does not consume the GHCN regional setup.
-- `notebooks/historical/Regional/regional_plots.ipynb` — **currently empty** (0 bytes); not yet authored. Do not claim it produces anything until it has real content.
+- `notebooks/historical/Regional/regional_plots.ipynb` — markdown-only Jupyter Book placeholder; it does not produce analysis or figures.
 - `functions/site_common.py` — shared site config I/O and output-path helpers for rainfall/air-temperature, re-exported by both `rainfall.py` and `air_temp.py`, and partly reused by `sea_level.py` (`save_site_config`, `build_site_tag`, `build_output_filename`, `save_dict_json`).
 - `functions/rainfall.py` — dry-spell metrics, rainfall persist helpers (re-exports `site_common.py`).
 - `functions/air_temp.py` — air-temperature persist helpers (re-exports `site_common.py`).
@@ -162,11 +162,11 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 
 ### Regional rainfall — built
 - Setup: `Regional/00_regional_setup.ipynb` (shared with air temperature — see next section). See `assistant/skills/regional-setup/SKILL.md`.
-- Indicators/maps: `Regional/rainfall/regional_indicators.ipynb` reproduces the National `a_Total_rainfall.ipynb`/`b_Consecutive_dry_days.ipynb`/`c_Heavy_rainfall.ipynb` formulas per station (`compute_regional_rainfall_indicators` in `functions/rainfall_regional.py`), builds one Pacific EEZ trend map per indicator (`plot_annual_regional_map`), plus an ERA5-background mean/trend map for `total_annual_mm` only. See `assistant/skills/regional-rainfall/SKILL.md`.
+- Indicators/maps: `Regional/rainfall/regional_indicators.ipynb` reproduces the National `a_Total_rainfall.ipynb`/`b_Consecutive_dry_days.ipynb`/`c_Heavy_rainfall.ipynb` formulas per station (`compute_regional_rainfall_indicators` in `functions/rainfall_regional.py`), builds one Pacific EEZ trend map per indicator (`plot_annual_regional_map`), plus an ERA5-background mean/trend map for `total_annual_mm` only. See `assistant/skills/regional-atmosphere/SKILL.md`.
 
 ### Regional air temperature — built
 - Setup: `Regional/00_regional_setup.ipynb` (same notebook as rainfall — it downloads both `TMIN`/`TMAX` and `PRCP` per station in one pass). See `assistant/skills/regional-setup/SKILL.md`.
-- Indicators/maps: `Regional/air_temperature/regional_indicators.ipynb` reproduces the National `a_mean_temperature.ipynb`/`b_min_max_temperature.ipynb`/`c_hot_cold_days.ipynb` formulas per station (`compute_regional_temperature_indicators` in `functions/rainfall_regional.py`), a regional-mean anomaly time series (station-average and, separately, an ERA5 EEZ area-weighted version), one trend map per indicator, plus an ERA5-background mean/trend map for `tmean_annual` only. See `assistant/skills/regional-temperature/SKILL.md`.
+- Indicators/maps: `Regional/air_temperature/regional_indicators.ipynb` reproduces the National `a_mean_temperature.ipynb`/`b_min_max_temperature.ipynb`/`c_hot_cold_days.ipynb` formulas per station (`compute_regional_temperature_indicators` in `functions/rainfall_regional.py`), a regional-mean anomaly time series (station-average and, separately, an ERA5 EEZ area-weighted version), one trend map per indicator, plus an ERA5-background mean/trend map for `tmean_annual` only. See `assistant/skills/regional-atmosphere/SKILL.md`.
 
 ### Regional tropical cyclones — built
 - `Regional/tropical_cyclones/regional_indicators.ipynb` loads all-basin IBTrACS independently of `00_regional_setup.ipynb`.
@@ -175,7 +175,7 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 
 ### Regional sea level — not built yet
 - No regional setup notebook exists for sea level (no multi-station UHSLC scan analogous to `Regional/00_regional_setup.ipynb`'s GHCN scan).
-- `notebooks/historical/Regional/regional_plots.ipynb` is an empty placeholder (0 bytes) — not valid JSON, no cells.
+- `notebooks/historical/Regional/regional_plots.ipynb` is a valid markdown-only placeholder with no calculations or figures.
 - `functions/cindra_regional_plotting_helpers.py` holds two **draft/experimental** plotting helpers prepared for this workflow (`plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview`) but neither is imported by any notebook.
 - Do not claim a regional sea-level map or indicator exists, and do not improvise one from the National single-site sea-level helpers as if they already generalized to many stations. See `assistant/skills/regional-sea-level/SKILL.md` for exactly what exists to build this from and what's still missing.
 
@@ -365,7 +365,7 @@ When plotting: (1) load the cleaned pickle; (2) compute normalised annual accumu
 - ERA5-background helpers: `load_or_compute_era5_annual_rainfall`/`temperature`, `compute_era5_annual_rainfall_trend`, `compute_era5_annual_mean_rainfall`, `compute_era5_annual_mean_temperature`, `compute_era5_annual_temperature_trend`, `compute_era5_eez_mean_temperature_series`, `plot_monthly_rainfall_with_era5_background`, `plot_monthly_temperature_with_era5_background`, `plot_era5_eez_temperature_anomaly`.
 
 ### `functions/cindra_regional_plotting_helpers.py` — draft, unused
-- `plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview` — prepared for the not-yet-built regional sea-level workflow (`Regional/regional_plots.ipynb`, currently empty). Not imported by any notebook; do not present their output as a published figure without first wiring them in and reviewing.
+- `plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview` — prepared for the not-yet-built regional sea-level workflow. They are not imported by the markdown-only placeholder; do not present their output as published without first wiring them into reviewed analysis.
 
 ### `indicators_setup` (external — clone if missing; rainfall/air-temperature only)
 - `ind_setup.plotting`: `plot_bar_probs`, `plot_bar_probs_ONI`, `add_oni_cat`, `plot_oni_index_th`, `fontsize`
@@ -428,20 +428,15 @@ Examples:
 For step-by-step notebook workflows, see:
 
 - `assistant/skills/site-setup/SKILL.md` — `notebooks/historical/National/00_site_setup.ipynb` (shared by rainfall and air temperature)
-- `assistant/skills/total-rainfall/SKILL.md` — `rainfall/a_Total_rainfall.ipynb`
-- `assistant/skills/consecutive-dry-days/SKILL.md` — `rainfall/b_Consecutive_dry_days.ipynb`
-- `assistant/skills/heavy-rainfall/SKILL.md` — `rainfall/c_Heavy_rainfall.ipynb`
-- `assistant/skills/mean-temperature/SKILL.md` — `air_temperature/a_mean_temperature.ipynb`
-- `assistant/skills/min-max-temperature/SKILL.md` — `air_temperature/b_min_max_temperature.ipynb`
-- `assistant/skills/hot-cold-days/SKILL.md` — `air_temperature/c_hot_cold_days.ipynb`
+- `assistant/skills/national-rainfall/SKILL.md` — all three National rainfall notebooks
+- `assistant/skills/national-temperature/SKILL.md` — all three National air-temperature notebooks
 - `assistant/skills/sea-level-site-setup/SKILL.md` — `sea_level/0_site_setup.ipynb`
 - `assistant/skills/trend-analysis/SKILL.md` — `sea_level/a_sea_level_trend.ipynb`
 - `assistant/skills/anomaly-analysis/SKILL.md` — `sea_level/b_sea_level_anomaly.ipynb`
 - `assistant/skills/flood-frequency/SKILL.md` — `sea_level/c_sea_level_ff.ipynb`
 - `assistant/skills/rankings/SKILL.md` — `sea_level/d_sea_level_rankings.ipynb`
 - `assistant/skills/regional-setup/SKILL.md` — `Regional/00_regional_setup.ipynb` (shared by regional rainfall and air temperature)
-- `assistant/skills/regional-rainfall/SKILL.md` — `Regional/rainfall/regional_indicators.ipynb`
-- `assistant/skills/regional-temperature/SKILL.md` — `Regional/air_temperature/regional_indicators.ipynb`
+- `assistant/skills/regional-atmosphere/SKILL.md` — Regional rainfall and air-temperature indicator notebooks
 - `assistant/skills/tropical-cyclones/SKILL.md` — National and Regional IBTrACS/ONI cyclone workflows
 - `assistant/skills/regional-sea-level/SKILL.md` — documents what's missing for a regional sea-level workflow (none exists yet)
 - `assistant/skills/functions-api/SKILL.md` — full function reference and discovery workflow
@@ -512,367 +507,141 @@ Before asking the user to pick a `country`/station, or before setting `site_key`
 
 ---
 
-<!-- SOURCE: assistant/skills/total-rainfall/SKILL.md -->
+<!-- SOURCE: assistant/skills/national-rainfall/SKILL.md -->
 
 ---
-name: total-rainfall
-description: Compute annual accumulated rainfall, daily/seasonal rainfall, top-10 wettest years, and ENSO-modulated rainfall anomalies for a site. Use when working on notebooks/historical/National/rainfall/a_Total_rainfall.ipynb or answering questions about total or accumulated rainfall trends.
+name: national-rainfall
+description: "Compute and maintain the complete National rainfall workflow for one configured GHCN-Daily station: annual and seasonal totals, anomalies, ENSO context, dry-day counts and consecutive dry spells, wet-day counts, and heavy rainfall above the 95th percentile. Use for any notebook under notebooks/historical/National/rainfall/ or questions about site-scale rainfall indicators."
 ---
 
-## Skill: Total Rainfall (notebook `notebooks/historical/National/rainfall/a_Total_rainfall.ipynb`)
+# National rainfall
 
-### Purpose
-Quantify annual accumulated precipitation, daily extremes, seasonal totals, and ENSO modulation at the site's GHCN station. Report anomalies relative to the reference period from the site config.
+Use this skill for the three National rainfall notebooks. Reuse their shared site configuration, cached `PRCP` record, plotting helpers, and persistence conventions instead of rebuilding those steps separately.
 
-### Required inputs
-- Site config JSON at `data/sites/<site_key>.json` (from the shared `../00_site_setup.ipynb`).
-- Cleaned pickle at `data/rainfall/GHCN_<ghcn_station_id>.pkl`.
+## Inputs and shared setup
 
-### Key definitions
-- **Wet day**: `PRCP > 1 mm` (used in some exploratory sections).
-- **Accumulated annual rainfall** — normalise for unequal observation counts:
+- Run `notebooks/historical/National/00_site_setup.ipynb` first.
+- Load `data/sites/<site_key>.json` with `load_site_config` and `site_config_filename`.
+- Load `data/rainfall/GHCN_<ghcn_station_id>.pkl`; never download or completeness-filter GHCN again inside an indicator notebook.
+- Build output paths with the helpers in `functions/site_common.py` or their `functions/rainfall.py` re-exports.
+- Use the reference period and completeness threshold stored in the site config. Do not hardcode Palau values for another site.
 
-  `annual accumulated rainfall = (sum of observed daily rainfall in the year / number of valid daily observations in the year) × 365`
+## Route by notebook
 
-  In code: `(groupby(year).sum() / groupby(year).count()) * 365`. Units: **mm/year**.
-- **Dry season** (Palau convention in notebook): months 12–4 and 11 (`season == "dry"`).
-- **Wet season**: months 5–10 (`season == "wet"`).
-- **Reference-period anomaly**: subtract `datag.loc[ref_start:ref_end].PRCP.mean()` (use slice syntax, not a single `"1961:1990"` string).
+### Total and seasonal rainfall
 
-### Workflow
-1. Set `site_key`, load config via `load_site_config(Path('../../../../data/sites') / site_config_filename(site_key))`. Extract `site_name`, coordinates, `ghcn_station_id`, `ref_start`, `ref_end`.
-2. Build `site_figures_dir = build_site_figures_dir(Path('../../../../outputs'), site_name, site_lon, site_lat)`.
-3. Load data: `data = pd.read_pickle(data_dir / f"GHCN_{ghcn_station_id}.pkl")`. Keep `data_daily = data.copy()`.
-4. **Daily series**: `plot_timeseries_interactive` on raw `PRCP` with `trendline=True`.
-5. **Annual daily maxima**: `data.groupby(data.index.year).max()`, resample to year-start timestamps, plot.
-6. **Accumulated annual rainfall** (`datag`):
-   - Build normalised annual totals (formula above).
-   - Styled bar plot via `plot_bar_probs(x=years, y=mm_per_year, bar_label='Accumulated annual rainfall', trendline=True, y_label='Accumulated annual rainfall (mm/year)', return_trend=True)` → glue `accum_rain`, save `F5_Rain_accum.png`.
-   - Multiply returned trend by 10 to report **mm/decade**; compute p-value separately if needed for reporting.
-   - Top-10 wettest years vs reference mean.
-   - Anomaly plot with twin axis for absolute rainfall + top-10 scatter → save `F5_Rain_anom_top10.png`.
-7. **Seasonal accumulated rainfall**: split by dry/wet season, compute annual normalised totals per season, plot anomalies vs reference → save `F6a_Rain_dry_season.png`, `F6a_Rain_wet_season.png`.
-8. **ONI / ENSO** (when requested):
-   - `download_oni_index('https://psl.noaa.gov/data/correlation/oni.data')` (cache as `data/rainfall/oni_index.pkl` when `update_oni = True`).
-   - Join monthly mean `PRCP` from `data_daily`.
-   - `add_oni_cat` + `plot_bar_probs_ONI` for mean and accumulated precipitation anomalies → save `F5_Rain_mean_ONI_daily.png`, `F5_Rain_mean_ONI_accum.png`.
-9. **Summary table**: `table_rain_21` via `style_matrix`. Persist via `persist_total_rainfall_outputs`.
+Notebook: `rainfall/a_Total_rainfall.ipynb`.
 
-### Function discovery
-Before writing custom matplotlib for bar charts, import `plot_bar_probs` from `ind_setup.plotting`. If missing, search locally or clone `https://github.com/lauracagigal/indicators_setup` into `external/indicators_setup` and add to `sys.path`. See `functions-api/SKILL.md`.
+1. Retain the daily `PRCP` series for daily maxima and ENSO joins.
+2. Normalize annual accumulated rainfall for unequal valid-day counts:
 
-### Persisted figures (under `outputs/figures/<site_tag>/`)
-- `F5_Rain_accum.png` — accumulated annual rainfall styled with `plot_bar_probs`.
-- `F5_Rain_anom_top10.png` — annual accumulated rainfall anomaly with top-10 years.
-- `F5_Rain_mean_ONI_daily.png`, `F5_Rain_mean_ONI_accum.png` — ENSO-modulated precipitation anomaly.
-- `F6a_Rain_dry_season.png` — dry-season accumulated anomaly.
-- `F6a_Rain_wet_season.png` — wet-season accumulated anomaly.
+   `annual mm = annual observed sum / annual valid-day count * 365`
 
-Optional diagnostic filename: `F5_Rain_accum_plot_bar_probs_<station_id>_<station_name>.png`.
+3. Calculate anomalies against `datag.loc[ref_start:ref_end].PRCP.mean()`; use a range slice, not a single `"1961:1990"` label.
+4. Plot annual totals and their trend with `plot_bar_probs`; multiply its annual slope by 10 for **mm/decade**.
+5. Report the ten wettest years and plot accumulated-rainfall anomalies.
+6. Calculate wet/dry seasonal totals only after confirming the site's season definitions. The notebook's Palau convention is wet May–October and dry November–April.
+7. When requested, join monthly rainfall to NOAA ONI and use `add_oni_cat` plus `plot_bar_probs_ONI`.
+8. Build `table_rain_21` and persist with `persist_total_rainfall_outputs`.
 
-### Reporting style
-Example:
+Canonical figures: `F5_Rain_accum.png`, `F5_Rain_anom_top10.png`, `F5_Rain_mean_ONI_daily.png`, `F5_Rain_mean_ONI_accum.png`, `F6a_Rain_dry_season.png`, and `F6a_Rain_wet_season.png`.
 
-> Accumulated annual rainfall at `PSW00040309 — KOROR` over 1952–2025 shows a trend of `+15.2 mm/decade` using the cleaned GHCN-Daily `PRCP` series. The trend is not statistically significant (`p = 0.636`). The 1961–1990 reference-period mean is `3757 mm/year`.
+### Dry days and consecutive dry spells
 
-Always include: station ID and name, data source (GHCN-Daily), analysis window, units (**mm**, **mm/year**), reference period, and whether data are completeness-filtered.
+Notebook: `rainfall/b_Consecutive_dry_days.ipynb`.
 
-### Hard rules
-- Do **not** re-download GHCN data here; read the cached pickle.
-- Use `ref_start:ref_end` slice for reference-period means — never `.loc["1961:1990"]` as a single label.
-- Use `plot_bar_probs` from `ind_setup.plotting` for published bar charts; do not inline matplotlib unless function discovery fails (label as quick-look).
-- Do not claim repo styling was used unless `plot_bar_probs` was actually imported and called.
-- Season labels (dry/wet months) are site-specific; confirm with the user before applying Palau defaults to another site.
+1. Use a **1 mm** threshold and state the exact comparison used by the notebook when reporting boundary values.
+2. Calculate annual dry-day counts.
+3. Call `consecutive_dry_days` for the annual maximum spell and `count_consecutive_days` for the running daily spell; do not reimplement either helper.
+4. Plot annual counts and maximum spells with `plot_bar_probs`; report trends in **days/decade**.
+5. Build `table_rain_22` and persist with `persist_dry_days_outputs`.
 
----
+Canonical figures: `F6a_Number_dry.png` and `F6b_Consecutive_dry.png`.
 
-<!-- SOURCE: assistant/skills/consecutive-dry-days/SKILL.md -->
+### Wet and heavy-rainfall days
 
----
-name: consecutive-dry-days
-description: Compute annual dry-day counts and maximum/mean consecutive dry-day spells (a drought indicator) using the 1 mm threshold. Use when working on notebooks/historical/National/rainfall/b_Consecutive_dry_days.ipynb or answering questions about dry spells, drought, or consecutive dry days.
----
+Notebook: `rainfall/c_Heavy_rainfall.ipynb`.
 
-## Skill: Consecutive Dry Days (notebook `notebooks/historical/National/rainfall/b_Consecutive_dry_days.ipynb`)
+1. Calculate annual wet-day counts using the notebook's 1 mm convention.
+2. Calculate the station threshold as the 95th percentile of non-missing `PRCP` over the **full available record**, rounded to two decimals.
+3. Count annual days above that threshold and keep the 1 mm and 95th-percentile populations explicitly labelled.
+4. Plot both series with `plot_bar_probs`; report trends in **days/decade** and the computed threshold in **mm**.
+5. Build `table_rain_23` and persist with `persist_heavy_rainfall_outputs`.
 
-### Purpose
-Quantify dry-day frequency and consecutive dry spells at the site's GHCN station. Dry conditions are a key drought / water-stress indicator for Pacific Island sites.
+Canonical figures: `F7a_Wet_days_1mm.png` and `F7b_Wet_days_95p.png`.
 
-### Required inputs
-- Site config JSON (`data/sites/<site_key>.json`, from the shared `../00_site_setup.ipynb`).
-- Cleaned pickle (`data/rainfall/GHCN_<ghcn_station_id>.pkl`).
+## Common plotting and reporting rules
 
-### Key definitions
-- **Dry day**: `PRCP < 1 mm` (equivalently `PRCP <= 1 mm` depending on strict `>` vs `>=` in the wet-day flag; primary threshold is **1 mm**).
-- **Wet day**: `PRCP > 1 mm`.
-- **Consecutive dry days (annual max)**: longest run of dry days within each year, via `consecutive_dry_days` applied per year.
-- **Running consecutive dry days**: per-day count of the current dry spell via `count_consecutive_days` on `PRCP < threshold`.
-
-Month/year completeness filtering is applied **once**, in the shared `00_site_setup.ipynb`, before the pickle is cached — do not re-filter years by observation count in this notebook.
-
-### Workflow
-1. Load config and cached `PRCP` data. Build `site_figures_dir`.
-2. Classify wet/dry: `data['wet_day'] = np.where(PRCP > 1, 1, 0)` (NaN where missing).
-3. Exploratory distribution bar chart (wet vs dry day counts).
-4. **Annual dry-day counts**:
-   - `threshold = 1` mm.
-   - Annual count of dry days (`wet_day_t == 0`) → `plot_bar_probs(..., trendline=True, return_trend=True)` → glue `number_dry_days`, save `F6a_Number_dry.png`.
-   - Multiply returned trend by 10 to report **days/decade**.
-5. **Consecutive dry days**:
-   - `data['dry_day'] = np.where(PRCP < threshold, 1, 0)`.
-   - `consecutive_dry_days` per year (annual maximum spell).
-   - `count_consecutive_days` on `PRCP < threshold` for per-day running counts.
-   - Mean consecutive dry days per year → glue `mean_dry_days_fig`.
-   - Maximum consecutive dry days per year → `plot_bar_probs` → glue `maximum_cons_dry_days`, save `F6b_Consecutive_dry.png`.
-6. **Summary table**: `table_rain_22` via `style_matrix`. Persist via `persist_dry_days_outputs`.
-
-### Function discovery
-Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions-api/SKILL.md`.
-
-### Persisted figures
-- `F6a_Number_dry.png` — annual number of dry days (< 1 mm).
-- `F6b_Consecutive_dry.png` — annual maximum consecutive dry days.
-
-### Reporting style
-- "Dry days are defined as days with rainfall below 1 mm (0.04 inches)."
-- "Maximum consecutive dry days at <station_id> (<start>–<end>): trend X days/decade (p = P). Source: GHCN-Daily."
-- Report both annual dry-day count and maximum consecutive dry-day metrics.
-- Always state whether data are completeness-filtered.
-
-### Hard rules
-- Use `consecutive_dry_days` and `count_consecutive_days` from `functions/rainfall.py` — do not reimplement inline.
-- Do not change the 1 mm threshold without explicit user request (WMO / ETCCDI wet-day convention).
-- Published figures must use `plot_bar_probs` from `ind_setup.plotting` after function discovery.
-- If falling back to custom matplotlib, label the figure as quick-look or non-repo-styled.
+- Discover and import `plot_bar_probs`, `plot_bar_probs_ONI`, `add_oni_cat`, and `plot_timeseries_interactive` as described in `../functions-api/SKILL.md`; do not redefine them inline.
+- Label a custom matplotlib fallback as a quick-look figure, not repository styling.
+- Report station ID and name, GHCN-Daily source, analysis window, units, reference period, completeness filtering, trend and p-value where available.
+- Distinguish **mm/day**, **mm/year**, **mm/decade**, event **days/year**, and **days/decade**.
+- Follow `../output-conventions/SKILL.md` for every persisted artifact.
 
 ---
 
-<!-- SOURCE: assistant/skills/heavy-rainfall/SKILL.md -->
+<!-- SOURCE: assistant/skills/national-temperature/SKILL.md -->
 
 ---
-name: heavy-rainfall
-description: Compute annual wet-day counts (>=1 mm) and heavy-rainfall day counts (above the station's own 95th percentile). Use when working on notebooks/historical/National/rainfall/c_Heavy_rainfall.ipynb or answering questions about wet days or extreme/heavy rainfall.
+name: national-temperature
+description: "Compute and maintain the complete National air-temperature workflow for one configured GHCN-Daily station: annual mean temperature and anomalies, TMIN/TMAX and diurnal range, hot-day TX90p and cold-night TN10p extremes, trends, top years, and ENSO context. Use for any notebook under notebooks/historical/National/air_temperature/ or questions about site-scale temperature indicators."
 ---
 
-## Skill: Heavy Rainfall (notebook `notebooks/historical/National/rainfall/c_Heavy_rainfall.ipynb`)
+# National air temperature
 
-### Purpose
-Quantify wet-day frequency and extreme (heavy) rainfall days at the site's GHCN station.
+Use this skill for all three National temperature notebooks. Keep their common setup, cached data, plotting functions and output paths consistent.
 
-### Required inputs
-- Site config JSON (`data/sites/<site_key>.json`, from the shared `../00_site_setup.ipynb`).
-- Cleaned pickle (`data/rainfall/GHCN_<ghcn_station_id>.pkl`).
+## Inputs and shared setup
 
-### Key definitions
-- **Wet day**: `PRCP >= 1 mm` (days above the 1 mm threshold).
-- **Heavy rainfall day**: `PRCP` above the **95th percentile** of the full record (`np.percentile(PRCP.dropna(), 95)`), rounded to 2 decimals. For Koror this is typically ~45.7 mm.
+- Run `notebooks/historical/National/00_site_setup.ipynb` first.
+- Load `data/sites/<site_key>.json`, then `data/air_temp/GHCN_<ghcn_station_id>.pkl`.
+- Verify a `DatetimeIndex` and the required `TMIN`, `TMAX`, `TMEAN`, and `diff` columns.
+- Preserve a daily copy before annual resampling.
+- Use the configured reference period and output-path helpers. Do not re-download GHCN or redefine site values in indicator notebooks.
 
-Month/year completeness filtering is applied **once**, in the shared `00_site_setup.ipynb`, before the pickle is cached — do not re-filter years by observation count in this notebook.
+## Route by notebook
 
-### Workflow
-1. Load config and cached data (already `.dropna()`'d for completeness). Build `site_figures_dir`. Glue `n_years`.
-2. Classify wet/dry (`wet_day` flag at 1 mm). Exploratory distribution plot.
-3. **Wet days (> 1 mm)**:
-   - Annual count of wet days → `plot_bar_probs(..., trendline=True, return_trend=True)` → glue `number_wet_days`, save `F7a_Wet_days_1mm.png`.
-   - Multiply returned trend by 10 to report **days/decade**.
-   - Keep copy `data_th_1mm` for the summary table.
-4. **Heavy rainfall days (95th percentile)**:
-   - `threshold = round(np.percentile(data['PRCP'].dropna(), 95), 2)`.
-   - Annual count of days above threshold → `plot_bar_probs` → glue `number_over_95`, save `F7b_Wet_days_95p.png`.
-   - Keep copy `data_th_95` for the summary table.
-5. **Summary table**: `table_rain_23` via `style_matrix`. Persist via `persist_heavy_rainfall_outputs`.
+### Annual mean temperature
 
-### Function discovery
-Use `plot_bar_probs` from `ind_setup.plotting` for all published bar charts. Import via `sys.path` to `indicators_setup` or clone from <https://github.com/lauracagigal/indicators_setup> if missing. See `functions-api/SKILL.md`.
+Notebook: `air_temperature/a_mean_temperature.ipynb`.
 
-### Persisted figures
-- `F7a_Wet_days_1mm.png` — annual wet-day count (> 1 mm).
-- `F7b_Wet_days_95p.png` — annual heavy-rainfall days (> 95th percentile).
+1. Resample `TMEAN` to annual means.
+2. Use `plot_bar_probs` for the published annual trend; report the slope in **°C/decade**.
+3. Calculate `TMEAN_ref = TMEAN - mean(TMEAN[ref_start:ref_end])` and identify the ten warmest anomaly years.
+4. For ENSO context, join monthly station values to NOAA ONI and use `add_oni_cat` plus `plot_bar_probs_ONI`.
+5. Persist the mean-temperature figures, ENSO summary CSV, and `T_mean_summary_metrics` JSON.
 
-### Reporting style
-- "Wet days: rainfall above 1 mm. Heavy rainfall days: rainfall above the 95th percentile (<threshold> mm)."
-- "Wet-day trend at <station_id>: X days/decade (p = P). Heavy-rainfall trend: Y days/decade (p = P)."
-- Always state the computed 95th-percentile threshold in mm and whether data are completeness-filtered.
+Canonical figures: `F2_ST_Mean.png` and `F2_ST_Annomalies_top10.png`.
 
-### Hard rules
-- The 95th percentile is computed on the **full available record** at the station (not restricted to the reference period), matching the notebook.
-- Do not conflate wet-day (1 mm) and heavy-rainfall (95p) metrics in the same sentence without labelling each.
-- Use `plot_bar_probs` for published bar charts after function discovery; do not inline matplotlib unless truly unavailable (label as quick-look).
-- Do not claim repo styling was used unless `plot_bar_probs` was actually imported and called.
+### Minimum, maximum and diurnal range
 
----
+Notebook: `air_temperature/b_min_max_temperature.ipynb`.
 
-<!-- SOURCE: assistant/skills/mean-temperature/SKILL.md -->
+1. Use `plot_timeseries_interactive` for daily and annual `TMIN` and `TMAX` series.
+2. Plot annual `TMIN` and `TMAX` together on a shared y-axis so their trends remain visually comparable.
+3. Treat `diff = TMAX - TMIN` as the diurnal temperature range and plot its annual trend separately.
+4. Persist HTML and PNG versions plus `T_minmax_summary_metrics` JSON.
 
----
-name: mean-temperature
-description: Compute annual mean surface temperature trend, anomaly versus the 1961-1990 reference period, top-10 warmest years, and ENSO sensitivity. Use when working on notebooks/historical/National/air_temperature/a_mean_temperature.ipynb or answering questions about mean or average temperature trends.
----
+Canonical figures: `F3_ST_min.html/.png`, `F3_ST_max.html/.png`, and `F3_ST_min_max.html/.png`.
 
-## Skill: Mean Temperature (notebook `notebooks/historical/National/air_temperature/a_mean_temperature.ipynb`)
+### Hot days and cold nights
 
-### Purpose
-Quantify the trend and reference-period anomaly of the annual mean surface temperature at the site's GHCN station, and characterize ENSO modulation using NOAA ONI.
+Notebook: `air_temperature/c_hot_cold_days.ipynb`.
 
-### Required inputs
-- A valid site config JSON at `data/sites/<site_key>.json` (produced by the shared `../00_site_setup.ipynb`, one level above `air_temperature/`).
-- The cleaned per-station pickle at `data/air_temp/GHCN_<ghcn_station_id>.pkl` (also produced by `00_site_setup.ipynb`).
+1. For ETCCDI-style results, use `exceedance_rate_for_base_period` and `exceedance_rate_for_outbase_period` from `functions/temp_func.py`.
+2. Define TX90p from calendar-day `TMAX` 90th-percentile thresholds and TN10p from calendar-day `TMIN` 10th-percentile thresholds over the configured base period.
+3. Keep the notebook's simpler station-wide fixed-percentile companion metric separately labelled; never present it as identical to the calendar-day ETCCDI method.
+4. Plot hot and cold counts with `plot_timeseries_interactive` and persist both interactive and static outputs plus the extremes summary metrics.
 
-### Workflow
-1. Set `site_key` (e.g. `"palau_PSW00040309"`, or list existing keys first with `list_available_sites(...)`) and load config: `site_cfg = load_site_config(Path('../../../../data/sites') / site_config_filename(site_key))`. Extract `site_name`, `site_lon`, `site_lat`, `country`, `ghcn_station_id`, `ghcn_station_name`, `vars_interest`, `ref_start`, `ref_end`.
-2. Build `site_output_dir = Path('../../../../outputs') / build_site_tag(site_name, site_lon, site_lat)` and `mkdir(parents=True, exist_ok=True)`.
-3. Load the cached station data: `st_data = pd.read_pickle(Path('../../../../data/air_temp') / f'GHCN_{ghcn_station_id}.pkl')`. Verify it has `TMIN`, `TMAX`, `TMEAN`, `diff` and a `DatetimeIndex`.
-4. Annual aggregation: `st_data = st_data.resample('YE').mean()`.
-5. Trend on annual mean (`TMEAN`):
-   - Static figure: `fig, ax, trend = plot_bar_probs(x=st_data.index.year, y=st_data['TMEAN'].values, ...)` (from `ind_setup.plotting`). The `trend` tuple gives the linear fit and significance.
-   - Interactive variant: `plot_timeseries_interactive([{'data': st_data, 'var': 'TMEAN', 'ax': 1, 'label': 'TMEAN'}], trendline=True, ...)` from `ind_setup.plotting_int`.
-6. Anomalies vs reference period:
-   - `mean_ref = st_data.loc[ref_start:ref_end].TMEAN.mean()`.
-   - `st_data['TMEAN_ref'] = st_data['TMEAN'] - mean_ref`.
-   - Top-`nevents=10` warmest years overlay via `plot_bar_probs(... nevents=10, ...)`.
-7. ENSO context:
-   - `df_oni = download_oni_index('https://psl.noaa.gov/data/correlation/oni.data')`.
-   - Resample station data to monthly: `st_data_monthly = st_data_daily.resample('M').mean()` (use `st_data_daily` before the annual resample).
-   - Join `df_oni['tmin'] = st_data_monthly['TMIN']`, `df_oni['tmax'] = st_data_monthly['TMAX']`.
-   - Build the ENSO-coloured bar plot via `add_oni_cat` + `plot_bar_probs_ONI` from `ind_setup.plotting`.
-   - Annual aggregation for the scatter: `df_oni.resample('Y').mean()`.
-8. Persist results in `site_output_dir`:
-   - `F2_ST_Mean_<site_tag>.png` (annual mean + trend).
-   - `F2_ST_Annomalies_top10_<site_tag>.png` (anomaly bars vs ref period).
-   - `ENSO_temperature_summary_<site_tag>.csv` (ENSO slope, correlation, p-value).
-   - `T_mean_summary_metrics_<site_tag>.json` with: trend rate (°C/decade), Δ over window (°C), `mean_ref` (°C), top-10 warmest years, ENSO slope (°C/°C), r, p-value, `station_id`, `country`, `period`.
+Canonical figures: `F4_ST_hot_cold.html/.png` and `F4_ST_hot_cold_percentiles.html/.png`.
 
-### Reporting style
-- "Annual mean temperature trend at <station_id> <station_name> (<start>–<end>): X °C/decade (Δ Y °C over the window). Source: GHCN-Daily."
-- "Top 10 warmest years (anomaly vs <ref_start>–<ref_end>): list of (year, +Δ °C)."
-- "ENSO sensitivity (TMEAN vs ONI): S °C/°C, r = R, p = P."
-- Always cite the analysis window, station ID, and which JSON in `outputs/<site_tag>/` backs each number.
+## Common plotting and reporting rules
 
-### Hard rules
-- Do NOT re-download GHCN data here; always read the cached pickle. If it's missing, instruct the user to run the shared `notebooks/historical/National/00_site_setup.ipynb`.
-- Do NOT redefine `plot_bar_probs` or `plot_timeseries_interactive` inline; import them from `ind_setup`.
-- Use the `ref_start` / `ref_end` from `site_cfg` (do not hardcode 1961-1990 here).
-- The trend reported in the JSON must come from `plot_bar_probs(...)` (or equivalent helper) — never from an ad-hoc `np.polyfit` call.
-
----
-
-<!-- SOURCE: assistant/skills/min-max-temperature/SKILL.md -->
-
----
-name: min-max-temperature
-description: Compute annual minimum and maximum temperature trends and the diurnal temperature range (TMAX minus TMIN). Use when working on notebooks/historical/National/air_temperature/b_min_max_temperature.ipynb or answering questions about TMIN/TMAX trends or diurnal range.
----
-
-## Skill: Min / Max Temperature (notebook `notebooks/historical/National/air_temperature/b_min_max_temperature.ipynb`)
-
-### Purpose
-Quantify and visualize the annual minimum (`TMIN`) and maximum (`TMAX`) temperature trends at the site's GHCN station, plus the diurnal range (`diff = TMAX − TMIN`).
-
-### Required inputs
-- A valid site config JSON (`data/sites/<site_key>.json`, from the shared `../00_site_setup.ipynb`).
-- The cleaned per-station pickle (`data/air_temp/GHCN_<ghcn_station_id>.pkl`).
-
-### Workflow
-1. Set `site_key`, load config (`load_site_config(Path('../../../../data/sites') / site_config_filename(site_key))`), and build `site_output_dir = Path('../../../../outputs') / build_site_tag(...)`.
-2. Load the cached pickle: `st_data = pd.read_pickle(...)`. Verify columns `TMIN`, `TMAX`, `TMEAN`, `diff` and a `DatetimeIndex`.
-3. Keep a daily copy: `st_data_daily = st_data.copy()`. Sanity print: `st_data_daily.TMIN.mean(), st_data_daily.TMAX.mean()`.
-4. Daily series figures (plotly interactive, last decade shown by default):
-   - `plot_timeseries_interactive([{'data': st_data_daily, 'var': 'TMAX', 'ax': 1, 'label': 'TMAX'}], trendline=False)`.
-   - Same for `'TMIN'`.
-5. Annual aggregation: `st_data = st_data.resample('YE').mean()` (annual mean of the daily values).
-6. Annual figures with trend (plotly):
-   - `plot_timeseries_interactive([{'data': st_data, 'var': 'TMIN', 'ax': 1, 'label': 'TMIN'}], trendline=True, ...)` → `F3_ST_min`.
-   - Same for `'TMAX'` → `F3_ST_max`.
-   - Combined: `[{'var': 'TMIN', ...}, {'var': 'TMAX', ...}]` → `F3_ST_min_max`. Helper returns `(fig, TRENDS)` where `TRENDS` holds the per-variable trend metadata.
-7. Diurnal range:
-   - `plot_timeseries_interactive([{'data': st_data, 'var': 'diff', 'ax': 1, 'label': 'Difference TMAX - TMIN'}], trendline=True)`.
-8. Persist results in `site_output_dir`:
-   - `F3_ST_min_<site_tag>.html` + `.png`.
-   - `F3_ST_max_<site_tag>.html` + `.png`.
-   - `F3_ST_min_max_<site_tag>.html` + `.png`.
-   - `T_minmax_summary_metrics_<site_tag>.json` with: TMIN trend (°C/decade), TMAX trend (°C/decade), diurnal-range trend (°C/decade), TMIN/TMAX annual mean (°C), `station_id`, `country`, `period`.
-
-### Reporting style
-- "Annual mean TMIN trend at <station_id> (<start>–<end>): X °C/decade. Annual mean TMAX trend: Y °C/decade. Diurnal range trend: Z °C/decade. Source: GHCN-Daily."
-- Always report TMIN and TMAX trends together (asymmetric warming is a key climate-monitoring indicator).
-- Always state the analysis window and station ID.
-
-### Hard rules
-- Do NOT re-download GHCN data here; always read the cached pickle.
-- Do NOT inline `plotly.graph_objects` figures; use `plot_timeseries_interactive(...)`.
-- The combined min/max figure must use a shared y-axis so the magnitude of TMIN and TMAX trends can be compared visually.
-- Do not drop or clip values manually (e.g. `st_data.loc[st_data.TMEAN < 50]`) — that responsibility belongs to the shared `notebooks/historical/National/00_site_setup.ipynb`.
-
----
-
-<!-- SOURCE: assistant/skills/hot-cold-days/SKILL.md -->
-
----
-name: hot-cold-days
-description: Compute hot-day (TX90p) and cold-night (TN10p) ETCCDI exceedance counts plus a simpler fixed-percentile variant. Use when working on notebooks/historical/National/air_temperature/c_hot_cold_days.ipynb or answering questions about extreme heat/cold days, TX90p, or TN10p.
----
-
-## Skill: Hot Days & Cold Nights (notebook `notebooks/historical/National/air_temperature/c_hot_cold_days.ipynb`)
-
-### Purpose
-Quantify the annual count and percentage anomaly of **hot days** (TX90p — `TMAX` above the 90th percentile of the 1961–1990 climatology) and **cold nights** (TN10p — `TMIN` below the 10th percentile of the same base period), plus a simpler percentile-based count using fixed quantiles over `1961`-`1991`.
-
-### Required inputs
-- A valid site config JSON (`data/sites/<site_key>.json`, from the shared `../00_site_setup.ipynb`).
-- The cleaned per-station pickle (`data/air_temp/GHCN_<ghcn_station_id>.pkl`).
-
-### Definitions (ETCCDI / WMO)
-- **TX90p (hot day)**: a calendar day on which `TMAX` exceeds the 90th percentile threshold computed from a centred 5-day window across the 1961–1990 base period for the same calendar day.
-- **TN10p (cold night)**: same as above, with `TMIN` and the 10th percentile (below instead of above).
-- The base period is hardcoded in `temp_func.py` (`BASE_PERIOD_START = 1961`, `BASE_PERIOD_END = 1990`). Do not change without explicit user request.
-
-### Workflow
-1. Set `site_key`, load config (`load_site_config(Path('../../../../data/sites') / site_config_filename(site_key))`) and the cached pickle. Build `site_output_dir = Path('../../../../outputs') / build_site_tag(...)`.
-2. Add the day-of-year key the climatology functions need:
-   - `st_data['DATE'] = st_data.index`.
-   - `st_data['DAY'] = pd.to_datetime("2024-" + st_data['DATE'].dt.strftime('%m-%d'), format='%Y-%m-%d')`.
-3. Daily copy: `st_data_daily = st_data.copy()`.
-4. **ETCCDI exceedance thresholds**:
-   - `exceed_rates_TMAX = exceedance_rate_for_outbase_period(st_data, "TMAX")` → 366-row DataFrame `(DAY, THRESHOLD)`.
-   - `exceed_rates_TMIN = exceedance_rate_for_outbase_period(st_data, "TMIN")`.
-5. Apply thresholds to the full record:
-   - `TMAX_dict = dict(zip(exceed_rates_TMAX['DAY'], exceed_rates_TMAX['THRESHOLD']))` and similar for TMIN.
-   - `df_exceed['THRESHOLD_TMAX'] = df_exceed['DAY'].map(TMAX_dict)`.
-   - `df_exceed['HOT_DAY'] = df_exceed['TMAX'] > df_exceed['THRESHOLD_TMAX']`.
-   - `df_exceed['THRESHOLD_TMIN'] = df_exceed['DAY'].map(TMIN_dict)`.
-   - `df_exceed['COLD_NIGHT'] = df_exceed['TMIN'] < df_exceed['THRESHOLD_TMIN']`.
-6. Base-period anomaly rates:
-   - `ex_cold, all_cold = exceedance_rate_for_base_period(st_data, "TMIN")`.
-   - `ex_hot, all_hot = exceedance_rate_for_base_period(st_data, "TMAX")`.
-   - These provide the per-year rate over 1961–1990 used to centre the percentage anomaly.
-7. Annual aggregation:
-   - For each year, count `HOT_DAY` and `COLD_NIGHT` and divide by the base-period mean (`ex_hot`, `ex_cold`) → `df_hot_anom`, `df_cold_anom` (one row per year, `Perc_Anom` column).
-   - Multiply by `3.6525` to express the percentage anomaly in **days/year** (≈ 365.25 / 100). Both representations should be available.
-8. Figures (plotly, via `plot_timeseries_interactive`):
-   - `F4_ST_hot_cold` — cold nights AND hot days percentage anomaly with trendlines.
-   - `F4_ST_hot_cold_percentiles` — same with simple percentile counts (see step 9).
-9. **Simple percentile counts** (second section of the notebook):
-   - `q90 = st_data.loc['1961':'1991'].TMAX.quantile(0.9)`.
-   - `q10 = st_data.loc['1961':'1991'].TMIN.quantile(0.1)`.
-   - `st_max_counts` = annual count of `TMAX > q90`.
-   - `st_min_counts` = annual count of `TMIN < q10`.
-10. Persist results in `site_output_dir`:
-    - `F4_ST_hot_cold_<site_tag>.png` + `.html`.
-    - `F4_ST_hot_cold_percentiles_<site_tag>.png` + `.html`.
-    - `T_hot_days_per_year_<site_tag>.csv` and `T_cold_nights_per_year_<site_tag>.csv`.
-    - `T_hot_cold_summary_metrics_<site_tag>.json` with: `threshold_definition` (ETCCDI / fixed-percentile), `hot_days_per_year_stats`, `cold_nights_per_year_stats` (`n`, `mean`, `min`, `max`, `std`), `slope_hot_days`, `p_value_hot_days`, `slope_cold_nights`, `p_value_cold_nights`, `q90_TMAX_C`, `q10_TMIN_C`, `station_id`, `country`, `period`.
-
-### Reporting style
-- "At <station_id>, hot days exceed the day-of-year 90th percentile of 1961–1990. Annual count trend: S days/year (p = P)."
-- "Cold nights are days with TMIN below the day-of-year 10th percentile of 1961–1990. Annual count trend: S days/year (p = P)."
-- Always state which definition is in use (ETCCDI percentile-by-day vs simple fixed-percentile over 1961–1991).
-- Color convention: hot days = warm tones (red/orange), cold nights = cool tones (blue).
-
-### Hard rules
-- Do NOT use percentile thresholds other than 90 (TMAX) / 10 (TMIN) in primary reporting unless explicitly requested.
-- Do NOT change the base period (1961–1990) without explicit user request; it is hardcoded in `temp_func.py`.
-- All figures must be produced via `plot_timeseries_interactive(...)` from `ind_setup.plotting_int`. If a new variant is needed, add it to `indicators_setup` first.
-- The simple-percentile and ETCCDI variants must NOT be conflated in the same table; keep them in separate JSON sub-dictionaries.
+- Reuse `plot_bar_probs` and `plot_timeseries_interactive`; follow `../functions-api/SKILL.md` before adding plotting code.
+- Report station ID and name, GHCN-Daily source, analysis period, configured reference period, completeness filtering and units.
+- Report trends in **°C/decade** and distinguish annual mean values from daily extremes and event counts.
+- Report `TMIN` and `TMAX` together when discussing asymmetric warming.
+- Follow `../output-conventions/SKILL.md` for saved HTML, PNG, CSV and JSON files.
 
 ---
 
@@ -1166,99 +935,55 @@ Rainfall and air-temperature share this one setup notebook (both variables are p
 
 ---
 
-<!-- SOURCE: assistant/skills/regional-rainfall/SKILL.md -->
+<!-- SOURCE: assistant/skills/regional-atmosphere/SKILL.md -->
 
 ---
-name: regional-rainfall
-description: Compute per-station regional rainfall indicators (total annual rainfall, dry/wet days, consecutive dry days, heavy rainfall) across every station in a region and build Pacific EEZ trend maps, with an optional ERA5 background for total annual rainfall. Use when working on notebooks/historical/Regional/rainfall/regional_indicators.ipynb or answering questions about Pacific-wide/regional rainfall maps or trends.
+name: regional-atmosphere
+description: Compute and maintain Regional Pacific rainfall and air-temperature indicators from the multi-station GHCN dataset, including station summaries, EEZ trend maps, regional temperature anomaly series, and the limited ERA5 backgrounds supported by monthly data. Use for either regional_indicators.ipynb under Regional/rainfall or Regional/air_temperature, or questions about Pacific-wide atmosphere maps and trends.
 ---
 
-## Skill: Regional Rainfall Indicators (notebook `notebooks/historical/Regional/rainfall/regional_indicators.ipynb`)
+# Regional atmosphere indicators
 
-### Purpose
-For every station saved by `Regional/00_regional_setup.ipynb`, compute the **same rainfall indicators used at the single-site level** (`notebooks/historical/National/rainfall/`) and collect them into one regional dataset that can be mapped across the Pacific EEZ area. The per-station formulas live in `functions/rainfall_regional.py` (`_station_rainfall_indicators` / `compute_regional_rainfall_indicators`) — this notebook stays thin: load → compute → save → map.
+Use this skill for the parallel Regional rainfall and temperature notebooks. Both follow the same load → compute → summarize → persist → map workflow and use `functions/rainfall_regional.py`.
 
-### Indicator mapping to the National notebooks
-- `a_Total_rainfall.ipynb` → `total_annual_mm` (count-normalised annual accumulation, same formula as the National notebook).
-- `b_Consecutive_dry_days.ipynb` → `dry_days`, `max_consecutive_dry_days`, `mean_consecutive_dry_days`.
-- `c_Heavy_rainfall.ipynb` → `wet_days`, `heavy_days` (each station's **own** 95th-percentile threshold, not a region-wide one).
+## Shared inputs and workflow
 
-### Required inputs
-- `data/regional/<region_key>_stations.pkl` from `Regional/00_regional_setup.ipynb`.
+1. Run `notebooks/historical/Regional/00_regional_setup.ipynb` first.
+2. Load `data/regional/<region_key>_stations.pkl`.
+3. Call the domain-specific regional computation helper; never reproduce National formulas inline.
+4. Create one station × year dataset and a station summary containing per-decade trends and p-values.
+5. Persist pickle, long CSV and summary CSV before plotting.
+6. Use `plot_annual_regional_map` with an EEZ base map, a diverging colour scale centred on zero, significance markers at `p < 0.05`, and `RegionalMapConfig(min_years=20, ...)` unless setup used another threshold.
+7. Save figures beneath `outputs/figures/regional_<region_key>/`.
 
-### Workflow
-1. Load the regional station dictionary for `region_key`.
-2. `compute_regional_rainfall_indicators(stations_data, ...)` → `(dict_lon_lat, annual_data, heavy_thresholds)`. Stations with no usable `PRCP` (e.g. temperature-only stations) are skipped automatically.
-3. Build a per-station summary table: linear trend (per decade) + p-value of each indicator over its own period of record — this is exactly what the Section 5 maps plot.
-4. Save the computed indicators (pickle + long CSV + summary CSV, see Output contract).
-5. **Regional maps** — one trend map per indicator via `plot_annual_regional_map` (EEZ base map, diverging colour scale centred on zero, `x` marker for stations significant at 95%). `RegionalMapConfig(min_years=20, ...)` guards against an unstable trend from a station with very few valid years dominating the colour scale.
-6. **ERA5 background maps — `total_annual_mm` only.** ERA5 is opened as **monthly** total precipitation (`tp`); a monthly total is only enough to reconstruct the annual accumulated rainfall (mean or trend) by summing 12 months/year. The other five indicators (`dry_days`, `wet_days`, `max_consecutive_dry_days`, `mean_consecutive_dry_days`, `heavy_days`) are day-count/consecutive-run metrics that need **daily** precipitation and have no ERA5 counterpart — do not attempt to fabricate one. ERA5 mean/trend fields are cached as NetCDF under `data/regional/era5_cache/`; set `force_recompute_era5 = True` to refresh.
+## Rainfall branch
 
-### Output contract
-- `data/regional/<region_key>_rainfall_indicators.pkl` — `{"dict_lon_lat", "annual_data", "heavy_thresholds"}`.
-- `data/regional/<region_key>_rainfall_indicators_annual.csv` — long format, one row per station × year.
-- `data/regional/<region_key>_rainfall_indicators_summary.csv` — one row per station, trend + p-value per indicator.
-- `outputs/figures/regional_<region_key>/R_regional_<indicator>_trend_<region_key>.png` — one per indicator: `dry_days`, `heavy_days`, `max_consecutive_dry_days`, `mean_consecutive_dry_days`, `total_annual_mm`, `wet_days`.
-- `outputs/figures/regional_<region_key>/R_regional_total_annual_mm_mean_era5_<region_key>.png` and `..._trend_era5_<region_key>.png`.
+Notebook: `Regional/rainfall/regional_indicators.ipynb`.
 
-### Reporting style
-- "Regional [indicator] trend across the Pacific EEZ area (`region_key`): station-level map, N stations, X significant at p < 0.05."
-- State whether a map is station-only or has an ERA5 background, and that ERA5 background only exists for `total_annual_mm`.
+- Call `compute_regional_rainfall_indicators`.
+- Map `total_annual_mm`, `dry_days`, `wet_days`, `max_consecutive_dry_days`, `mean_consecutive_dry_days`, and `heavy_days`.
+- Produce an ERA5 mean or trend background only for `total_annual_mm`. Monthly ERA5 precipitation cannot reconstruct daily counts, consecutive spells or percentile-event metrics.
+- Report whether a figure is station-only or includes ERA5 context.
+- Persist `<region_key>_rainfall_indicators.pkl`, annual and summary CSVs, `R_regional_<indicator>_trend_<region_key>.png`, and the supported ERA5 total-rainfall maps.
 
-### Hard rules
-- Do not reimplement the per-station formulas inline — always call `compute_regional_rainfall_indicators` from `functions/rainfall_regional.py` so regional and National numbers can never silently diverge.
-- Do not add an ERA5 background to any indicator besides `total_annual_mm` — the underlying monthly ERA5 field cannot support the others.
-- Use `min_years=20` (or whatever `Regional/00_regional_setup.ipynb`'s `min_years_after_filter` was set to) consistently between the setup and mapping steps.
+## Temperature branch
 
----
+Notebook: `Regional/air_temperature/regional_indicators.ipynb`.
 
-<!-- SOURCE: assistant/skills/regional-temperature/SKILL.md -->
+- Call `compute_regional_temperature_indicators`.
+- Map `tmean_annual`, `tmin_annual`, `tmax_annual`, `diff_annual`, `hot_days_pct`, and `cold_nights_pct`.
+- Describe `hot_days_pct` and `cold_nights_pct` as fixed station-wide percentile proxies, not as the National calendar-day ETCCDI TX90p/TN10p method.
+- Use `compute_regional_temperature_anomaly_series` for the unweighted station-average anomaly and distinguish it from the area-weighted ERA5 EEZ anomaly.
+- Produce an ERA5 background only for `tmean_annual`; monthly mean ERA5 cannot reconstruct daily min/max or threshold counts.
+- Persist `<region_key>_temperature_indicators.pkl`, annual and summary CSVs, `T_regional_<indicator>_trend_<region_key>.png`, regional anomaly series, and the supported ERA5 mean-temperature maps.
 
----
-name: regional-temperature
-description: Compute per-station regional air-temperature indicators (mean/min/max annual temperature, diurnal range, hot days, cold nights) across every station in a region, build Pacific EEZ trend maps and a regional-mean anomaly time series, with an optional ERA5 background for mean annual temperature. Use when working on notebooks/historical/Regional/air_temperature/regional_indicators.ipynb or answering questions about Pacific-wide/regional temperature maps or trends.
----
+## Common safeguards
 
-## Skill: Regional Air-Temperature Indicators (notebook `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb`)
-
-### Purpose
-For every station saved by `Regional/00_regional_setup.ipynb`, compute the **same air-temperature indicators used at the single-site level** (`notebooks/historical/National/air_temperature/`) and collect them into one regional dataset that can be mapped across the Pacific EEZ area. Mirrors `Regional/rainfall/regional_indicators.ipynb` cell-for-cell. The per-station formulas live in `functions/rainfall_regional.py` (`_station_temperature_indicators` / `compute_regional_temperature_indicators`) — this notebook stays thin: load → compute → save → map.
-
-### Indicator mapping to the National notebooks
-- `a_mean_temperature.ipynb` → `tmean_annual` (annual mean of `TMEAN = (TMAX + TMIN) / 2`).
-- `b_min_max_temperature.ipynb` → `tmin_annual`, `tmax_annual`, `diff_annual` (diurnal range).
-- `c_hot_cold_days.ipynb` → `hot_days_pct`, `cold_nights_pct` — the notebook's **fixed-percentile companion metric** (a single station-wide 90th/10th percentile of `TMAX`/`TMIN` over the reference period), **not** the full calendar-day ETCCDI TX90p/TN10p climatology. `temp_func.py`'s method estimates a percentile per calendar day from a centred 5-day window with nested Python loops over the whole base period — fine for one station, far too slow for a few hundred. Do not describe `hot_days_pct`/`cold_nights_pct` as ETCCDI-equivalent; they are a simplified regional proxy.
-
-### Required inputs
-- `data/regional/<region_key>_stations.pkl` from `Regional/00_regional_setup.ipynb`.
-
-### Workflow
-1. Load the regional station dictionary for `region_key`.
-2. `compute_regional_temperature_indicators(stations_data, ...)` → `(dict_lon_lat, annual_data, thresholds)`. Stations with no usable `TMIN`/`TMAX` (e.g. rainfall-only stations) are skipped automatically.
-3. Build a per-station summary table: linear trend (per decade) + p-value of each indicator over its own period of record.
-4. Save the computed indicators (pickle + long CSV + summary CSV, see Output contract).
-5. **Regional-mean anomaly time series**: `compute_regional_temperature_anomaly_series(annual_data, ...)` — each station's own anomaly relative to the reference period, then a simple unweighted average across stations per year, with a 5-year centred rolling mean (solid = annual value, dashed = 5-year running mean).
-6. **Regional maps** — one trend map per indicator via `plot_annual_regional_map` (EEZ base map, red/blue diverging colour scale centred on zero, `x` marker for stations significant at 95%). Same `RegionalMapConfig(min_years=20, ...)` guard as the rainfall notebook.
-7. **ERA5 background maps — `tmean_annual` only.** ERA5 is opened as **monthly mean** 2 m temperature (`t2m`); a monthly mean is only enough to reconstruct the annual mean temperature (mean or trend) by averaging 12 months/year. `tmin_annual`, `tmax_annual`, `diff_annual` need daily min/max, and `hot_days_pct`/`cold_nights_pct` need a daily percentile-exceedance count — none of those exist in the monthly-mean ERA5 product, so no ERA5 background is produced for them. Cached under `data/regional/era5_cache/` (shared with the rainfall notebook's cache directory, different filenames).
-8. **ERA5 EEZ-mean anomaly time series**: `plot_era5_eez_temperature_anomaly(...)` — the ERA5 counterpart of Step 5, but an **area-weighted** mean over the Pacific EEZ grid cells rather than a station average.
-
-### Output contract
-- `data/regional/<region_key>_temperature_indicators.pkl` — `{"dict_lon_lat", "annual_data", "thresholds"}`.
-- `data/regional/<region_key>_temperature_indicators_annual.csv` — long format, one row per station × year.
-- `data/regional/<region_key>_temperature_indicators_summary.csv` — one row per station, trend + p-value per indicator.
-- `outputs/figures/regional_<region_key>/T_regional_<indicator>_trend_<region_key>.png` — one per indicator: `cold_nights_pct`, `diff_annual`, `hot_days_pct`, `tmax_annual`, `tmean_annual`, `tmin_annual`.
-- `outputs/figures/regional_<region_key>/T_regional_mean_anomaly_timeseries_<region_key>.png` (station average) and `..._timeseries_era5_<region_key>.png` (EEZ area-weighted).
-- `outputs/figures/regional_<region_key>/T_regional_tmean_annual_mean_era5_<region_key>.png` and `..._trend_era5_<region_key>.png`.
-
-### Reporting style
-- "Regional [indicator] trend across the Pacific EEZ area (`region_key`): station-level map, N stations, X significant at p < 0.05."
-- Always disambiguate `hot_days_pct`/`cold_nights_pct` (fixed regional percentile proxy) from the National `c_hot_cold_days.ipynb`'s ETCCDI TX90p/TN10p when reporting both in the same conversation.
-- State whether an anomaly series is the station-average or the ERA5 EEZ area-weighted version.
-
-### Hard rules
-- Do not reimplement the per-station formulas inline — always call `compute_regional_temperature_indicators` from `functions/rainfall_regional.py`.
-- Do not add an ERA5 background to any indicator besides `tmean_annual`.
-- Do not present `hot_days_pct`/`cold_nights_pct` as ETCCDI-equivalent to the National workflow's TX90p/TN10p — they use a different (simpler, faster) method by design.
+- Skip stations without the variables required by the selected branch.
+- Keep `region_key`, `min_years`, analysis periods, units and significance criteria explicit.
+- Do not compare station-average and ERA5 area-weighted series as though they used the same sampling.
+- Keep the ERA5 cache under `data/regional/era5_cache/` and use `force_recompute_era5` only when a refresh is intended.
+- Consult `../functions-api/SKILL.md`, `../data-sources/SKILL.md`, and `../output-conventions/SKILL.md` for shared implementation details.
 
 ---
 
@@ -1444,10 +1169,10 @@ description: Explains that no regional (multi-station, Pacific-wide) sea-level w
 ## Skill: Regional Sea Level (notebook `notebooks/historical/Regional/regional_plots.ipynb` — not yet built)
 
 ### Status
-**This workflow does not exist yet.** It is documented here, in the same structure as `regional-rainfall/SKILL.md` and `regional-temperature/SKILL.md`, specifically so the gap is visible and tracked with the same weight as the other two domains — not so an assistant can pretend the capability is already there. If a user asks for a regional/Pacific-wide sea-level map or a multi-station sea-level indicator, say plainly that it isn't built yet and point at what already exists to build it from (below), rather than improvising an ad-hoc figure or reusing the National single-site helpers as if they already generalized to many stations.
+**This workflow does not exist yet.** It is documented alongside `regional-atmosphere/SKILL.md` so the gap remains visible — not so an assistant can pretend the capability is already there. If a user asks for a regional/Pacific-wide sea-level map or a multi-station sea-level indicator, say plainly that it isn't built yet and point at what already exists to build it from (below), rather than improvising an ad-hoc figure or reusing the National single-site helpers as if they already generalized to many stations.
 
 Concretely, as of this repository merge:
-- `notebooks/historical/Regional/regional_plots.ipynb` is a **0-byte placeholder** — not valid JSON, no cells, nothing to run.
+- `notebooks/historical/Regional/regional_plots.ipynb` is a valid markdown-only placeholder included in the Jupyter Book; it contains no analysis or figures.
 - There is **no** `Regional/00_regional_setup.ipynb` equivalent for sea level — no notebook scans multiple UHSLC stations the way `Regional/00_regional_setup.ipynb` scans multiple GHCN stations. The National sea-level setup (`sea_level/0_site_setup.ipynb`) configures exactly one hardcoded site (see `assistant/skills/sea-level-site-setup/SKILL.md`).
 - `functions/cindra_regional_plotting_helpers.py` holds two **draft/experimental** plotting helpers clearly aimed at this future workflow, but neither is imported by any notebook.
 
@@ -1712,7 +1437,7 @@ The sea-level equivalent of `indicators_setup`: **every** published sea-level fi
 
 ## `functions/cindra_regional_plotting_helpers.py` — draft, not wired into any notebook
 
-Two regional sea-level plotting helpers prepared ahead of a not-yet-built regional sea-level workflow: `plot_regional_altimetry_trend_map_filled_tide_gauges` (gridded absolute altimetry trend + optional filled tide-gauge markers) and `plot_regional_flood_frequency_overview` (station-year flood-day heatmap + regional annual totals). The module docstring marks them "Draft / Experimental"; `grep` confirms no notebook imports them. `notebooks/historical/Regional/regional_plots.ipynb` is the presumed future consumer, but it is currently an empty file (0 bytes). Do not present output from these two functions as a published/repo-styled figure until they are actually wired into a notebook and reviewed — treat a request to use them the same as "the helper doesn't exist yet."
+Two regional sea-level plotting helpers prepared ahead of a not-yet-built regional sea-level workflow: `plot_regional_altimetry_trend_map_filled_tide_gauges` (gridded absolute altimetry trend + optional filled tide-gauge markers) and `plot_regional_flood_frequency_overview` (station-year flood-day heatmap + regional annual totals). The module docstring marks them "Draft / Experimental"; `grep` confirms no notebook imports them. `notebooks/historical/Regional/regional_plots.ipynb` is a markdown-only Jupyter Book placeholder. Do not present output from these helpers as published/repo-styled figures until they are wired into a reviewed analysis.
 
 ---
 
@@ -2010,25 +1735,20 @@ This folder holds the instructions used to train an external assistant — **CIn
 
 - **`CIndRA_role.md`** — paste the contents into the "Instructions" / system prompt of the assistant. Defines CIndRA's identity, scope (rainfall + air temperature + sea level + regional), conventions, data sources, analysis rules, plotting rules, output naming, and error handling for all domains. This is background context CIndRA always has, not something conditionally "activated" — it does not follow the Agent Skills format below.
 - **`aggregated_CIndRA_markdowns.md`** — single file with **all** markdowns below concatenated (role + skills + this README). Use when the assistant platform accepts one large knowledge file instead of separate uploads (e.g. a ChatGPT custom GPT's knowledge base). Regenerate after any source change: `python assistant/build_aggregated_CIndRA.py`.
-- **`skills/`** — one workflow-specific [Agent Skill](https://github.com/anthropics/skills) per notebook/topic: `skills/<name>/SKILL.md`, each with `name`/`description` YAML frontmatter per the [Agent Skills spec](https://agentskills.io/specification). In Claude Code / other Agent-Skills-aware clients, drop this whole `skills/` folder somewhere the client discovers skills from (e.g. `.claude/skills/`) and each one loads on demand. For a ChatGPT custom GPT (which has no skill-activation mechanism), instead upload each `SKILL.md` as a knowledge file, or use `aggregated_CIndRA_markdowns.md` for a single upload:
+- **`skills/`** — one focused [Agent Skill](https://github.com/anthropics/skills) per coherent domain or specialized workflow: `skills/<name>/SKILL.md`, each with `name`/`description` YAML frontmatter per the [Agent Skills spec](https://agentskills.io/specification). Related National atmosphere notebooks and their repeated setup/plotting rules are consolidated by domain. In Claude Code / other Agent-Skills-aware clients, drop this whole `skills/` folder somewhere the client discovers skills from (e.g. `.claude/skills/`) and each one loads on demand. For a ChatGPT custom GPT (which has no skill-activation mechanism), instead upload each `SKILL.md` as a knowledge file, or use `aggregated_CIndRA_markdowns.md` for a single upload:
 
 | Skill name | Notebook / scope |
 |---|---|
 | `site-setup` | `notebooks/historical/National/00_site_setup.ipynb` — shared entry point for rainfall + air temperature; not under `rainfall/` or `air_temperature/` |
-| `total-rainfall` | `National/rainfall/a_Total_rainfall.ipynb` |
-| `consecutive-dry-days` | `National/rainfall/b_Consecutive_dry_days.ipynb` |
-| `heavy-rainfall` | `National/rainfall/c_Heavy_rainfall.ipynb` |
-| `mean-temperature` | `National/air_temperature/a_mean_temperature.ipynb` |
-| `min-max-temperature` | `National/air_temperature/b_min_max_temperature.ipynb` |
-| `hot-cold-days` | `National/air_temperature/c_hot_cold_days.ipynb` |
+| `national-rainfall` | Complete National rainfall workflow: totals, anomalies, dry spells, wet days and heavy rainfall |
+| `national-temperature` | Complete National air-temperature workflow: mean/min/max temperature, diurnal range and hot/cold extremes |
 | `sea-level-site-setup` | `National/sea_level/0_site_setup.ipynb` — sea level's own entry point, not shared with the other two domains |
 | `trend-analysis` | `National/sea_level/a_sea_level_trend.ipynb` |
 | `anomaly-analysis` | `National/sea_level/b_sea_level_anomaly.ipynb` |
 | `flood-frequency` | `National/sea_level/c_sea_level_ff.ipynb` |
 | `rankings` | `National/sea_level/d_sea_level_rankings.ipynb` |
 | `regional-setup` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
-| `regional-rainfall` | `Regional/rainfall/regional_indicators.ipynb` |
-| `regional-temperature` | `Regional/air_temperature/regional_indicators.ipynb` |
+| `regional-atmosphere` | Regional rainfall and air-temperature indicators, station maps, anomaly series and supported ERA5 backgrounds |
 | `tropical-cyclones` | National site-radius and Regional Pacific-subregion IBTrACS/ONI workflows; `functions/tcs.py` |
 | `regional-sea-level` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
 | `functions-api` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
@@ -2041,7 +1761,7 @@ This folder holds the instructions used to train an external assistant — **CIn
 - `notebooks/historical/National/rainfall/` (`a_Total_rainfall.ipynb`, `b_Consecutive_dry_days.ipynb`, `c_Heavy_rainfall.ipynb`) and `notebooks/historical/National/air_temperature/` (`a_mean_temperature.ipynb`, `b_min_max_temperature.ipynb`, `c_hot_cold_days.ipynb`) — the two atmosphere indicator-specific analysis folders. Both use bare `a_`/`b_`/`c_` filename prefixes but live in different folders — disambiguate by folder or full filename, not by the bare letter.
 - `notebooks/historical/National/sea_level/` (`0_site_setup.ipynb`, `a_sea_level_trend.ipynb`, `b_sea_level_anomaly.ipynb`, `c_sea_level_ff.ipynb`, `d_sea_level_rankings.ipynb`) — the sea-level workflow, with its **own** site setup (a single hardcoded Palau site today, not the multi-site GHCN picker the atmosphere `00_site_setup.ipynb` has).
 - `notebooks/historical/National/tropical_cyclones/` — all and severe tropical cyclones entering a radius around a configured site, using IBTrACS and ONI.
-- `notebooks/historical/Regional/` includes multi-station rainfall/temperature and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` remains an empty sea-level placeholder.
+- `notebooks/historical/Regional/` includes multi-station rainfall/temperature and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` is a markdown-only sea-level placeholder.
 - `functions/` also includes `tcs.py`, the canonical National and Regional tropical-cyclone calculations, tables, and plotting helpers.
 - `data/rainfall/` — cached per-station GHCN pickles for `PRCP` (`GHCN_<station_id>.pkl`).
 - `data/air_temp/` — cached per-station GHCN pickles for `TMIN`/`TMAX`.

@@ -1,0 +1,49 @@
+# Jupyter Book configuration
+title: CIndRA Climate Indicators
+author: Laura Cagigal
+copyright: "2026"
+only_build_toc_files: true
+
+execute:
+  # Render stored notebook outputs. Data downloads and analyses are run manually.
+  execute_notebooks: off
+  timeout: -1
+
+latex:
+  latex_documents:
+    targetname: cindra-climate-indicators.tex
+
+repository:
+  url: https://github.com/lauracagigal/CIndRA
+  branch: main
+
+html:
+  use_issues_button: true
+  use_repository_button: true
+  use_edit_page_button: true
+  home_page_in_navbar: true
+  announcement: "In development"
+
+parse:
+  myst_url_schemes: [mailto, http, https]
+  myst_enable_extensions:
+    - amsmath
+    - dollarmath
+    - colon_fence
+
+sphinx:
+  config:
+    html_static_path:
+      - _static
+    html_css_files:
+      - custom.css
+    html_js_files:
+      - https://cdn.plot.ly/plotly-latest.min.js
+      - https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js
+    suppress_warnings:
+      - mystnb.unknown_mime_type
+
+launch_buttons:
+  binderhub_url: "https://mybinder.org"
+  use_jupyter_lab: true
+  thebe: true

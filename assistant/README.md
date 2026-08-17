@@ -6,25 +6,20 @@ This folder holds the instructions used to train an external assistant — **CIn
 
 - **`CIndRA_role.md`** — paste the contents into the "Instructions" / system prompt of the assistant. Defines CIndRA's identity, scope (rainfall + air temperature + sea level + regional), conventions, data sources, analysis rules, plotting rules, output naming, and error handling for all domains. This is background context CIndRA always has, not something conditionally "activated" — it does not follow the Agent Skills format below.
 - **`aggregated_CIndRA_markdowns.md`** — single file with **all** markdowns below concatenated (role + skills + this README). Use when the assistant platform accepts one large knowledge file instead of separate uploads (e.g. a ChatGPT custom GPT's knowledge base). Regenerate after any source change: `python assistant/build_aggregated_CIndRA.py`.
-- **`skills/`** — one workflow-specific [Agent Skill](https://github.com/anthropics/skills) per notebook/topic: `skills/<name>/SKILL.md`, each with `name`/`description` YAML frontmatter per the [Agent Skills spec](https://agentskills.io/specification). In Claude Code / other Agent-Skills-aware clients, drop this whole `skills/` folder somewhere the client discovers skills from (e.g. `.claude/skills/`) and each one loads on demand. For a ChatGPT custom GPT (which has no skill-activation mechanism), instead upload each `SKILL.md` as a knowledge file, or use `aggregated_CIndRA_markdowns.md` for a single upload:
+- **`skills/`** — one focused [Agent Skill](https://github.com/anthropics/skills) per coherent domain or specialized workflow: `skills/<name>/SKILL.md`, each with `name`/`description` YAML frontmatter per the [Agent Skills spec](https://agentskills.io/specification). Related National atmosphere notebooks and their repeated setup/plotting rules are consolidated by domain. In Claude Code / other Agent-Skills-aware clients, drop this whole `skills/` folder somewhere the client discovers skills from (e.g. `.claude/skills/`) and each one loads on demand. For a ChatGPT custom GPT (which has no skill-activation mechanism), instead upload each `SKILL.md` as a knowledge file, or use `aggregated_CIndRA_markdowns.md` for a single upload:
 
 | Skill name | Notebook / scope |
 |---|---|
 | `site-setup` | `notebooks/historical/National/00_site_setup.ipynb` — shared entry point for rainfall + air temperature; not under `rainfall/` or `air_temperature/` |
-| `total-rainfall` | `National/rainfall/a_Total_rainfall.ipynb` |
-| `consecutive-dry-days` | `National/rainfall/b_Consecutive_dry_days.ipynb` |
-| `heavy-rainfall` | `National/rainfall/c_Heavy_rainfall.ipynb` |
-| `mean-temperature` | `National/air_temperature/a_mean_temperature.ipynb` |
-| `min-max-temperature` | `National/air_temperature/b_min_max_temperature.ipynb` |
-| `hot-cold-days` | `National/air_temperature/c_hot_cold_days.ipynb` |
+| `national-rainfall` | Complete National rainfall workflow: totals, anomalies, dry spells, wet days and heavy rainfall |
+| `national-temperature` | Complete National air-temperature workflow: mean/min/max temperature, diurnal range and hot/cold extremes |
 | `sea-level-site-setup` | `National/sea_level/0_site_setup.ipynb` — sea level's own entry point, not shared with the other two domains |
 | `trend-analysis` | `National/sea_level/a_sea_level_trend.ipynb` |
 | `anomaly-analysis` | `National/sea_level/b_sea_level_anomaly.ipynb` |
 | `flood-frequency` | `National/sea_level/c_sea_level_ff.ipynb` |
 | `rankings` | `National/sea_level/d_sea_level_rankings.ipynb` |
 | `regional-setup` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
-| `regional-rainfall` | `Regional/rainfall/regional_indicators.ipynb` |
-| `regional-temperature` | `Regional/air_temperature/regional_indicators.ipynb` |
+| `regional-atmosphere` | Regional rainfall and air-temperature indicators, station maps, anomaly series and supported ERA5 backgrounds |
 | `tropical-cyclones` | National site-radius and Regional Pacific-subregion IBTrACS/ONI workflows; `functions/tcs.py` |
 | `regional-sea-level` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
 | `functions-api` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
@@ -37,7 +32,7 @@ This folder holds the instructions used to train an external assistant — **CIn
 - `notebooks/historical/National/rainfall/` (`a_Total_rainfall.ipynb`, `b_Consecutive_dry_days.ipynb`, `c_Heavy_rainfall.ipynb`) and `notebooks/historical/National/air_temperature/` (`a_mean_temperature.ipynb`, `b_min_max_temperature.ipynb`, `c_hot_cold_days.ipynb`) — the two atmosphere indicator-specific analysis folders. Both use bare `a_`/`b_`/`c_` filename prefixes but live in different folders — disambiguate by folder or full filename, not by the bare letter.
 - `notebooks/historical/National/sea_level/` (`0_site_setup.ipynb`, `a_sea_level_trend.ipynb`, `b_sea_level_anomaly.ipynb`, `c_sea_level_ff.ipynb`, `d_sea_level_rankings.ipynb`) — the sea-level workflow, with its **own** site setup (a single hardcoded Palau site today, not the multi-site GHCN picker the atmosphere `00_site_setup.ipynb` has).
 - `notebooks/historical/National/tropical_cyclones/` — all and severe tropical cyclones entering a radius around a configured site, using IBTrACS and ONI.
-- `notebooks/historical/Regional/` includes multi-station rainfall/temperature and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` remains an empty sea-level placeholder.
+- `notebooks/historical/Regional/` includes multi-station rainfall/temperature and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` is a markdown-only sea-level placeholder.
 - `functions/` also includes `tcs.py`, the canonical National and Regional tropical-cyclone calculations, tables, and plotting helpers.
 - `data/rainfall/` — cached per-station GHCN pickles for `PRCP` (`GHCN_<station_id>.pkl`).
 - `data/air_temp/` — cached per-station GHCN pickles for `TMIN`/`TMAX`.

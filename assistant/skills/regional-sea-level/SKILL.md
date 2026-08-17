@@ -6,10 +6,10 @@ description: Explains that no regional (multi-station, Pacific-wide) sea-level w
 ## Skill: Regional Sea Level (notebook `notebooks/historical/Regional/regional_plots.ipynb` — not yet built)
 
 ### Status
-**This workflow does not exist yet.** It is documented here, in the same structure as `regional-rainfall/SKILL.md` and `regional-temperature/SKILL.md`, specifically so the gap is visible and tracked with the same weight as the other two domains — not so an assistant can pretend the capability is already there. If a user asks for a regional/Pacific-wide sea-level map or a multi-station sea-level indicator, say plainly that it isn't built yet and point at what already exists to build it from (below), rather than improvising an ad-hoc figure or reusing the National single-site helpers as if they already generalized to many stations.
+**This workflow does not exist yet.** It is documented alongside `regional-atmosphere/SKILL.md` so the gap remains visible — not so an assistant can pretend the capability is already there. If a user asks for a regional/Pacific-wide sea-level map or a multi-station sea-level indicator, say plainly that it isn't built yet and point at what already exists to build it from (below), rather than improvising an ad-hoc figure or reusing the National single-site helpers as if they already generalized to many stations.
 
 Concretely, as of this repository merge:
-- `notebooks/historical/Regional/regional_plots.ipynb` is a **0-byte placeholder** — not valid JSON, no cells, nothing to run.
+- `notebooks/historical/Regional/regional_plots.ipynb` is a valid markdown-only placeholder included in the Jupyter Book; it contains no analysis or figures.
 - There is **no** `Regional/00_regional_setup.ipynb` equivalent for sea level — no notebook scans multiple UHSLC stations the way `Regional/00_regional_setup.ipynb` scans multiple GHCN stations. The National sea-level setup (`sea_level/0_site_setup.ipynb`) configures exactly one hardcoded site (see `assistant/skills/sea-level-site-setup/SKILL.md`).
 - `functions/cindra_regional_plotting_helpers.py` holds two **draft/experimental** plotting helpers clearly aimed at this future workflow, but neither is imported by any notebook.
 

@@ -97,7 +97,7 @@ Sea level has no `plot_bar_probs` equivalent — use the dedicated helpers in `s
 - `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` — regional rainfall indicators and Pacific EEZ maps, computed station-by-station from `00_regional_setup.ipynb`'s output.
 - `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb` — regional air-temperature indicators and Pacific EEZ maps, same pattern.
 - `notebooks/historical/Regional/tropical_cyclones/regional_indicators.ipynb` — independent all-basin IBTrACS Pacific-subregion workflow; it does not consume the GHCN regional setup.
-- `notebooks/historical/Regional/regional_plots.ipynb` — **currently empty** (0 bytes); not yet authored. Do not claim it produces anything until it has real content.
+- `notebooks/historical/Regional/regional_plots.ipynb` — markdown-only Jupyter Book placeholder; it does not produce analysis or figures.
 - `functions/site_common.py` — shared site config I/O and output-path helpers for rainfall/air-temperature, re-exported by both `rainfall.py` and `air_temp.py`, and partly reused by `sea_level.py` (`save_site_config`, `build_site_tag`, `build_output_filename`, `save_dict_json`).
 - `functions/rainfall.py` — dry-spell metrics, rainfall persist helpers (re-exports `site_common.py`).
 - `functions/air_temp.py` — air-temperature persist helpers (re-exports `site_common.py`).
@@ -154,11 +154,11 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 
 ### Regional rainfall — built
 - Setup: `Regional/00_regional_setup.ipynb` (shared with air temperature — see next section). See `assistant/skills/regional-setup/SKILL.md`.
-- Indicators/maps: `Regional/rainfall/regional_indicators.ipynb` reproduces the National `a_Total_rainfall.ipynb`/`b_Consecutive_dry_days.ipynb`/`c_Heavy_rainfall.ipynb` formulas per station (`compute_regional_rainfall_indicators` in `functions/rainfall_regional.py`), builds one Pacific EEZ trend map per indicator (`plot_annual_regional_map`), plus an ERA5-background mean/trend map for `total_annual_mm` only. See `assistant/skills/regional-rainfall/SKILL.md`.
+- Indicators/maps: `Regional/rainfall/regional_indicators.ipynb` reproduces the National `a_Total_rainfall.ipynb`/`b_Consecutive_dry_days.ipynb`/`c_Heavy_rainfall.ipynb` formulas per station (`compute_regional_rainfall_indicators` in `functions/rainfall_regional.py`), builds one Pacific EEZ trend map per indicator (`plot_annual_regional_map`), plus an ERA5-background mean/trend map for `total_annual_mm` only. See `assistant/skills/regional-atmosphere/SKILL.md`.
 
 ### Regional air temperature — built
 - Setup: `Regional/00_regional_setup.ipynb` (same notebook as rainfall — it downloads both `TMIN`/`TMAX` and `PRCP` per station in one pass). See `assistant/skills/regional-setup/SKILL.md`.
-- Indicators/maps: `Regional/air_temperature/regional_indicators.ipynb` reproduces the National `a_mean_temperature.ipynb`/`b_min_max_temperature.ipynb`/`c_hot_cold_days.ipynb` formulas per station (`compute_regional_temperature_indicators` in `functions/rainfall_regional.py`), a regional-mean anomaly time series (station-average and, separately, an ERA5 EEZ area-weighted version), one trend map per indicator, plus an ERA5-background mean/trend map for `tmean_annual` only. See `assistant/skills/regional-temperature/SKILL.md`.
+- Indicators/maps: `Regional/air_temperature/regional_indicators.ipynb` reproduces the National `a_mean_temperature.ipynb`/`b_min_max_temperature.ipynb`/`c_hot_cold_days.ipynb` formulas per station (`compute_regional_temperature_indicators` in `functions/rainfall_regional.py`), a regional-mean anomaly time series (station-average and, separately, an ERA5 EEZ area-weighted version), one trend map per indicator, plus an ERA5-background mean/trend map for `tmean_annual` only. See `assistant/skills/regional-atmosphere/SKILL.md`.
 
 ### Regional tropical cyclones — built
 - `Regional/tropical_cyclones/regional_indicators.ipynb` loads all-basin IBTrACS independently of `00_regional_setup.ipynb`.
@@ -167,7 +167,7 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 
 ### Regional sea level — not built yet
 - No regional setup notebook exists for sea level (no multi-station UHSLC scan analogous to `Regional/00_regional_setup.ipynb`'s GHCN scan).
-- `notebooks/historical/Regional/regional_plots.ipynb` is an empty placeholder (0 bytes) — not valid JSON, no cells.
+- `notebooks/historical/Regional/regional_plots.ipynb` is a valid markdown-only placeholder with no calculations or figures.
 - `functions/cindra_regional_plotting_helpers.py` holds two **draft/experimental** plotting helpers prepared for this workflow (`plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview`) but neither is imported by any notebook.
 - Do not claim a regional sea-level map or indicator exists, and do not improvise one from the National single-site sea-level helpers as if they already generalized to many stations. See `assistant/skills/regional-sea-level/SKILL.md` for exactly what exists to build this from and what's still missing.
 
@@ -357,7 +357,7 @@ When plotting: (1) load the cleaned pickle; (2) compute normalised annual accumu
 - ERA5-background helpers: `load_or_compute_era5_annual_rainfall`/`temperature`, `compute_era5_annual_rainfall_trend`, `compute_era5_annual_mean_rainfall`, `compute_era5_annual_mean_temperature`, `compute_era5_annual_temperature_trend`, `compute_era5_eez_mean_temperature_series`, `plot_monthly_rainfall_with_era5_background`, `plot_monthly_temperature_with_era5_background`, `plot_era5_eez_temperature_anomaly`.
 
 ### `functions/cindra_regional_plotting_helpers.py` — draft, unused
-- `plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview` — prepared for the not-yet-built regional sea-level workflow (`Regional/regional_plots.ipynb`, currently empty). Not imported by any notebook; do not present their output as a published figure without first wiring them in and reviewing.
+- `plot_regional_altimetry_trend_map_filled_tide_gauges`, `plot_regional_flood_frequency_overview` — prepared for the not-yet-built regional sea-level workflow. They are not imported by the markdown-only placeholder; do not present their output as published without first wiring them into reviewed analysis.
 
 ### `indicators_setup` (external — clone if missing; rainfall/air-temperature only)
 - `ind_setup.plotting`: `plot_bar_probs`, `plot_bar_probs_ONI`, `add_oni_cat`, `plot_oni_index_th`, `fontsize`
@@ -420,20 +420,15 @@ Examples:
 For step-by-step notebook workflows, see:
 
 - `assistant/skills/site-setup/SKILL.md` — `notebooks/historical/National/00_site_setup.ipynb` (shared by rainfall and air temperature)
-- `assistant/skills/total-rainfall/SKILL.md` — `rainfall/a_Total_rainfall.ipynb`
-- `assistant/skills/consecutive-dry-days/SKILL.md` — `rainfall/b_Consecutive_dry_days.ipynb`
-- `assistant/skills/heavy-rainfall/SKILL.md` — `rainfall/c_Heavy_rainfall.ipynb`
-- `assistant/skills/mean-temperature/SKILL.md` — `air_temperature/a_mean_temperature.ipynb`
-- `assistant/skills/min-max-temperature/SKILL.md` — `air_temperature/b_min_max_temperature.ipynb`
-- `assistant/skills/hot-cold-days/SKILL.md` — `air_temperature/c_hot_cold_days.ipynb`
+- `assistant/skills/national-rainfall/SKILL.md` — all three National rainfall notebooks
+- `assistant/skills/national-temperature/SKILL.md` — all three National air-temperature notebooks
 - `assistant/skills/sea-level-site-setup/SKILL.md` — `sea_level/0_site_setup.ipynb`
 - `assistant/skills/trend-analysis/SKILL.md` — `sea_level/a_sea_level_trend.ipynb`
 - `assistant/skills/anomaly-analysis/SKILL.md` — `sea_level/b_sea_level_anomaly.ipynb`
 - `assistant/skills/flood-frequency/SKILL.md` — `sea_level/c_sea_level_ff.ipynb`
 - `assistant/skills/rankings/SKILL.md` — `sea_level/d_sea_level_rankings.ipynb`
 - `assistant/skills/regional-setup/SKILL.md` — `Regional/00_regional_setup.ipynb` (shared by regional rainfall and air temperature)
-- `assistant/skills/regional-rainfall/SKILL.md` — `Regional/rainfall/regional_indicators.ipynb`
-- `assistant/skills/regional-temperature/SKILL.md` — `Regional/air_temperature/regional_indicators.ipynb`
+- `assistant/skills/regional-atmosphere/SKILL.md` — Regional rainfall and air-temperature indicator notebooks
 - `assistant/skills/tropical-cyclones/SKILL.md` — National and Regional IBTrACS/ONI cyclone workflows
 - `assistant/skills/regional-sea-level/SKILL.md` — documents what's missing for a regional sea-level workflow (none exists yet)
 - `assistant/skills/functions-api/SKILL.md` — full function reference and discovery workflow

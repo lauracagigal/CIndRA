@@ -1,0 +1,56 @@
+format: jb-book
+root: intro
+parts:
+  - caption: NATIONAL INDICATORS
+    chapters:
+      - file: notebooks/historical/National/national
+        sections:
+          - file: notebooks/historical/National/00_site_setup
+            title: Site setup — atmosphere
+          - file: notebooks/historical/National/air_temperature/surface_temperature
+            sections:
+              - file: notebooks/historical/National/air_temperature/a_mean_temperature
+              - file: notebooks/historical/National/air_temperature/b_min_max_temperature
+              - file: notebooks/historical/National/air_temperature/c_hot_cold_days
+          - file: notebooks/historical/National/rainfall/rainfall
+            sections:
+              - file: notebooks/historical/National/rainfall/a_Total_rainfall
+              - file: notebooks/historical/National/rainfall/b_Consecutive_dry_days
+              - file: notebooks/historical/National/rainfall/c_Heavy_rainfall
+          - file: notebooks/historical/National/tropical_cyclones/tropical_cyclones
+            sections:
+              - file: notebooks/historical/National/tropical_cyclones/a_tropical_cyclones
+              - file: notebooks/historical/National/tropical_cyclones/b_severe_tropical_cyclones
+          - file: notebooks/historical/National/sea_level/sea_level
+            sections:
+              - file: notebooks/historical/National/sea_level/0_site_setup
+                title: Site setup — sea level
+              - file: notebooks/historical/National/sea_level/a_sea_level_trend
+              - file: notebooks/historical/National/sea_level/b_sea_level_anomaly
+              - file: notebooks/historical/National/sea_level/c_sea_level_ff
+              - file: notebooks/historical/National/sea_level/d_sea_level_rankings
+
+  - caption: REGIONAL INDICATORS
+    chapters:
+      - file: notebooks/historical/Regional/regional
+        sections:
+          - file: notebooks/historical/Regional/00_regional_setup
+          - file: notebooks/historical/Regional/air_temperature/air_temperature
+            sections:
+              - file: notebooks/historical/Regional/air_temperature/regional_indicators
+          - file: notebooks/historical/Regional/rainfall/rainfall
+            sections:
+              - file: notebooks/historical/Regional/rainfall/regional_indicators
+          - file: notebooks/historical/Regional/tropical_cyclones/tropical_cyclones
+            sections:
+              - file: notebooks/historical/Regional/tropical_cyclones/regional_indicators
+          - file: notebooks/historical/Regional/regional_plots
+            title: Regional sea level — placeholder
+
+  - caption: CINDRA ASSISTANT
+    chapters:
+      - file: assistant
+
+  - caption: REFERENCES
+    chapters:
+      - file: references
