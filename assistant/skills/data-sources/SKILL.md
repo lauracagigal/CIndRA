@@ -1,6 +1,6 @@
 ---
 name: data-sources
-description: Documents every external data source used in this repository (GHCN-Daily, NOAA ONI, UHSLC tide gauges, CMEMS satellite altimetry), their URLs, units, sentinels, and citations, plus reference-period conventions. Use when downloading new data, citing a data source, or converting units.
+description: Documents every external data source used in this repository (GHCN-Daily, IBTrACS, NOAA ONI, UHSLC tide gauges, CMEMS satellite altimetry), their URLs, units, sentinels, and citations, plus reference-period conventions. Use when downloading new data, citing a data source, or converting units.
 ---
 
 ## Skill: Data Sources & Attribution
@@ -27,6 +27,16 @@ description: Documents every external data source used in this repository (GHCN-
   - Neutral otherwise.
 - **Colours**: El Niño = red, La Niña = blue, Neutral = gray.
 - **Citation**: NOAA Climate Prediction Center / Physical Sciences Laboratory.
+
+### Tropical cyclones — NOAA IBTrACS
+
+- **Dataset**: International Best Track Archive for Climate Stewardship, v04r01.
+- **URL**: `https://www.ncei.noaa.gov/data/international-best-track-archive-for-climate-stewardship-ibtracs/v04r01/access/netcdf/IBTrACS.ALL.v04r01.nc`.
+- **Access**: `download_ibtracs(url, basin=...)` in `functions/data_downloaders.py`; use `basin="WP"` for the current National notebooks and `basin=None` for the Regional multi-basin notebook.
+- **Cache**: `data/tcs/tcs_WP.nc` or `data/tcs/tcs_ALL.nc`.
+- **Variables**: `lon`/`lat` in degrees, `time`, `wmo_wind` in knots, `wmo_pres` in hPa.
+- **Missing intensity**: Regional indicators omit missing WMO winds. National radius workflows currently use `fillwinds=True`, which estimates wind from pressure; disclose the estimate.
+- **Citation**: Knapp, K.R. et al., International Best Track Archive for Climate Stewardship (IBTrACS), NOAA NCEI. State dataset version and access window.
 
 ### Tide gauge — UHSLC (University of Hawaii Sea Level Center)
 
@@ -59,8 +69,8 @@ Rainfall notebooks `b_Consecutive_dry_days.ipynb` and `c_Heavy_rainfall.ipynb` d
 
 ### Hard rules
 
-- Always attribute sources in narrative outputs ("Source: GHCN-Daily station <id>", "Source: NOAA ONI", "Source: UHSLC station <id>", "Source: CMEMS L4 SSH").
+- Always attribute sources in narrative outputs ("Source: GHCN-Daily station <id>", "Source: NOAA IBTrACS v04r01", "Source: NOAA ONI", "Source: UHSLC station <id>", "Source: CMEMS L4 SSH").
 - Never invent GHCN station IDs; resolve via site config and `GHCN.get_country_code`. Never invent UHSLC station IDs; resolve via `select_uhslc_station` / the saved site config.
-- Always state units: **mm**, **mm/day**, **mm/year**, **°C**, **°C/decade**, **days/year** (rainfall/temperature); **mm/yr**, **cm** (sea level).
+- Always state units: **mm**, **mm/day**, **mm/year**, **°C**, **°C/decade**, **days/year** (rainfall/temperature); **kt**, **cyclones/year**, **ACE/decade** (cyclones); **mm/yr**, **cm** (sea level).
 - Never present user-uploaded data as primary without explicit user instruction.
 - Do not claim `download_uhslc_data` fetches new data from UHSLC — it only serves an already-cached local file (`data/sea_level/d<id>.nc` / `h<id>.nc`); automatic download was lost in the PICCM_Atmosphere/PICCM_SeaLevel merge and has not been restored.

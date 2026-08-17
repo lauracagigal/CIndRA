@@ -13,12 +13,13 @@ Rainfall notebooks use the ``PRCP`` variable (daily precipitation in mm after
 the GHCN tenths scaling factor is applied).
 """
 
-from io import StringIO
+from io import BytesIO, StringIO
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import requests
+import xarray as xr
 
 GHCND_ACCESS_URL = (
     "https://www.ncei.noaa.gov/data/global-historical-climatology-network-daily/access/"
@@ -235,6 +236,46 @@ class GHCN:
             })
 
         return results, station_ids
+
+
+def download_ibtracs(url, basin=None):
+    """Download the IBTrACS tropical-cyclone track archive.
+
+    Used by the tropical-cyclone notebooks (``a_tropical_cyclones.ipynb``,
+    ``b_severe_tropical_cyclones.ipynb``) to fetch the full IBTrACS NetCDF
+    file, optionally filtered to a single basin.
+
+    Parameters
+    ----------
+    url : str
+        URL of the IBTrACS NetCDF file (``IBTrACS.ALL.v04r01.nc`` or a
+        basin-specific subset).
+    basin : str, optional
+        Two-letter basin code (e.g. ``"WP"`` for West Pacific) used to
+        filter storms by their genesis basin. If ``None``, all basins are
+        returned.
+
+    Returns
+    -------
+    xarray.Dataset
+        Dataset with the ``wmo_wind``, ``wmo_pres`` and ``name`` variables.
+
+    Raises
+    ------
+    None
+        Download failures are printed as an error message rather than
+        raised.
+    """
+    response = requests.get(url)
+    if response.status_code == 200:
+        tcs = xr.open_dataset(BytesIO(response.content))
+    else:
+        print(f"Error while downloading file: {response.status_code}")
+
+    if basin:
+        tcs = tcs.isel(storm=np.where(tcs.isel(date_time=0).basin.values.astype(str) == basin)[0])
+
+    return tcs[["wmo_wind", "wmo_pres", "name"]]
 
 
 def download_oni_index(url=ONI_URL):

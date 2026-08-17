@@ -1,0 +1,4 @@
+interface:
+  display_name: "Tropical Cyclones"
+  short_description: "Analyse national and regional cyclone indicators"
+  default_prompt: "Use $tropical-cyclones to analyse or update tropical cyclone indicators and figures."

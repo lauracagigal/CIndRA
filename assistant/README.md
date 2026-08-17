@@ -1,6 +1,6 @@
 # CIndRA Assistant — Training Material (PICCM_atmosphere_sealevel)
 
-This folder holds the instructions used to train an external assistant — **CIndRA** (Climate Indicator Research Assistant) — e.g. as a ChatGPT custom GPT. CIndRA is the single assistant for the whole [PICCM_atmosphere_sealevel](https://github.com/lauracagigal/PICCM_atmosphere_sealevel) repository (merged from the former `PICCM_Atmosphere` and `PICCM_SeaLevel` repositories): the rainfall notebooks (`notebooks/historical/National/rainfall/`), the air-temperature notebooks (`notebooks/historical/National/air_temperature/`), the sea-level notebooks (`notebooks/historical/National/sea_level/`), the two site-setup notebooks they use, and the Regional rainfall/air-temperature workflow.
+This folder holds the instructions used to train an external assistant — **CIndRA** (Climate Indicator Research Assistant) — e.g. as a ChatGPT custom GPT. CIndRA covers rainfall, air temperature, sea level, and tropical cyclones across the National site workflows and Regional Pacific workflows in this repository.
 
 ## How to use
 
@@ -25,6 +25,7 @@ This folder holds the instructions used to train an external assistant — **CIn
 | `regional-setup` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
 | `regional-rainfall` | `Regional/rainfall/regional_indicators.ipynb` |
 | `regional-temperature` | `Regional/air_temperature/regional_indicators.ipynb` |
+| `tropical-cyclones` | National site-radius and Regional Pacific-subregion IBTrACS/ONI workflows; `functions/tcs.py` |
 | `regional-sea-level` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
 | `functions-api` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
 | `output-conventions` | Figure / table naming and folders (all domains) |
@@ -35,11 +36,13 @@ This folder holds the instructions used to train an external assistant — **CIn
 - `notebooks/historical/National/00_site_setup.ipynb` — shared entry point for rainfall + air temperature; run before anything under `rainfall/` or `air_temperature/`.
 - `notebooks/historical/National/rainfall/` (`a_Total_rainfall.ipynb`, `b_Consecutive_dry_days.ipynb`, `c_Heavy_rainfall.ipynb`) and `notebooks/historical/National/air_temperature/` (`a_mean_temperature.ipynb`, `b_min_max_temperature.ipynb`, `c_hot_cold_days.ipynb`) — the two atmosphere indicator-specific analysis folders. Both use bare `a_`/`b_`/`c_` filename prefixes but live in different folders — disambiguate by folder or full filename, not by the bare letter.
 - `notebooks/historical/National/sea_level/` (`0_site_setup.ipynb`, `a_sea_level_trend.ipynb`, `b_sea_level_anomaly.ipynb`, `c_sea_level_ff.ipynb`, `d_sea_level_rankings.ipynb`) — the sea-level workflow, with its **own** site setup (a single hardcoded Palau site today, not the multi-site GHCN picker the atmosphere `00_site_setup.ipynb` has).
-- `notebooks/historical/Regional/` (`00_regional_setup.ipynb`, `rainfall/regional_indicators.ipynb`, `air_temperature/regional_indicators.ipynb`, `regional_plots.ipynb`) — multi-station Pacific-wide rainfall/air-temperature indicators and maps. `regional_plots.ipynb` is currently an empty placeholder. There is no regional sea-level workflow yet.
-- `functions/` — `site_common.py` (shared site-config/output-path helpers), `rainfall.py` and `air_temp.py` (persist helpers re-exporting `site_common.py`), `temp_func.py` (ETCCDI percentile helpers), `data_downloaders.py` (GHCN, ONI, UHSLC cache lookup), `rainfall_regional.py` (regional indicators + Pacific EEZ maps + ERA5 backgrounds), `sea_level.py` (sea-level calculations, partly re-using `site_common.py`), `sea_level_plotting.py` (every sea-level figure), `cindra_regional_plotting_helpers.py` (draft regional sea-level plotting helpers, not yet wired into a notebook).
+- `notebooks/historical/National/tropical_cyclones/` — all and severe tropical cyclones entering a radius around a configured site, using IBTrACS and ONI.
+- `notebooks/historical/Regional/` includes multi-station rainfall/temperature and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` remains an empty sea-level placeholder.
+- `functions/` also includes `tcs.py`, the canonical National and Regional tropical-cyclone calculations, tables, and plotting helpers.
 - `data/rainfall/` — cached per-station GHCN pickles for `PRCP` (`GHCN_<station_id>.pkl`).
 - `data/air_temp/` — cached per-station GHCN pickles for `TMIN`/`TMAX`.
 - `data/sea_level/` — cached UHSLC NetCDF (`d<id>.nc`/`h<id>.nc`) and CMEMS NetCDF (`cmems_L4_SSH_*.nc`).
+- `data/tcs/` — cached IBTrACS NetCDF and ONI pickle used by cyclone notebooks.
 - `data/regional/` — multi-station pickles/summaries from `00_regional_setup.ipynb`, plus an `era5_cache/` subfolder.
 - `data/sites/` — per-site config JSON files. `<country_slug>_<ghcn_station_id>.json` for rainfall/air-temperature (shared between both); a fixed `palau.json` for sea level.
 - `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` — per-site figure/table outputs (rainfall, air-temperature; PNG/HTML and CSV/JSON respectively). Sea level persists to its own output directory — see `skills/output-conventions/SKILL.md`.

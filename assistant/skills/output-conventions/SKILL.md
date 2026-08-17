@@ -1,6 +1,6 @@
 ---
 name: output-conventions
-description: Defines the site-tag, filename, and folder conventions for every persisted figure/table/JSON across rainfall, air-temperature, and sea-level notebooks, so multi-site outputs never collide. Use whenever saving a new figure, table, or metrics file, or when asked where a given output file lives.
+description: Defines the site-tag, filename, and folder conventions for every persisted figure/table/JSON across rainfall, air-temperature, tropical-cyclone, and sea-level notebooks, so outputs never collide. Use whenever saving a new figure, table, or metrics file, or when asked where a given output file lives.
 ---
 
 ## Skill: Output Conventions
@@ -127,6 +127,22 @@ Save plotly: `fig.write_html(site_figures_dir / build_output_filename(..., ext='
 - `T_hot_cold_summary_table_etccdi_<site_tag>.csv`
 - `T_hot_cold_summary_table_percentiles_<site_tag>.csv`
 - `T_hot_cold_summary_metrics_<site_tag>.json`
+
+### Canonical filenames — Regional tropical cyclones (`TC_regional_*`)
+
+Regional cyclone figures go to `outputs/figures/regional_pacific/`:
+
+- `TC_regional_subregions_pacific.png`
+- `TC_regional_genesis_tracks_pacific.png`
+- `TC_regional_monthly_genesis_pacific.png`
+- `TC_regional_track_density_pacific.png`
+- `TC_regional_period_comparison_pacific.png`
+- `TC_regional_annual_counts_pacific.png`
+- `TC_regional_intensity_composition_pacific.png`
+- `TC_regional_map_dashboard_pacific.png`
+- `TC_regional_ace_pacific.png`
+
+Optional Regional annual tables go to `outputs/tables/regional_tropical_cyclones/`. National cyclone notebooks currently use legacy `F8_TCs_*`/`F9_TCs_*` filenames under `matrix_cc/figures`; migrate them to a per-site output convention deliberately before documenting new canonical National paths.
 
 ### Canonical filenames — sea level (`SL_*` prefix, `F10`/`F11` figures)
 

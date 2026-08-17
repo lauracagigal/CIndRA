@@ -1,11 +1,11 @@
 ---
 name: functions-api
-description: Full reference of callable functions across functions/site_common.py, rainfall.py, air_temp.py, temp_func.py, data_downloaders.py, rainfall_regional.py, sea_level.py, sea_level_plotting.py, and the external indicators_setup package, plus the function-discovery workflow. Use before writing any analysis or plotting code, to find and reuse an existing function instead of reimplementing it inline.
+description: Full reference of callable functions across functions/site_common.py, rainfall.py, air_temp.py, temp_func.py, data_downloaders.py, rainfall_regional.py, tcs.py, sea_level.py, sea_level_plotting.py, and the external indicators_setup package, plus the function-discovery workflow. Use before writing any analysis or plotting code, to find and reuse an existing function instead of reimplementing it inline.
 ---
 
-## Skill: Functions API Reference (`functions/site_common.py` + `functions/rainfall.py` + `functions/air_temp.py` + `functions/temp_func.py` + `functions/data_downloaders.py` + `functions/rainfall_regional.py` + `functions/sea_level.py` + `functions/sea_level_plotting.py` + `indicators_setup`)
+## Skill: Functions API Reference (repository indicator modules + `indicators_setup`)
 
-Single source of truth for what the assistant is allowed to call, across the rainfall, air-temperature, and sea-level workflows. If something is missing, add a function to `functions/` — do not inline it in notebooks.
+Single source of truth for what the assistant is allowed to call across rainfall, air-temperature, sea-level, and tropical-cyclone workflows. If something is missing, add a function to `functions/` — do not inline it in notebooks.
 
 ---
 
@@ -59,6 +59,7 @@ Search bounded local paths:
 - `functions/temp_func.py`
 - `functions/data_downloaders.py`
 - `functions/rainfall_regional.py`
+- `functions/tcs.py`
 - `functions/sea_level.py`
 - `functions/sea_level_plotting.py`
 
@@ -182,6 +183,16 @@ Used by `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` and `
 - ERA5 endpoint: `https://api.earthdatahub.destine.eu/era5/era5-single-levels-atmosphere-monthly-v0.zarr` (opened with `xarray.open_dataset(..., engine="zarr")`); `tp` needs `* 1000 * 30` (m/day → mm/month) and an explicit `.attrs["units"] = "mm"` before use, `t2m` needs `- 273.15` (K → °C).
 
 ---
+
+## `functions/tcs.py` — National and Regional tropical cyclones
+
+Use `assistant/skills/tropical-cyclones/SKILL.md` for selection and interpretation rules.
+
+- Regional metrics: `classify_genesis_region`, `observations_in_region`, `build_storm_metrics`, `annual_region_metrics`, `monthly_genesis_metrics`, `spatial_track_density`.
+- Regional figures: `plot_pacific_regions_map`, `plot_genesis_tracks`, `plot_monthly_intensity_distribution`, `plot_spatial_track_density`, `plot_period_comparison`, `plot_regional_annual_counts`, `plot_regional_intensity_counts`, `plot_regional_map_dashboard`, `plot_regional_ace`.
+- National radius extraction/categories: `Extract_Circle`, `get_ibtracs_category`, `GeoDistance`, `GeoAzimuth`, `GetStormCategory_pres`, `GetStormCategory_wind`, `SortCategoryCount`.
+- National figures/ENSO: `Plot_TCs_HistoricalTracks_Category`, `plot_tc_categories_trend`, `plot_bar_probs`, `plot_bar_probs_ONI`, `add_oni_cat`, `get_storm_color`.
+- Tables: `style_matrix`, `table_tcs_32a`, `table_tcs_32b`.
 
 ## `functions/sea_level.py` — sea-level calculations, station selection, persistence
 
