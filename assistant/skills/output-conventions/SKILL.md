@@ -1,6 +1,6 @@
 ---
 name: output-conventions
-description: Defines the site-tag, filename, and folder conventions for every persisted figure/table/JSON across rainfall, air-temperature, tropical-cyclone, and sea-level notebooks, so outputs never collide. Use whenever saving a new figure, table, or metrics file, or when asked where a given output file lives.
+description: Defines the site-tag, filename, and folder conventions for every persisted figure/table/JSON across rainfall, air-temperature, sea-surface-temperature, tropical-cyclone, and sea-level notebooks, so outputs never collide. Use whenever saving a new figure, table, or metrics file, or when asked where a given output file lives.
 ---
 
 ## Skill: Output Conventions
@@ -144,6 +144,15 @@ Regional cyclone figures go to `outputs/figures/regional_pacific/`:
 
 Optional Regional annual tables go to `outputs/tables/regional_tropical_cyclones/`. National cyclone notebooks currently use legacy `F8_TCs_*`/`F9_TCs_*` filenames under `matrix_cc/figures`; migrate them to a per-site output convention deliberately before documenting new canonical National paths.
 
+### Canonical filenames — sea-surface temperature
+
+SST notebooks currently save PNG figures under `matrix_cc/figures/` (legacy layout):
+
+- National: `SST_mean_<country_slug>.png`, `SST_trend_<country_slug>.png`, `SST_trends_anomalies_<country_slug>.png`, `SST_ENSO_<country_slug>.png`.
+- Regional: `SST_regional_mean.png`, `F19_SST_regional_trend.png`, `F20_SST_DJF_5year_anomalies.png`.
+
+The regional data cache is `data/sea_surface_temperature/sst.mnmean.nc`. Keep the `F19`/`F20` names aligned with the PICCM reference figures unless the notebooks and book documentation are deliberately migrated together.
+
 ### Canonical filenames — sea level (`SL_*` prefix, `F10`/`F11` figures)
 
 **Notebook `a_sea_level_trend.ipynb`**:
@@ -174,4 +183,4 @@ Sea-level filenames are **not** suffixed with `_<site_tag>` the way rainfall/air
 - Never overwrite a different site's outputs. Always re-derive `site_tag` from the loaded config.
 - Cached pickle/NetCDF is keyed by **station ID** (GHCN) or **UHSLC ID**; figures/tables are keyed by **site tag**.
 - Use `persist_*_outputs` for rainfall/air-temperature tables — do not call `style_matrix` alone without persisting. Sea level uses `save_table_to_csv`/`save_dict_json` directly instead of a `persist_*_outputs` wrapper.
-- Rainfall outputs use the `R_`/`F5`/`F6`/`F7` prefixes; air-temperature outputs use `T_`/`F2`/`F3`/`F4`; sea-level outputs use `SL_`/`F10`/`F11`. Don't mix them.
+- Rainfall outputs use the `R_`/`F5`/`F6`/`F7` prefixes; air-temperature outputs use `T_`/`F2`/`F3`/`F4`; Regional SST uses `F19`/`F20`; sea-level outputs use `SL_`/`F10`/`F11`. Don't mix them.

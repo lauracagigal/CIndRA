@@ -194,6 +194,16 @@ Use `assistant/skills/tropical-cyclones/SKILL.md` for selection and interpretati
 - National figures/ENSO: `Plot_TCs_HistoricalTracks_Category`, `plot_tc_categories_trend`, `plot_bar_probs`, `plot_bar_probs_ONI`, `add_oni_cat`, `get_storm_color`.
 - Tables: `style_matrix`, `table_tcs_32a`, `table_tcs_32b`.
 
+## `functions/sst.py` — National and Regional sea-surface temperature
+
+Use `assistant/skills/sea-surface-temperature/SKILL.md` for workflow and period conventions.
+
+- National containers/masking: `SSTRegion`, `normalise_name`, `polygon_mask`, `resolve_eez_sst`.
+- National plots: `setup_map`, `plot_map`, `plot_panels`.
+- Regional loading: `PacificSST`, `load_pacific_sst` (0–360 longitudes, Pacific subset, all EEZ boundaries).
+- Regional calculations: `compute_sst_trend` (annual means → °C/decade), `compute_djf_period_anomalies` (equal half-open DJF blocks). `compute_djf_decadal_anomalies` remains available for the earlier decade-based form.
+- Regional plots: `plot_pacific_sst_field`, `plot_pacific_sst_panels`; both overlay all Pacific EEZ boundaries.
+
 ## `functions/sea_level.py` — sea-level calculations, station selection, persistence
 
 Used by all four sea-level notebooks (`0_site_setup.ipynb` through `d_sea_level_rankings.ipynb`). Not part of the atmosphere `site_common.py`/`rainfall.py`/`air_temp.py` family, though it re-uses four of `site_common.py`'s functions directly (see the `site_common.py` note above) rather than keeping fully independent copies.
@@ -252,10 +262,10 @@ Two regional sea-level plotting helpers prepared ahead of a not-yet-built region
 
 ## Hard rules
 
-- Never redefine helpers that exist in `functions/site_common.py`, `functions/rainfall.py`, `functions/air_temp.py`, `functions/temp_func.py`, `functions/data_downloaders.py`, `functions/rainfall_regional.py`, `functions/sea_level.py`, or `functions/sea_level_plotting.py`.
+- Never redefine helpers that exist in `functions/site_common.py`, `functions/rainfall.py`, `functions/air_temp.py`, `functions/temp_func.py`, `functions/data_downloaders.py`, `functions/sst.py`, `functions/rainfall_regional.py`, `functions/sea_level.py`, or `functions/sea_level_plotting.py`.
 - Use repository functions before custom code; clone `indicators_setup` if missing (rainfall/air-temperature only — sea level has no external plotting dependency to clone).
 - Do not fabricate repository functions or claim repo styling was used unless the function was actually imported and called.
 - Do not claim `download_uhslc_data` downloads a new station's data — it only serves an already-cached local file.
 - Do not present output from `functions/cindra_regional_plotting_helpers.py` as a finished/published figure — it is draft code not wired into any notebook.
-- After editing modules, reload in the notebook: `import importlib; import rainfall as rf; importlib.reload(rf)` (or `air_temp`, `temp_func`, `rainfall_regional`, `sea_level`, `sea_level_plotting`).
+- After editing modules, reload in the notebook: `import importlib; import rainfall as rf; importlib.reload(rf)` (or `air_temp`, `temp_func`, `sst`, `rainfall_regional`, `sea_level`, `sea_level_plotting`).
 - Keep this file in sync when `functions/` or `indicators_setup` usage changes.

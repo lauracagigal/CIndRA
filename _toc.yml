@@ -21,6 +21,9 @@ parts:
             sections:
               - file: notebooks/historical/National/tropical_cyclones/a_tropical_cyclones
               - file: notebooks/historical/National/tropical_cyclones/b_severe_tropical_cyclones
+          - file: notebooks/historical/National/sea_surface_temperature/sea_surface_temperature
+            sections:
+              - file: notebooks/historical/National/sea_surface_temperature/a_Mean_Temperature_maps
           - file: notebooks/historical/National/sea_level/sea_level
             sections:
               - file: notebooks/historical/National/sea_level/0_site_setup
@@ -44,6 +47,9 @@ parts:
           - file: notebooks/historical/Regional/tropical_cyclones/tropical_cyclones
             sections:
               - file: notebooks/historical/Regional/tropical_cyclones/regional_indicators
+          - file: notebooks/historical/Regional/sea_surface_temperature/sea_surface_temperature
+            sections:
+              - file: notebooks/historical/Regional/sea_surface_temperature/regional_indicators
           - file: notebooks/historical/Regional/regional_plots
             title: Regional sea level — placeholder
 

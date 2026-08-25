@@ -2,6 +2,7 @@ Real example output tree, captured from three already-run sites in this repo:
   - Atmosphere (rainfall + air temperature) site: palau_psw00040309_lat7p337_lon134p477
   - Sea level site:                              palau_lat7p340_lon134p620
   - Regional (rainfall + air temperature):       region_key = "pacific"
+  - Sea-surface temperature:                     legacy matrix_cc/figures layout
 
 Use this as a quick visual reference for "what does a fully-run site actually
 write to disk", grouped by the notebook that produced each file. Filenames are
@@ -156,3 +157,8 @@ Key pattern differences to notice:
     prevents collisions instead.
   - Regional: no per-site folder at all -- one shared outputs/figures/regional_<region_key>/
     folder, filenames suffixed with _<region_key> instead of a site tag.
+  - SST currently uses the legacy matrix_cc/figures/ folder rather than outputs/:
+    National writes SST_mean_<country>.png, SST_trend_<country>.png,
+    SST_trends_anomalies_<country>.png and SST_ENSO_<country>.png; Regional writes
+    SST_regional_mean.png, F19_SST_regional_trend.png and
+    F20_SST_DJF_5year_anomalies.png.

@@ -1,6 +1,6 @@
 ---
 name: data-sources
-description: Documents every external data source used in this repository (GHCN-Daily, IBTrACS, NOAA ONI, UHSLC tide gauges, CMEMS satellite altimetry), their URLs, units, sentinels, and citations, plus reference-period conventions. Use when downloading new data, citing a data source, or converting units.
+description: Documents every external data source used in this repository (GHCN-Daily, NOAA OISST, IBTrACS, NOAA ONI, UHSLC tide gauges, CMEMS satellite altimetry), their URLs, units, sentinels, and citations, plus reference-period conventions. Use when downloading new data, citing a data source, or converting units.
 ---
 
 ## Skill: Data Sources & Attribution
@@ -27,6 +27,15 @@ description: Documents every external data source used in this repository (GHCN-
   - Neutral otherwise.
 - **Colours**: El Niño = red, La Niña = blue, Neutral = gray.
 - **Citation**: NOAA Climate Prediction Center / Physical Sciences Laboratory.
+
+### Sea-surface temperature — NOAA OISST v2
+
+- **Regional monthly NetCDF**: `https://downloads.psl.noaa.gov/Datasets/noaa.oisst.v2/sst.mnmean.nc`.
+- **Cache**: `data/sea_surface_temperature/sst.mnmean.nc`; `Regional/sea_surface_temperature/regional_indicators.ipynb` downloads it with `urlretrieve`, using a `.part` file before the final rename.
+- **Variable/coordinates**: `sst`, `time`, `lat`, `lon`; SST is °C. `load_pacific_sst` converts longitude to 0–360 and subsets `(125, 245, -35, 35)`.
+- **National input**: `data/sea_surface_temperature/sst_daily_1981_2024_palau.nc`, a Palau-only daily subset used by `National/sea_surface_temperature/a_Mean_Temperature_maps.ipynb`.
+- **Regional periods**: mean/reference climatology 1981–2020; trend 1982–2020; five-year DJF anomaly blocks 1985–1990 through 2015–2020.
+- **Citation**: NOAA Physical Sciences Laboratory, NOAA Optimum Interpolation Sea Surface Temperature (OISST) v2.
 
 ### Tropical cyclones — NOAA IBTrACS
 
@@ -59,6 +68,7 @@ description: Documents every external data source used in this repository (GHCN-
 - In code, slice with `.loc[ref_start:ref_end]` — never pass `"1961:1990"` as a single label to `.loc` on a DatetimeIndex.
 - Hot days (TX90p) / cold nights (TN10p) use the same 1961–1990 window as the ETCCDI base period, hardcoded in `temp_func.py` (`BASE_PERIOD_START`/`BASE_PERIOD_END`).
 - Sea level has no fixed WMO reference period; each notebook uses the available UHSLC/CMEMS record window (commonly 1993–2022/2025) for trends, and the station's own monthly climatology (not 1961–1990) for anomalies.
+- Regional SST uses the 1981–2020 DJF climatology for five-year boreal-winter anomalies; period labels are half-open (`1985–1990` contains winters 1985–1989).
 
 ### QC applied in the shared `00_site_setup.ipynb`
 
@@ -69,7 +79,7 @@ Rainfall notebooks `b_Consecutive_dry_days.ipynb` and `c_Heavy_rainfall.ipynb` d
 
 ### Hard rules
 
-- Always attribute sources in narrative outputs ("Source: GHCN-Daily station <id>", "Source: NOAA IBTrACS v04r01", "Source: NOAA ONI", "Source: UHSLC station <id>", "Source: CMEMS L4 SSH").
+- Always attribute sources in narrative outputs ("Source: GHCN-Daily station <id>", "Source: NOAA OISST v2", "Source: NOAA IBTrACS v04r01", "Source: NOAA ONI", "Source: UHSLC station <id>", "Source: CMEMS L4 SSH").
 - Never invent GHCN station IDs; resolve via site config and `GHCN.get_country_code`. Never invent UHSLC station IDs; resolve via `select_uhslc_station` / the saved site config.
 - Always state units: **mm**, **mm/day**, **mm/year**, **°C**, **°C/decade**, **days/year** (rainfall/temperature); **kt**, **cyclones/year**, **ACE/decade** (cyclones); **mm/yr**, **cm** (sea level).
 - Never present user-uploaded data as primary without explicit user instruction.

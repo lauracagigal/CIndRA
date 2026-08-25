@@ -1,6 +1,6 @@
 # CIndRA Assistant — Training Material (PICCM_atmosphere_sealevel)
 
-This folder holds the instructions used to train an external assistant — **CIndRA** (Climate Indicator Research Assistant) — e.g. as a ChatGPT custom GPT. CIndRA covers rainfall, air temperature, sea level, and tropical cyclones across the National site workflows and Regional Pacific workflows in this repository.
+This folder holds the instructions used to train an external assistant — **CIndRA** (Climate Indicator Research Assistant) — e.g. as a ChatGPT custom GPT. CIndRA covers rainfall, air temperature, sea-surface temperature, sea level, and tropical cyclones across the National site workflows and Regional Pacific workflows in this repository.
 
 ## How to use
 
@@ -13,6 +13,7 @@ This folder holds the instructions used to train an external assistant — **CIn
 | `site-setup` | `notebooks/historical/National/00_site_setup.ipynb` — shared entry point for rainfall + air temperature; not under `rainfall/` or `air_temperature/` |
 | `national-rainfall` | Complete National rainfall workflow: totals, anomalies, dry spells, wet days and heavy rainfall |
 | `national-temperature` | Complete National air-temperature workflow: mean/min/max temperature, diurnal range and hot/cold extremes |
+| `sea-surface-temperature` | National selected-EEZ and Regional Pacific SST means, trends, anomalies, NOAA OISST download and `functions/sst.py` |
 | `sea-level-site-setup` | `National/sea_level/0_site_setup.ipynb` — sea level's own entry point, not shared with the other two domains |
 | `trend-analysis` | `National/sea_level/a_sea_level_trend.ipynb` |
 | `anomaly-analysis` | `National/sea_level/b_sea_level_anomaly.ipynb` |
@@ -32,11 +33,13 @@ This folder holds the instructions used to train an external assistant — **CIn
 - `notebooks/historical/National/rainfall/` (`a_Total_rainfall.ipynb`, `b_Consecutive_dry_days.ipynb`, `c_Heavy_rainfall.ipynb`) and `notebooks/historical/National/air_temperature/` (`a_mean_temperature.ipynb`, `b_min_max_temperature.ipynb`, `c_hot_cold_days.ipynb`) — the two atmosphere indicator-specific analysis folders. Both use bare `a_`/`b_`/`c_` filename prefixes but live in different folders — disambiguate by folder or full filename, not by the bare letter.
 - `notebooks/historical/National/sea_level/` (`0_site_setup.ipynb`, `a_sea_level_trend.ipynb`, `b_sea_level_anomaly.ipynb`, `c_sea_level_ff.ipynb`, `d_sea_level_rankings.ipynb`) — the sea-level workflow, with its **own** site setup (a single hardcoded Palau site today, not the multi-site GHCN picker the atmosphere `00_site_setup.ipynb` has).
 - `notebooks/historical/National/tropical_cyclones/` — all and severe tropical cyclones entering a radius around a configured site, using IBTrACS and ONI.
-- `notebooks/historical/Regional/` includes multi-station rainfall/temperature and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` is a markdown-only sea-level placeholder.
-- `functions/` also includes `tcs.py`, the canonical National and Regional tropical-cyclone calculations, tables, and plotting helpers.
+- `notebooks/historical/National/sea_surface_temperature/` — selected-EEZ SST maps, trends, anomalies, area averages and ONI analysis.
+- `notebooks/historical/Regional/` includes multi-station rainfall/temperature, regional NOAA OISST, and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` is a markdown-only sea-level placeholder.
+- `functions/` also includes `sst.py` for National/Regional SST and `tcs.py` for tropical-cyclone calculations and plots.
 - `data/rainfall/` — cached per-station GHCN pickles for `PRCP` (`GHCN_<station_id>.pkl`).
 - `data/air_temp/` — cached per-station GHCN pickles for `TMIN`/`TMAX`.
 - `data/sea_level/` — cached UHSLC NetCDF (`d<id>.nc`/`h<id>.nc`) and CMEMS NetCDF (`cmems_L4_SSH_*.nc`).
+- `data/sea_surface_temperature/` — National SST subsets and the cached regional NOAA OISST monthly NetCDF.
 - `data/tcs/` — cached IBTrACS NetCDF and ONI pickle used by cyclone notebooks.
 - `data/regional/` — multi-station pickles/summaries from `00_regional_setup.ipynb`, plus an `era5_cache/` subfolder.
 - `data/sites/` — per-site config JSON files. `<country_slug>_<ghcn_station_id>.json` for rainfall/air-temperature (shared between both); a fixed `palau.json` for sea level.

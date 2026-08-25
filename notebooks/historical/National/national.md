@@ -39,6 +39,11 @@ Select a section below to open its overview and access the corresponding noteboo
   <p>Nearby cyclone tracks, intensity, seasonality and trends for all systems and severe tropical cyclones.</p>
 </a>
 
+<a href="sea_surface_temperature/sea_surface_temperature.html" class="dashboard-card ocean">
+  <h3>Sea-surface temperature</h3>
+  <p>Mean SST, spatial trends, seasonal and annual anomalies, area averages and relationships with ENSO inside the selected EEZ.</p>
+</a>
+
 <a href="sea_level/sea_level.html" class="dashboard-card ocean">
   <h3>Sea level</h3>
   <p>Relative and absolute sea-level trends, anomalies, minor flooding and rankings of extreme water levels.</p>
