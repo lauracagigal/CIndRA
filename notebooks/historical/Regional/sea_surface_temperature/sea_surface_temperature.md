@@ -15,7 +15,7 @@ The regional SST workflow places ocean-temperature variability and change in a P
 
 ## What you will find
 
-The notebook reproduces the regional concepts shown in Figures 19 and 20 of the *Pacific Climate Change Monitor 2021*: an SST trend field in °C per decade and boreal-winter SST anomalies. All calculations use a reproducibly cached NOAA monthly-mean NetCDF.
+The notebook presents an SST trend field in °C per decade and boreal-winter SST anomalies. All calculations use a reproducibly cached NOAA monthly-mean NetCDF.
 
 ```{note}
 EEZ outlines provide geographic context; the SST values are gridded ocean observations and are not averaged separately by country in this notebook.

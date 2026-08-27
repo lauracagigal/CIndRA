@@ -103,10 +103,18 @@ def resolve_eez_sst(
         data_raw.close()
         raise KeyError(f"Missing variables/coordinates: {sorted(missing)}")
 
-    data_raw = data_raw.assign_coords(
-        lon=((data_raw.lon + 180) % 360) - 180
-    ).sortby("lon")
-    data_bbox = data_raw.sel(lon=slice(xmin, xmax), lat=slice(ymin, ymax))
+    data_raw = (
+        data_raw.assign_coords(lon=((data_raw.lon + 180) % 360) - 180)
+        .sortby("lon")
+        .sortby("lat")
+    )
+    if xmin <= xmax:
+        data_bbox = data_raw.sel(lon=slice(xmin, xmax), lat=slice(ymin, ymax))
+    else:
+        # An EEZ crossing the antimeridian occupies both ends of [-180, 180).
+        west = data_raw.sel(lon=slice(xmin, 180), lat=slice(ymin, ymax))
+        east = data_raw.sel(lon=slice(-180, xmax), lat=slice(ymin, ymax))
+        data_bbox = xr.concat([west, east], dim="lon")
     if data_bbox.lon.size == 0 or data_bbox.lat.size == 0:
         coverage = (
             f"lon {float(data_raw.lon.min()):.3f}..{float(data_raw.lon.max()):.3f}, "

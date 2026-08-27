@@ -24,6 +24,7 @@ SOURCE_FILES = [
     ASSISTANT_DIR / "skills" / "tropical-cyclones" / "references" / "national.md",
     ASSISTANT_DIR / "skills" / "tropical-cyclones" / "references" / "regional.md",
     ASSISTANT_DIR / "skills" / "regional-sea-level" / "SKILL.md",
+    ASSISTANT_DIR / "skills" / "product-assembly" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "functions-api" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "output-conventions" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "data-sources" / "SKILL.md",

@@ -23,6 +23,7 @@ This folder holds the instructions used to train an external assistant — **CIn
 | `regional-atmosphere` | Regional rainfall and air-temperature indicators, station maps, anomaly series and supported ERA5 backgrounds |
 | `tropical-cyclones` | National site-radius and Regional Pacific-subregion IBTrACS/ONI workflows; `functions/tcs.py` |
 | `regional-sea-level` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
+| `product-assembly` | Assemble or audit a traceable National/Regional climate-indicator report package: inventory, captions, methods, limitations, provenance, validation, issue log, and Markdown/DOCX/PDF report outputs |
 | `functions-api` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
 | `output-conventions` | Figure / table naming and folders (all domains) |
 | `data-sources` | GHCN-Daily, UHSLC, CMEMS, ONI, units, citations (all domains) |
@@ -50,6 +51,7 @@ This folder holds the instructions used to train an external assistant — **CIn
 - When you add or rename a function in `functions/` or change `indicators_setup` usage, update `skills/functions-api/SKILL.md` and the **Functions API** section of `CIndRA_role.md` in the same PR.
 - When you introduce a new persisted artifact (figure / CSV / JSON), document it in `skills/output-conventions/SKILL.md`.
 - When a new analysis notebook is added, mirror its workflow in a new `skills/<name>/SKILL.md` (kebab-case `name` matching the directory, `description` stating what it does *and* when to use it — see the [Agent Skills spec](https://agentskills.io/specification)), extend `CIndRA_role.md`, and add the new `SKILL.md` path to `SOURCE_FILES` in `build_aggregated_CIndRA.py`.
+- When report-package requirements, validation labels, or report-facing product expectations change, update `skills/product-assembly/SKILL.md` and regenerate the aggregate.
 - Validate a skill's frontmatter with the [skills-ref](https://github.com/agentskills/agentskills/tree/main/skills-ref) reference tool: `skills-ref validate assistant/skills/<name>`.
 - When `Regional/regional_plots.ipynb` gets real content, or a regional sea-level workflow is built, update the [Regional Workflows](CIndRA_role.md#cindra-regional-workflows) section of `CIndRA_role.md` and stop describing them as empty/unbuilt.
 - After editing any markdown in `assistant/` or `assistant/skills/`, run `python assistant/build_aggregated_CIndRA.py` to refresh `aggregated_CIndRA_markdowns.md`.

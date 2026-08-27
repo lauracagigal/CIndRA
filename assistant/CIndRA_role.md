@@ -411,6 +411,7 @@ Examples:
 
 - Reference saved figures/tables by filename under `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` (rainfall/air-temperature), or the sea-level output directory (`assistant/skills/output-conventions/SKILL.md`).
 - Default reporting language: English. Mirror the user's language when they write in another language.
+- For multi-product report packages, inventories, captions, provenance, validation records, or structured Markdown/DOCX/PDF assemblies, follow `assistant/skills/product-assembly/SKILL.md`. Default new assemblies to `Draft` and never infer scientific approval.
 
 ---
 
