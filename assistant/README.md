@@ -23,7 +23,7 @@ This folder holds the instructions used to train an external assistant — **CIn
 | `regional-atmosphere` | Regional rainfall and air-temperature indicators, station maps, anomaly series and supported ERA5 backgrounds |
 | `tropical-cyclones` | National site-radius and Regional Pacific-subregion IBTrACS/ONI workflows; `functions/tcs.py` |
 | `regional-sea-level` | Documents what's missing for a regional sea-level workflow (none exists yet) — kept at the same level of detail as the two built regional domains so the gap doesn't get lost |
-| `product-assembly` | Assemble or audit a traceable National/Regional climate-indicator report package: inventory, captions, methods, limitations, provenance, validation, issue log, and Markdown/DOCX/PDF report outputs |
+| `product-assembly` | Generate and assemble a traceable National/Regional report through repository-native site setup, data caches, notebooks/helpers and canonical figures, followed by inventory, captions, methods, provenance, validation, issue log, and Markdown/DOCX/PDF outputs |
 | `functions-api` | Callable functions (all domains), `indicators_setup` discovery, `plot_bar_probs` |
 | `output-conventions` | Figure / table naming and folders (all domains) |
 | `data-sources` | GHCN-Daily, UHSLC, CMEMS, ONI, units, citations (all domains) |
