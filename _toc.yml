@@ -24,6 +24,12 @@ parts:
           - file: notebooks/historical/National/sea_surface_temperature/sea_surface_temperature
             sections:
               - file: notebooks/historical/National/sea_surface_temperature/a_Mean_Temperature_maps
+          - file: notebooks/historical/National/biochemistry/biochemistry
+            sections:
+              - file: notebooks/historical/National/biochemistry/a_oceanic_pH
+              - file: notebooks/historical/National/biochemistry/b_chlorophyll
+              - file: notebooks/historical/National/biochemistry/c_phytoplankton
+              - file: notebooks/historical/National/biochemistry/d_dissolved_o2
           - file: notebooks/historical/National/sea_level/sea_level
             sections:
               - file: notebooks/historical/National/sea_level/0_site_setup
@@ -50,6 +56,14 @@ parts:
           - file: notebooks/historical/Regional/sea_surface_temperature/sea_surface_temperature
             sections:
               - file: notebooks/historical/Regional/sea_surface_temperature/regional_indicators
+              - file: notebooks/historical/Regional/sea_surface_temperature/mhw_regional
+          - file: notebooks/historical/Regional/biochemistry/biochemistry
+            sections:
+              - file: notebooks/historical/Regional/biochemistry/a_oceanic_pH
+              - file: notebooks/historical/Regional/biochemistry/b_chlorophyll
+              - file: notebooks/historical/Regional/biochemistry/c_phytoplankton
+              - file: notebooks/historical/Regional/biochemistry/c2_phytoplankton
+              - file: notebooks/historical/Regional/biochemistry/d_dissolved_o2
           - file: notebooks/historical/Regional/regional_plots
             title: Regional sea level — placeholder
 

@@ -21,6 +21,8 @@ The book provides guided navigation through the National and Regional analyses, 
 | **Air temperature** | Mean, minimum and maximum temperature, diurnal range, hot days and cold nights | Multi-station indicators, Pacific maps, regional anomaly series and supported ERA5 context |
 | **Rainfall** | Annual and seasonal totals, anomalies, dry days, consecutive dry spells and heavy rainfall | Multi-station indicators, Pacific trend maps and supported ERA5 context |
 | **Tropical cyclones** | Cyclones entering a configurable radius around a site, including severe systems and ENSO context | Tracks, genesis seasonality, spatial density, intensity, period comparisons, trends and ACE for four Pacific subregions |
+| **Sea-surface temperature** | EEZ mean conditions, trends, seasonal and annual anomalies and ENSO relationships | Pacific-wide SST means, trends, anomaly blocks and marine-heatwave indicators with EEZ boundaries |
+| **Ocean biochemistry** | EEZ analyses of pH, chlorophyll-a, phytoplankton size and dissolved oxygen | Pacific maps, trends, seasonality, full-period ENSO anomalies and EEZ summaries; additionally includes Copernicus phytoplankton biomass |
 | **Sea level** | Satellite and tide-gauge trends, anomalies, minor flooding and extreme-level rankings | Documented placeholder and experimental foundations for future development |
 
 ## Project organization
@@ -50,7 +52,7 @@ The recommended order is:
 4. Review completeness and quality-control diagnostics.
 5. Save notebook outputs before rebuilding the documentation.
 
-Some workflows access external datasets such as NOAA GHCN-Daily, NOAA IBTrACS and ONI, UHSLC tide gauges, CMEMS satellite altimetry and ERA5. Cached data and credentials are not necessarily distributed with the repository.
+Some workflows access external datasets such as NOAA GHCN-Daily, NOAA IBTrACS, OISST and ONI, UHSLC tide gauges, Copernicus Marine biogeochemistry and satellite altimetry, NOAA PIFSC MD50, and ERA5. Cached data and credentials are not necessarily distributed with the repository.
 
 ## Building the Jupyter Book locally
 

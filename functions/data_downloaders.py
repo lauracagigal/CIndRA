@@ -303,6 +303,21 @@ def download_oni_index(url=ONI_URL):
     return df
 
 
+def download_ERDDAP_data(base_url, dataset_id, date_ini, date_end, lon_range, lat_range):
+    """Download one gridded ERDDAP variable as a tidy DataFrame."""
+    url = (
+        f"{base_url}?{dataset_id}"
+        f"%5B({date_ini}):1:({date_end})%5D"
+        f"%5B({lat_range[0]}):1:({lat_range[1]})%5D"
+        f"%5B({lon_range[0]}):1:({lon_range[1]})%5D"
+    )
+    data = pd.read_csv(url).iloc[1:].reset_index(drop=True)
+    data["time"] = pd.to_datetime(data["time"])
+    for variable in ["latitude", "longitude", dataset_id]:
+        data[variable] = pd.to_numeric(data[variable], errors="coerce")
+    return data
+
+
 def download_uhslc_data(data_dir, uhslc_id, resolution="daily"):
     """Return the cached UHSLC Research Quality NetCDF file for one station.
 

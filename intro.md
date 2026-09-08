@@ -4,8 +4,8 @@ This Jupyter Book contains the National and Regional climate-indicator notebooks
 
 The book is organized into two principal parts:
 
-- **National indicators** — site-based rainfall, air-temperature, tropical-cyclone and sea-level workflows.
-- **Regional indicators** — Pacific-wide rainfall, air-temperature and tropical-cyclone analyses, plus the regional sea-level placeholder.
+- **National indicators** — site- and EEZ-based air-temperature, rainfall, tropical-cyclone, sea-surface-temperature, marine-biochemistry and sea-level workflows.
+- **Regional indicators** — Pacific-wide atmosphere, tropical-cyclone, sea-surface-temperature, marine-heatwave and marine-biochemistry analyses, plus the regional sea-level placeholder.
 
 Each section exposes the scientific narrative, executable code, stored outputs and links back to the source repository. Data-intensive notebooks are not automatically re-executed during the website build; run them in their documented order to refresh data and figures before publishing.
 
@@ -17,12 +17,12 @@ The complete source repository is available at [github.com/lauracagigal/CIndRA](
 
 <a href="notebooks/historical/National/national.html" class="dashboard-card atmosphere">
   <h3>National indicators</h3>
-  <p>Configure an individual Pacific site and explore air temperature, rainfall, tropical cyclones and sea level.</p>
+  <p>Configure an individual Pacific site or EEZ and explore atmosphere, tropical cyclones, ocean temperature, biochemistry and sea level.</p>
 </a>
 
 <a href="notebooks/historical/Regional/regional.html" class="dashboard-card regional">
   <h3>Regional indicators</h3>
-  <p>Compare climate behaviour across Pacific stations, countries and tropical-cyclone subregions.</p>
+  <p>Compare climate and ocean conditions across Pacific stations, countries, EEZs and tropical-cyclone subregions.</p>
 </a>
 
 <a href="assistant.html" class="dashboard-card cyclone">

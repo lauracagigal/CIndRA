@@ -198,7 +198,7 @@ def plot_stacked_annual_counts(
     significant = trend.pvalue < 0.05
     ax.plot(
         x, trend.intercept + trend.slope * x, color="#2166ac", linewidth=2.2,
-        linestyle="-" if significant else ":", zorder=6,
+        linestyle="-" if significant else "--", zorder=6,
         label=(f"Linear trend: {trend.slope * 10:+.2f}/decade "
                f"(p={trend.pvalue:.3f}; "
                f"{'significant' if significant else 'not significant'})"),
@@ -236,7 +236,7 @@ def plot_region_inset(
     trend = linregress(x[valid], metrics.loc[valid, "named"].to_numpy())
     significant = trend.pvalue < 0.05
     ax.plot(x, trend.intercept + trend.slope * x, color="#2166ac",
-            linewidth=1.8, linestyle="-" if significant else ":", zorder=5)
+            linewidth=1.8, linestyle="-" if significant else "--", zorder=5)
     ax.set_title(region_name, fontsize=9, fontweight="bold", pad=3)
     ax.text(
         0.97, 0.94, f"Trend: {trend.slope * 10:+.2f}/decade\np={trend.pvalue:.3f}",
@@ -754,7 +754,7 @@ def plot_regional_ace(
         trend_values = trend.intercept + trend.slope * values.index.to_numpy()
         significant = trend.pvalue < 0.05
         ax.plot(values.index, trend_values, color="#2166ac", linewidth=2,
-                linestyle="-" if significant else ":", label="Linear trend",
+                linestyle="-" if significant else "--", label="Linear trend",
                 zorder=5)
         ax.text(
             0.98, 0.95,
@@ -1451,7 +1451,7 @@ def plot_trendline_year(data, var, ax, color='k'):
         ax.plot(time_num, trendline(time_num), color=color, linestyle='-', label=label)
     else:
         label = f'Trend (rate = {np.round(change_rate, 3)}/year) - Not Significant (p > 0.05)'
-        ax.plot(time_num, trendline(time_num), color=color, linestyle=':', label=label)
+        ax.plot(time_num, trendline(time_num), color=color, linestyle='--', label=label)
 
 
 def add_oni_cat(df1, lims=[-.5, .5]):
@@ -1514,7 +1514,7 @@ def plot_bar_probs(x, y, bar_label=None, labels=None, trendline=False,
             ax.plot(time_num, trendline(time_num), color='k', linestyle='-', label=label)
         else:
             label = f'Trend (rate = {np.round(change_rate, 3)}/year) - Not Significant (p > 0.05)'
-            ax.plot(time_num, trendline(time_num), color='k', linestyle=':', label=label)
+            ax.plot(time_num, trendline(time_num), color='k', linestyle='--', label=label)
         ax.legend(fontsize=fontsize)
 
     ax.grid(color='lightgrey', linestyle=':', alpha=0.6)
@@ -1629,7 +1629,7 @@ def plot_tc_categories_trend(tcs_sel_params, trendline_plot=True):
             ax.plot(x, trendline(x), color='k', linestyle='-', label=label)
         else:
             label = f'Trend (rate = {np.round(change_rate, 2)}/year) - Not Significant (p > 0.05)'
-            ax.plot(x, trendline(x), color='k', linestyle=':', label=label)
+            ax.plot(x, trendline(x), color='k', linestyle='--', label=label)
 
     ax.legend(fontsize=12, ncol=7)
 

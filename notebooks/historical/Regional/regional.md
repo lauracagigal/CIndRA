@@ -37,6 +37,11 @@ Regional workflows describe climate variability and change across Pacific statio
   <p>Map Pacific SST means, long-term trends and five-year DJF anomalies with all Pacific EEZ boundaries.</p>
 </a>
 
+<a href="biochemistry/biochemistry.html" class="dashboard-card ocean regional">
+  <h3>Regional marine biochemistry</h3>
+  <p>Compare pH, chlorophyll-a, phytoplankton size and biomass, and dissolved oxygen, including trends, full-period ENSO anomalies and EEZ summaries.</p>
+</a>
+
 <a href="regional_plots.html" class="dashboard-card ocean regional">
   <h3>Regional sea level</h3>
   <p>Reserved section for future comparisons of tide gauges, satellite altimetry and regional sea-level variability.</p>
@@ -46,4 +51,4 @@ Regional workflows describe climate variability and change across Pacific statio
 
 ## Data flow
 
-Rainfall and air temperature use the multi-station dataset produced by the [regional setup](00_regional_setup.ipynb). Tropical cyclones independently load the all-basin IBTrACS archive and allocate observations to four Pacific subregions. Sea-surface temperature downloads the NOAA OISST monthly product directly, while regional sea level is currently documented as a placeholder for future development.
+Rainfall and air temperature use the multi-station dataset produced by the [regional setup](00_regional_setup.ipynb). Tropical cyclones independently load the all-basin IBTrACS archive and allocate observations to four Pacific subregions. Sea-surface temperature and marine heatwaves use NOAA OISST. Marine-biochemistry notebooks use Pacific-wide regional NetCDF caches from Copernicus Marine and NOAA PIFSC; they never substitute a national subset. Regional sea level is currently documented as a placeholder for future development.

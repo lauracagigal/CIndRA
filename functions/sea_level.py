@@ -470,11 +470,11 @@ def get_trend_info(x, y, timescale="days"):
     """Linear trend metadata for flood count charts."""
     slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
     trend_counts = intercept + slope * x
-    if timescale == "days":
-        trend_label = "Increasing {:.2f} days/year (p= {:.2f})".format(slope, p_value)
-    else:
-        trend_label = "Increasing {:.2f} hours/year (p= {:.2f})".format(slope, p_value)
-    linestyle_trend = "-" if p_value < 0.05 else "--"
+    units = "days/year" if timescale == "days" else "hours/year"
+    significant = p_value < 0.05
+    status = "Significant (p < 0.05)" if significant else "Not significant (p ≥ 0.05)"
+    trend_label = f"Trend (rate = {slope:+.2f} {units}) – {status}"
+    linestyle_trend = "-" if significant else "--"
     return trend_counts, trend_label, linestyle_trend, slope, p_value
 
 

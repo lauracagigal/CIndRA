@@ -12,6 +12,16 @@ import plotly.graph_objects as go
 from sea_level import get_trend_info
 
 
+def _trend_style_and_label(rate, p_value, units):
+    """Return the standard CIndRA trend style and legend label."""
+    rate = float(np.asarray(rate).squeeze())
+    p_value = float(np.asarray(p_value).squeeze())
+    significant = np.isfinite(p_value) and p_value < 0.05
+    linestyle = "-" if significant else "--"
+    status = "Significant (p < 0.05)" if significant else "Not significant (p ≥ 0.05)"
+    return linestyle, f"Trend (rate = {rate:+.2f} {units}) – {status}"
+
+
 def add_zebra_frame(ax, lw=2, segment_length=0.5, crs=ccrs.PlateCarree()):
     left, right, bot, top = ax.get_extent(crs=crs)
 
@@ -135,16 +145,19 @@ def plot_altimetry_trend_timeseries(
     end_date_str,
     start_date,
     end_date,
+    p_value_asl=np.nan,
 ):
     sns.set_style("whitegrid")
     palette = sns.color_palette("Set1")
     fig, ax = plt.subplots()
     ax.scatter(sla_nearest["time"], 100 * sla_nearest, label="Altimetry", color=palette[0], alpha=0.2, s=5)
-    ax.plot(sla_nearest["time"], 100 * trend_line_asl, label="Altimetry Trend", color=palette[0], linestyle="--")
+    trend_style, trend_label = _trend_style_and_label(100 * trend_rate_asl, p_value_asl, "cm/year")
+    ax.plot(sla_nearest["time"], 100 * trend_line_asl, label=trend_label, color=palette[0], linestyle=trend_style)
     ax.set_title(f"Altimetry ({lat_str}, {lon_str}) ({start_date_str} to {end_date_str})")
     ax.set_xlabel("Year")
     ax.set_ylabel("Height (cm)")
     ax.set_xlim([start_date, end_date])
+    ax.legend(loc="best")
     trendmag_str = f"Δ Sea Level: {100*trend_mag_asl.values:.2f} cm, Trend: {100*trend_rate_asl.values:.2f} cm/year"
     ax.text(
         0.95,
@@ -183,18 +196,21 @@ def plot_tide_gauge_trend_timeseries(
     end_date_str,
     start_date,
     end_date,
+    p_value_rsl=np.nan,
 ):
     sns.set_style("whitegrid")
     palette = sns.color_palette("Set1")
     fig, ax = plt.subplots()
     ax.scatter(rsl_daily["time"], 100 * rsl_daily, label="Tide Gauge", color=palette[1], alpha=0.2, s=5)
-    ax.plot(rsl_daily["time"], 100 * trend_line_rsl, label="Tide Gauge Trend", color=palette[1], linestyle="--")
+    trend_style, trend_label = _trend_style_and_label(100 * trend_rate_rsl, p_value_rsl, "cm/year")
+    ax.plot(rsl_daily["time"], 100 * trend_line_rsl, label=trend_label, color=palette[1], linestyle=trend_style)
     ax.plot(rsl_monthly["time"], 100 * rsl_monthly, label="Tide Gauge", color=palette[3])
     ax.set_title(f"Tide Gauge ({station_name}) ({start_date_str} to {end_date_str})")
     ax.set_xlabel("Year")
     ax.set_ylabel("Height (cm, MSL)")
     ax.set_ylim([-50, 50])
     ax.set_xlim([start_date, end_date])
+    ax.legend(loc="best")
     trendmag_str = f"Δ Sea Level: {100*trend_mag_rsl:.2f} cm, Trend: {100*trend_rate_rsl:.2f} cm/year"
     ax.text(
         0.95,
@@ -274,18 +290,20 @@ def plot_combined_trends(
     end_date_str,
     start_date,
     end_date,
+    p_value_asl=np.nan,
+    p_value_rsl=np.nan,
 ):
     sns.set_style("whitegrid")
     palette = sns.color_palette("Set1")
     fig, ax = plt.subplots()
 
-    label_sat = f"Altimetry Trend ({1000*trend_rate_asl.values:.2f} mm/year)"
+    style_sat, label_sat = _trend_style_and_label(1000 * trend_rate_asl, p_value_asl, "mm/year")
     ax.scatter(sla_nearest["time"], 100 * sla_nearest, label="Altimetry", color=palette[0], alpha=0.2, s=5)
-    ax.plot(sla_nearest["time"], 100 * trend_line_asl, label=label_sat, color=palette[0], linestyle="-")
+    ax.plot(sla_nearest["time"], 100 * trend_line_asl, label=label_sat, color=palette[0], linestyle=style_sat)
 
-    label_tg = f"Tide Gauge Trend ({1000*trend_rate_rsl:.2f} mm/year)"
+    style_tg, label_tg = _trend_style_and_label(1000 * trend_rate_rsl, p_value_rsl, "mm/year")
     ax.scatter(rsl_daily["time"], 100 * rsl_daily, label="Tide Gauge", color=palette[1], alpha=0.2, s=10)
-    ax.plot(rsl_daily["time"], 100 * trend_line_rsl, label=label_tg, color=palette[1], linestyle="-")
+    ax.plot(rsl_daily["time"], 100 * trend_line_rsl, label=label_tg, color=palette[1], linestyle=style_tg)
 
     title = f"Altimetry ({lat_str}, {lon_str}) vs \nTide Gauge ({station_name}) ({start_date_str} to {end_date_str})"
     ax.set_title(title)

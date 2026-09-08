@@ -44,6 +44,11 @@ Select a section below to open its overview and access the corresponding noteboo
   <p>Mean SST, spatial trends, seasonal and annual anomalies, area averages and relationships with ENSO inside the selected EEZ.</p>
 </a>
 
+<a href="biochemistry/biochemistry.html" class="dashboard-card ocean">
+  <h3>Ocean biochemistry</h3>
+  <p>Ocean pH, chlorophyll-a, phytoplankton size and dissolved oxygen, including trends, seasonal variability and ENSO patterns inside the selected EEZ.</p>
+</a>
+
 <a href="sea_level/sea_level.html" class="dashboard-card ocean">
   <h3>Sea level</h3>
   <p>Relative and absolute sea-level trends, anomalies, minor flooding and rankings of extreme water levels.</p>
@@ -59,5 +64,5 @@ Select a section below to open its overview and access the corresponding noteboo
 4. Save the refreshed notebook outputs and rebuild the book for publication.
 
 ```{note}
-Air temperature and rainfall share the atmosphere setup. Tropical-cyclone notebooks use the configured site coordinates together with NOAA IBTrACS, while sea level has a separate setup because it uses tide-gauge and satellite products.
+Air temperature and rainfall share the atmosphere setup. Tropical-cyclone, sea-surface-temperature and biochemistry notebooks reuse the configured national site coordinates, while sea level has a separate setup because it uses tide-gauge and satellite products.
 ```
