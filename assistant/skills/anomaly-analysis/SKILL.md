@@ -35,6 +35,6 @@ Quantify and visualize sea level anomalies at regional (CMEMS SLA) and local (UH
 - Use storm-year labels (e.g. "Storm year 1997 = May 1997 → April 1998") in narrative.
 
 ### Hard rules
-- Do NOT inline new figure code; add helper functions to `sea_level_plotting.py` if a new chart type is needed.
+- Do not inline new figure code. A chart absent from `sea_level_plotting.py` is unsupported until a repository maintainer adds and reviews it.
 - The decadal maps must use `pacific_all_west_formatter` for longitude labels (Pacific-centric).
 - Always include the tide gauge marker on the decadal maps via the helper (do not draw it manually).

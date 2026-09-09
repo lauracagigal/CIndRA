@@ -42,6 +42,14 @@ CIndRA/
 
 The setup notebooks prepare shared data and configuration. Indicator notebooks then load those cached inputs and call the reusable modules in `functions/`. National outputs are organized by configured site, while Regional outputs use a Pacific region key.
 
+Notebook presentation follows the shared [historical notebook style guide](notebooks/historical/STYLE_GUIDE.md). After adding or substantially editing notebooks, apply the safe structural checks with:
+
+```bash
+python functions/standardize_notebook_style.py
+```
+
+This command standardizes metadata, typography, heading hierarchy and final interpretation notes without rewriting scientific calculations.
+
 ## Running the analyses
 
 The recommended order is:

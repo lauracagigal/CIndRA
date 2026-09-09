@@ -1,6 +1,6 @@
 ---
 name: product-assembly
-description: Generate, assemble, or audit a traceable CIndRA climate-indicator report package for a requested National site or Regional scope. Use for end-to-end Markdown/DOCX/PDF reports, product inventories, captions, methods, provenance, validation, and issue logs across rainfall, air temperature, SST, sea level, and tropical cyclones. Generate data and figures only through the repository's approved setup, notebooks, functions, and output formats; do not substitute ad hoc analyses or approve scientific results.
+description: Generate, assemble, or audit a traceable CIndRA National/Regional report across atmosphere, SST, marine heatwaves, marine biochemistry, sea level and cyclones. Use only executed outputs from the canonical repository; do not add unsupported analyses or figures.
 ---
 
 # CIndRA product assembly
@@ -15,14 +15,14 @@ Before assembling a report, classify every requested product as either already g
 
 For products needing generation:
 
-1. Run the relevant repository setup workflow for the requested site/profile. For National rainfall or air temperature, use `site-setup` and its saved `data/sites/<site_key>.json`; never reuse another country's or station's configuration.
+1. Run the relevant repository setup workflow for the requested site/profile. Every new National location must pass through the appropriate National site setup and user selection; never reuse another country's, station's or EEZ's configuration.
 2. Resolve any scientifically material selection through the upstream skill. In particular, if a country has multiple suitable GHCN stations and the user has not selected one, present the repository-discovered candidates and obtain the station choice rather than choosing silently.
 3. Acquire data only through the repository downloader/cache path documented by the relevant domain and `data-sources` skills. User-supplied data may replace this only when the user explicitly requests it and the report labels that substitution.
 4. Execute the applicable repository notebook or its approved functions/helpers with that saved configuration. Do not rewrite the calculation or plotting logic inside the report workflow.
 5. Persist figures, tables and metrics through the repository's normal save helpers, directories, filenames, dimensions, colours, labels and formats from `output-conventions` and the domain skill.
 6. Verify that the generated output resolves back to the requested site/profile, input cache, notebook/helper and run parameters before admitting it to the report inventory.
 
-Figures embedded in the report must be the actual files emitted by these workflows. Do not redraw, restyle, screenshot, trace, crop away labels, replace a figure with a look-alike, or recompute it with report-specific plotting code. The report renderer may only scale the complete figure proportionally to fit the page. If a required figure cannot be produced by an existing approved workflow, mark it missing/deferred and explain the gap unless the user separately asks to extend the repository.
+Figures embedded in the report must be the actual files emitted by these workflows. Do not redraw, restyle, screenshot, trace, crop away labels, replace a figure with a look-alike, or recompute it with report-specific plotting code. The report renderer may only scale the complete figure proportionally to fit the page. If a required figure cannot be produced by an existing approved workflow, mark it unsupported or missing and explain the gap.
 
 Example: for “give me a PDF of the rainfall analysis for Samoa,” establish or reuse the Samoa GHCN site configuration, resolve the station choice when needed, run the National rainfall notebooks/helpers against the corresponding repository cache, collect the resulting canonical `F5`/`F6`/`F7`, `R_*` and metrics outputs, and embed those exact figure files in the PDF.
 

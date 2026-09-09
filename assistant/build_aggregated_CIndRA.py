@@ -13,6 +13,8 @@ SOURCE_FILES = [
     ASSISTANT_DIR / "skills" / "national-rainfall" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "national-temperature" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "sea-surface-temperature" / "SKILL.md",
+    ASSISTANT_DIR / "skills" / "marine-heatwaves" / "SKILL.md",
+    ASSISTANT_DIR / "skills" / "marine-biochemistry" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "sea-level-site-setup" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "trend-analysis" / "SKILL.md",
     ASSISTANT_DIR / "skills" / "anomaly-analysis" / "SKILL.md",

@@ -1,8 +1,15 @@
-# CIndRA Assistant — Training Material (PICCM_atmosphere_sealevel)
+# CIndRA Assistant — Training Material
 
-This folder holds the instructions used to train an external assistant — **CIndRA** (Climate Indicator Research Assistant) — e.g. as a ChatGPT custom GPT. CIndRA covers rainfall, air temperature, sea-surface temperature, sea level, and tropical cyclones across the National site workflows and Regional Pacific workflows in this repository.
+This folder holds the English-first instructions used to configure an external assistant — **CIndRA** (Climate Indicator Research Assistant), for example on a custom-assistant platform. Its authoritative code source is [github.com/lauracagigal/CIndRA](https://github.com/lauracagigal/CIndRA). CIndRA covers only the National and Regional indicators implemented in that repository; computed answers and figures require actual execution of the corresponding repository workflow.
 
 ## How to use
+
+On an external platform, give the assistant access to a current clone or retrievable
+copy of `https://github.com/lauracagigal/CIndRA` and an execution environment capable
+of running its notebooks. Uploading these instructions alone does not authorize the
+assistant to invent calculations: if it cannot retrieve and execute the repository,
+it must limit itself to documented explanations and state that computed outputs are
+unavailable.
 
 - **`CIndRA_role.md`** — paste the contents into the "Instructions" / system prompt of the assistant. Defines CIndRA's identity, scope (rainfall + air temperature + sea level + regional), conventions, data sources, analysis rules, plotting rules, output naming, and error handling for all domains. This is background context CIndRA always has, not something conditionally "activated" — it does not follow the Agent Skills format below.
 - **`aggregated_CIndRA_markdowns.md`** — single file with **all** markdowns below concatenated (role + skills + this README). Use when the assistant platform accepts one large knowledge file instead of separate uploads (e.g. a ChatGPT custom GPT's knowledge base). Regenerate after any source change: `python assistant/build_aggregated_CIndRA.py`.
@@ -14,6 +21,8 @@ This folder holds the instructions used to train an external assistant — **CIn
 | `national-rainfall` | Complete National rainfall workflow: totals, anomalies, dry spells, wet days and heavy rainfall |
 | `national-temperature` | Complete National air-temperature workflow: mean/min/max temperature, diurnal range and hot/cold extremes |
 | `sea-surface-temperature` | National selected-EEZ and Regional Pacific SST means, trends, anomalies, NOAA OISST download and `functions/sst.py` |
+| `marine-heatwaves` | National EEZ-first/point and Regional Pacific NOAA OISST MHW detection, trends, decadal/ENSO maps and EEZ summaries |
+| `marine-biochemistry` | National and Regional pH, chlorophyll-a, phytoplankton size/biomass and dissolved-oxygen workflows |
 | `sea-level-site-setup` | `National/sea_level/0_site_setup.ipynb` — sea level's own entry point, not shared with the other two domains |
 | `trend-analysis` | `National/sea_level/a_sea_level_trend.ipynb` |
 | `anomaly-analysis` | `National/sea_level/b_sea_level_anomaly.ipynb` |
@@ -35,12 +44,14 @@ This folder holds the instructions used to train an external assistant — **CIn
 - `notebooks/historical/National/sea_level/` (`0_site_setup.ipynb`, `a_sea_level_trend.ipynb`, `b_sea_level_anomaly.ipynb`, `c_sea_level_ff.ipynb`, `d_sea_level_rankings.ipynb`) — the sea-level workflow, with its **own** site setup (a single hardcoded Palau site today, not the multi-site GHCN picker the atmosphere `00_site_setup.ipynb` has).
 - `notebooks/historical/National/tropical_cyclones/` — all and severe tropical cyclones entering a radius around a configured site, using IBTrACS and ONI.
 - `notebooks/historical/National/sea_surface_temperature/` — selected-EEZ SST maps, trends, anomalies, area averages and ONI analysis.
-- `notebooks/historical/Regional/` includes multi-station rainfall/temperature, regional NOAA OISST, and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` is a markdown-only sea-level placeholder.
-- `functions/` also includes `sst.py` for National/Regional SST and `tcs.py` for tropical-cyclone calculations and plots.
+- `notebooks/historical/National/biochemistry/` — selected-EEZ pH, chlorophyll-a, phytoplankton-size and dissolved-oxygen analyses.
+- `notebooks/historical/Regional/` includes multi-station rainfall/temperature, regional NOAA OISST and marine heatwaves, five marine-biochemistry notebooks, and the independent `tropical_cyclones/regional_indicators.ipynb` all-basin IBTrACS workflow. `regional_plots.ipynb` is a markdown-only sea-level placeholder.
+- `functions/` includes the repository calculations and plotting helpers, including `sst.py`, `marineHeatWaves.py`, `ocean.py`, `tcs.py` and the Regional-biochemistry notebook generator.
 - `data/rainfall/` — cached per-station GHCN pickles for `PRCP` (`GHCN_<station_id>.pkl`).
 - `data/air_temp/` — cached per-station GHCN pickles for `TMIN`/`TMAX`.
 - `data/sea_level/` — cached UHSLC NetCDF (`d<id>.nc`/`h<id>.nc`) and CMEMS NetCDF (`cmems_L4_SSH_*.nc`).
 - `data/sea_surface_temperature/` — National SST subsets and the cached regional NOAA OISST monthly NetCDF.
+- `data/biochemistry/` and `data/regional/biochemistry/` — National and Pacific-wide marine-biochemistry caches.
 - `data/tcs/` — cached IBTrACS NetCDF and ONI pickle used by cyclone notebooks.
 - `data/regional/` — multi-station pickles/summaries from `00_regional_setup.ipynb`, plus an `era5_cache/` subfolder.
 - `data/sites/` — per-site config JSON files. `<country_slug>_<ghcn_station_id>.json` for rainfall/air-temperature (shared between both); a fixed `palau.json` for sea level.

@@ -1,6 +1,6 @@
 ---
 name: output-conventions
-description: Defines the site-tag, filename, and folder conventions for every persisted figure/table/JSON across rainfall, air-temperature, sea-surface-temperature, tropical-cyclone, and sea-level notebooks, so outputs never collide. Use whenever saving a new figure, table, or metrics file, or when asked where a given output file lives.
+description: Defines persisted artifact conventions across all supported CIndRA indicators, including marine heatwaves and marine biochemistry. Use whenever saving or locating a repository-generated figure, table, HTML or metrics file.
 ---
 
 ## Skill: Output Conventions
@@ -153,6 +153,29 @@ SST notebooks currently save PNG figures under `matrix_cc/figures/` (legacy layo
 
 The regional data cache is `data/sea_surface_temperature/sst.mnmean.nc`. Keep the `F19`/`F20` names aligned with the PICCM reference figures unless the notebooks and book documentation are deliberately migrated together.
 
+### Canonical filenames — marine heatwaves
+
+MHW figures currently use the legacy `matrix_cc/figures/` directory.
+
+- National: `F_MHW_EEZ_mask.png`, `F_MHW_EEZ_full_period.png`, `F_MHW_EEZ_last_10_years.png`, `F_MHW_EEZ_annual_indicators.png`, `F_MHW_selected_point_full_period.png`, `F_MHW_EEZ_vs_point.png`.
+- Regional: `MHW_regional_mean_days.png`, `MHW_regional_days_trend.png`, `MHW_regional_frequency_duration_intensity.png`, `MHW_regional_5year_days_anomalies.png`, `MHW_regional_decadal_summaries.png`, `MHW_regional_annual_days_ENSO.png`, `MHW_regional_ENSO_anomalies.png`.
+- Regional tables/caches: `mhw_EEZ_summary_<cache_tag>.csv` and `regional_MHW_ENSO_EEZ_summary.csv` under the configured MHW cache directory.
+
+### Canonical filenames — Regional marine biochemistry
+
+Regional figures are written under `matrix_cc/figures/` using the variable key
+(`ph`, `chl`, `MD50`, `phyc`, `o2`):
+
+- `regional_<variable>_mean.png`
+- `regional_<variable>_trend.png`
+- `regional_<variable>_seasonal.png`
+- `regional_<variable>_seasonal_anomaly.png`
+- `regional_<variable>_timeseries.html`
+- `regional_<variable>_enso_anomalies.png`
+
+EEZ summaries are written by the corresponding notebook. Copernicus and MD50 inputs
+remain caches under `data/regional/biochemistry/`, never report outputs.
+
 ### Canonical filenames — sea level (`SL_*` prefix, `F10`/`F11` figures)
 
 **Notebook `a_sea_level_trend.ipynb`**:
@@ -183,4 +206,4 @@ Sea-level filenames are **not** suffixed with `_<site_tag>` the way rainfall/air
 - Never overwrite a different site's outputs. Always re-derive `site_tag` from the loaded config.
 - Cached pickle/NetCDF is keyed by **station ID** (GHCN) or **UHSLC ID**; figures/tables are keyed by **site tag**.
 - Use `persist_*_outputs` for rainfall/air-temperature tables — do not call `style_matrix` alone without persisting. Sea level uses `save_table_to_csv`/`save_dict_json` directly instead of a `persist_*_outputs` wrapper.
-- Rainfall outputs use the `R_`/`F5`/`F6`/`F7` prefixes; air-temperature outputs use `T_`/`F2`/`F3`/`F4`; Regional SST uses `F19`/`F20`; sea-level outputs use `SL_`/`F10`/`F11`. Don't mix them.
+- Rainfall outputs use the `R_`/`F5`/`F6`/`F7` prefixes; air-temperature uses `T_`/`F2`/`F3`/`F4`; Regional SST uses `F19`/`F20`; MHW uses `F_MHW_`/`MHW_regional_`; Regional biochemistry uses `regional_<variable>_`; sea level uses `SL_`/`F10`/`F11`. Do not mix them.

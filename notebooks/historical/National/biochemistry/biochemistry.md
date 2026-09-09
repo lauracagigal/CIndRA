@@ -32,6 +32,8 @@ Ocean biochemistry connects physical climate variability with marine ecosystems.
 
 All four notebooks use the common national site configuration in `data/sites/palau.json`, resolve paths from the CIndRA repository root and mask gridded observations to the configured Palau EEZ. They present a consistent sequence of mean conditions, trends, seasonal and annual variability, EEZ averages, the configured point and ENSO composites.
 
+Their line-based time series use interactive figures, allowing values to be inspected, traces to be hidden and selected periods to be zoomed.
+
 The cached input datasets are stored under `data/biochemistry/`; figures are written to `matrix_cc/figures/`.
 
 ```{note}

@@ -1,6 +1,6 @@
 ---
 name: data-sources
-description: Documents every external data source used in this repository (GHCN-Daily, NOAA OISST, IBTrACS, NOAA ONI, UHSLC tide gauges, CMEMS satellite altimetry), their URLs, units, sentinels, and citations, plus reference-period conventions. Use when downloading new data, citing a data source, or converting units.
+description: Documents CIndRA data sources including GHCN-Daily, NOAA OISST/ONI/IBTrACS, UHSLC, Copernicus Marine physical and biogeochemical products, and NOAA PIFSC MD50. Use when running a supported download, attribution or unit conversion.
 ---
 
 ## Skill: Data Sources & Attribution
@@ -17,7 +17,7 @@ description: Documents every external data source used in this repository (GHCN-
 - **Documentation**: `https://www.ncei.noaa.gov/data/global-historical-climatology-network-daily/doc/GHCND_documentation.pdf`.
 - **Citation**: Menne, M.J., I. Durre, R.S. Vose, B.E. Gleason, and T.G. Houston, 2012. *An overview of the Global Historical Climatology Network-Daily Database.* J. Atmos. Oceanic Technol., 29, 897-910.
 
-### ENSO — NOAA ONI (rainfall `a_Total_rainfall.ipynb` and temperature `a_mean_temperature.ipynb`)
+### ENSO — NOAA ONI
 
 - **URL**: `https://psl.noaa.gov/data/correlation/oni.data`.
 - **Format**: monthly Niño 3.4 anomalies. `-99.9` → NaN (`download_oni_index`).
@@ -27,6 +27,7 @@ description: Documents every external data source used in this repository (GHCN-
   - Neutral otherwise.
 - **Colours**: El Niño = red, La Niña = blue, Neutral = gray.
 - **Citation**: NOAA Climate Prediction Center / Physical Sciences Laboratory.
+- **Use in CIndRA**: rainfall, air temperature, sea level, tropical cyclones, SST, marine heatwaves and marine biochemistry. Preserve the classification rule implemented by the relevant notebook; do not mix monthly phase labels and annual dominant-phase composites silently.
 
 ### Sea-surface temperature — NOAA OISST v2
 
@@ -46,6 +47,22 @@ description: Documents every external data source used in this repository (GHCN-
 - **Variables**: `lon`/`lat` in degrees, `time`, `wmo_wind` in knots, `wmo_pres` in hPa.
 - **Missing intensity**: Regional indicators omit missing WMO winds. National radius workflows currently use `fillwinds=True`, which estimates wind from pressure; disclose the estimate.
 - **Citation**: Knapp, K.R. et al., International Best Track Archive for Climate Stewardship (IBTrACS), NOAA NCEI. State dataset version and access window.
+
+### Marine biochemistry — Copernicus Marine and NOAA PIFSC
+
+- **Copernicus dataset**: `cmems_mod_glo_bgc_my_0.25deg_P1M-m`, monthly 0.25° global biogeochemical reanalysis.
+- **Variables**: `ph` (pH units), `chl` (mg m⁻³), `phyc` (mmol C m⁻³) and `o2` (µmol L⁻¹), using the surface level selected in the notebooks.
+- **Regional cache**: `data/regional/biochemistry/copernicus_bgc_pacific_surface_monthly.nc`.
+- **Access**: `copernicusmarine.subset`; configure credentials with `copernicusmarine login` outside the notebook and never store credentials in assistant instructions or code.
+- **Product page**: `https://data.marine.copernicus.eu/product/GLOBAL_MULTIYEAR_BGC_001_029/description`.
+- **NOAA PIFSC MD50**: experimental `md50_exp_2025` median phytoplankton-size product, units µm, from `https://oceanwatch.pifsc.noaa.gov/erddap/info/md50_exp_2025/index.html`; Regional cache `data/regional/biochemistry/MD50_pacific_monthly.nc`.
+- Never use a National/Palau subset as a Regional Pacific product.
+
+### Marine heatwaves — NOAA OISST and Hobday method
+
+- Daily NOAA OISST is processed by the repository's `functions/marineHeatWaves.py` implementation.
+- Cite the marineHeatWaves implementation and Hobday marine-heatwave method as recorded in the MHW notebooks.
+- Detection parameters, climatology period and spatial stride come from the executed notebook and must be reported with results.
 
 ### Tide gauge — UHSLC (University of Hawaii Sea Level Center)
 

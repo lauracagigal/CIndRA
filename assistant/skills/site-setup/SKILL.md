@@ -1,9 +1,27 @@
 ---
 name: site-setup
-description: Set up a new rainfall/air-temperature analysis site by picking a GHCN-Daily station, downloading and cleaning daily TMIN/TMAX/PRCP, and saving a reusable site config JSON. Use when starting analysis for a new Pacific Island site, or before running any National rainfall or air-temperature notebook (notebooks/historical/National/00_site_setup.ipynb).
+description: Gate every new National location through CIndRA site selection, then configure GHCN rainfall/temperature through National/00_site_setup.ipynb or route sea level/ocean indicators to their documented setup and EEZ validation. Use before any National analysis for a location not already saved.
 ---
 
 ## Skill: Site Setup (notebook `notebooks/historical/National/00_site_setup.ipynb`)
+
+### National location gate
+
+This skill is mandatory whenever a user requests a National analysis for a location
+different from the active saved configuration. First retrieve the current CIndRA
+repository, inspect available configurations and run the appropriate setup/selection
+workflow. Ask the user to choose among repository-discovered stations, EEZ matches or
+points; never infer or invent them.
+
+- Rainfall and air temperature use the full GHCN workflow documented below.
+- SST, marine heatwaves, marine biochemistry and National cyclones reuse saved National
+  location information and their notebook-specific EEZ/radius validation. Run the
+  selection flow and verify dataset coverage before analysis.
+- Sea level uses `National/sea_level/0_site_setup.ipynb`; its current arbitrary-location
+  limitation must be disclosed rather than bypassed.
+
+Do not execute a downstream National indicator until the user has confirmed any
+material selection and the resulting configuration exists.
 
 ### Purpose
 Define a new analysis site interactively, pick the right GHCN-Daily station, and pre-download + clean daily **temperature** (`TMIN`/`TMAX`) and **precipitation** (`PRCP`) **once**, so every other notebook — both the air-temperature (`a_mean_temperature.ipynb`, `b_min_max_temperature.ipynb`, `c_hot_cold_days.ipynb`) and rainfall (`a_Total_rainfall.ipynb`, `b_Consecutive_dry_days.ipynb`, `c_Heavy_rainfall.ipynb`) notebooks — only loads cached data.

@@ -1,17 +1,17 @@
 ---
 name: functions-api
-description: Full reference of callable functions across functions/site_common.py, rainfall.py, air_temp.py, temp_func.py, data_downloaders.py, rainfall_regional.py, tcs.py, sea_level.py, sea_level_plotting.py, and the external indicators_setup package, plus the function-discovery workflow. Use before writing any analysis or plotting code, to find and reuse an existing function instead of reimplementing it inline.
+description: Reference for the reviewed CIndRA calculation and plotting functions, including atmosphere, SST, marine heatwaves, biochemistry, cyclones and sea level. Use before any supported analysis to locate and execute repository code; do not use it to invent an analysis absent from the repository.
 ---
 
 ## Skill: Functions API Reference (repository indicator modules + `indicators_setup`)
 
-Single source of truth for what the assistant is allowed to call across rainfall, air-temperature, sea-level, and tropical-cyclone workflows. If something is missing, add a function to `functions/` — do not inline it in notebooks.
+Single source of truth for what the assistant is allowed to call across CIndRA workflows. If an analysis is missing, report that it is unsupported; do not inline or invent it. Repository maintainers may add and review a function separately before the assistant uses it.
 
 ---
 
 ## Function-Discovery Rule
 
-CIndRA should actively **find and use functions from the relevant repositories** before writing custom analysis or plotting code.
+CIndRA must actively **find and execute existing reviewed functions** before producing a supported analysis or plot.
 
 For PICCM plotting and styling (rainfall and air temperature alike), look for and use functions from the external **`indicators_setup`** repository:
 
@@ -29,7 +29,7 @@ For PICCM plotting and styling (rainfall and air temperature alike), look for an
 
 ## Function Discovery Workflow
 
-When a required function is not immediately importable, search the local workspace and known repositories before falling back to ad-hoc code.
+When a required function is not immediately importable, search the current CIndRA clone and documented dependency paths. If it is absent, stop and report the unsupported/unavailable workflow; never fall back to ad-hoc analytical code.
 
 ### 1. Try direct imports first
 
@@ -60,6 +60,9 @@ Search bounded local paths:
 - `functions/data_downloaders.py`
 - `functions/rainfall_regional.py`
 - `functions/tcs.py`
+- `functions/marineHeatWaves.py`
+- `functions/ocean.py`
+- `functions/build_regional_biochemistry_notebooks.py`
 - `functions/sea_level.py`
 - `functions/sea_level_plotting.py`
 
@@ -97,7 +100,7 @@ Returns `(fig, ax)` or `(fig, ax, trend)` when `return_trend=True`.
 | Wet-day / heavy-day counts | years | days/year | as appropriate | days/year → ×10 for days/decade |
 | Annual mean temperature | years | °C | `Mean Temperature` | °C/year → ×10 for °C/decade |
 
-Ad-hoc matplotlib bar plots are acceptable only for quick-look/QC or when `plot_bar_probs` is truly unavailable after discovery. Label such outputs as quick-look or non-repo-styled.
+Only QC figures already implemented in setup notebooks may bypass published plotting helpers. If `plot_bar_probs` is unavailable, report the dependency problem rather than returning an analytical substitute.
 
 ---
 
@@ -204,6 +207,13 @@ Use `assistant/skills/sea-surface-temperature/SKILL.md` for workflow and period 
 - Regional calculations: `compute_sst_trend` (annual means → °C/decade), `compute_djf_period_anomalies` (equal half-open DJF blocks). `compute_djf_decadal_anomalies` remains available for the earlier decade-based form.
 - Regional plots: `plot_pacific_sst_field`, `plot_pacific_sst_panels`; both overlay all Pacific EEZ boundaries.
 
+## Marine heatwaves and marine biochemistry
+
+- `functions/marineHeatWaves.py`: `detect` and related Hobday MHW utilities used by the two MHW notebooks. Call the notebook-defined wrappers rather than changing detection semantics.
+- `functions/ocean.py`: `process_trend_with_nan` for gridded ocean and biogeochemical trends.
+- `functions/build_regional_biochemistry_notebooks.py`: maintenance generator for the five Regional biochemistry notebooks; running it rewrites those notebooks from the reviewed common template.
+- Detailed routing and scientific invariants live in `assistant/skills/marine-heatwaves/SKILL.md` and `assistant/skills/marine-biochemistry/SKILL.md`.
+
 ## `functions/sea_level.py` — sea-level calculations, station selection, persistence
 
 Used by all four sea-level notebooks (`0_site_setup.ipynb` through `d_sea_level_rankings.ipynb`). Not part of the atmosphere `site_common.py`/`rainfall.py`/`air_temp.py` family, though it re-uses four of `site_common.py`'s functions directly (see the `site_common.py` note above) rather than keeping fully independent copies.
@@ -235,7 +245,7 @@ Used by all four sea-level notebooks (`0_site_setup.ipynb` through `d_sea_level_
 
 ## `functions/sea_level_plotting.py` — every sea-level figure
 
-The sea-level equivalent of `indicators_setup`: **every** published sea-level figure comes from here, not from ad-hoc matplotlib/plotly code. If a new sea-level chart type is needed, add it here first.
+The sea-level equivalent of `indicators_setup`: **every** published sea-level figure comes from here, not from ad-hoc matplotlib/plotly code. A missing chart type remains unsupported until a repository maintainer adds and reviews it.
 
 - **Maps**: `plot_map`, `plot_map_base`, `plot_station_vs_grid_map`, `plot_magnitude_map`, `plot_magnitude_map_background`, `plot_anomaly_decadal_maps`, `add_zebra_frame`/`plot_zebra_frame` (map border styling), `pacific_all_west_formatter` (Pacific-centric longitude tick labels — required on any decadal/regional map).
 - **Trend timeseries**: `plot_altimetry_scatter`, `plot_altimetry_trend_timeseries`, `plot_tide_gauge_scatter`, `plot_tide_gauge_trend_timeseries`, `plot_combined_trends` (single-panel altimetry + tide-gauge comparison), `plot_enso_scatter` (ENSO sensitivity scatter + regression).
@@ -262,8 +272,9 @@ Two regional sea-level plotting helpers prepared ahead of a not-yet-built region
 
 ## Hard rules
 
-- Never redefine helpers that exist in `functions/site_common.py`, `functions/rainfall.py`, `functions/air_temp.py`, `functions/temp_func.py`, `functions/data_downloaders.py`, `functions/sst.py`, `functions/rainfall_regional.py`, `functions/sea_level.py`, or `functions/sea_level_plotting.py`.
-- Use repository functions before custom code; clone `indicators_setup` if missing (rainfall/air-temperature only — sea level has no external plotting dependency to clone).
+- Use only functions and notebook workflows retrieved from `https://github.com/lauracagigal/CIndRA` (plus the explicitly documented `indicators_setup` dependency for atmosphere styling).
+- Never redefine helpers that exist in `functions/`, and never invent a replacement for a missing indicator or analysis.
+- Execute repository functions before reporting computed results; clone `indicators_setup` if missing for rainfall/air-temperature styling only.
 - Do not fabricate repository functions or claim repo styling was used unless the function was actually imported and called.
 - Do not claim `download_uhslc_data` downloads a new station's data — it only serves an already-cached local file.
 - Do not present output from `functions/cindra_regional_plotting_helpers.py` as a finished/published figure — it is draft code not wired into any notebook.
