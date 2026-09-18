@@ -1,6 +1,6 @@
 ---
 name: data-sources
-description: Documents CIndRA data sources including GHCN-Daily, NOAA OISST/ONI/IBTrACS, UHSLC, Copernicus Marine physical and biogeochemical products, and NOAA PIFSC MD50. Use when running a supported download, attribution or unit conversion.
+description: Documents CIndRA data sources including GHCN-Daily, NOAA OISST/ONI/IBTrACS, Copernicus Marine biogeochemical products, and NOAA PIFSC MD50. Use when running a supported download, attribution or unit conversion.
 ---
 
 ## Skill: Data Sources & Attribution
@@ -27,7 +27,7 @@ description: Documents CIndRA data sources including GHCN-Daily, NOAA OISST/ONI/
   - Neutral otherwise.
 - **Colours**: El Niño = red, La Niña = blue, Neutral = gray.
 - **Citation**: NOAA Climate Prediction Center / Physical Sciences Laboratory.
-- **Use in CIndRA**: rainfall, air temperature, sea level, tropical cyclones, SST, marine heatwaves and marine biochemistry. Preserve the classification rule implemented by the relevant notebook; do not mix monthly phase labels and annual dominant-phase composites silently.
+- **Use in CIndRA**: rainfall, air temperature, tropical cyclones, SST, marine heatwaves and marine biochemistry. Preserve the classification rule implemented by the relevant notebook; do not mix monthly phase labels and annual dominant-phase composites silently.
 
 ### Sea-surface temperature — NOAA OISST v2
 
@@ -64,27 +64,11 @@ description: Documents CIndRA data sources including GHCN-Daily, NOAA OISST/ONI/
 - Cite the marineHeatWaves implementation and Hobday marine-heatwave method as recorded in the MHW notebooks.
 - Detection parameters, climatology period and spatial stride come from the executed notebook and must be reported with results.
 
-### Tide gauge — UHSLC (University of Hawaii Sea Level Center)
-
-- **Portal**: `https://uhslc.soest.hawaii.edu/data/?rq` (Research Quality Data Set).
-- **Per-station NetCDF**: daily `d<uhslc_id>.nc`, hourly `h<uhslc_id>.nc` (`uhslc_id` zero-padded to 3 digits, e.g. `d007.nc` for Malakal, Palau), cached under `data/sea_level/`.
-- **Lookup helper**: `download_uhslc_data(data_dir, uhslc_id, resolution)` in `data_downloaders.py` — **cache lookup only**, does not download new files (see Hard Rules).
-- **Datums**: `get_uhslc_datum(uhslc_id, datum_name)` in `sea_level.py` fetches the live datum table from `https://uhslc.soest.hawaii.edu/stations/TIDES_DATUMS/...` (e.g. `MSL`, `MHHW`).
-- **Station discovery**: `select_uhslc_station(...)` in `sea_level.py` queries `https://uhslc.soest.hawaii.edu/data/meta.geojson` and picks the nearest/matching station.
-- **Units**: sea level in metres in the raw NetCDF (`sea_level` variable); notebooks convert to cm for reporting (`100 * value`).
-
-### Satellite altimetry — CMEMS (Copernicus Marine Service)
-
-- **Dataset**: `cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1D` (global ocean gridded L4, `adt` absolute dynamic topography and `sla` sea level anomaly variables).
-- **Access**: the `copernicusmarine` Python package, via `get_CMEMS_data(...)` in `sea_level.py`, which subsets to a bounding box (derived from the site's EEZ shapefile, or `cmems_bbox_override`) and a date range, caching the result as `cmems_L4_SSH_0.125deg_<start_year>_<end_year>.nc` under `data/sea_level/`.
-- **Units**: metres in the raw NetCDF; notebooks convert to mm/yr for trends and cm for anomalies/deltas.
-
 ### Reference periods / analysis windows
 
 - Rainfall and air-temperature climatology baseline for anomalies: **1961–1990** (WMO standard), stored in site config as `reference_period_start` / `reference_period_end`. Applies to rainfall totals and to mean/min/max temperature anomalies alike.
 - In code, slice with `.loc[ref_start:ref_end]` — never pass `"1961:1990"` as a single label to `.loc` on a DatetimeIndex.
 - Hot days (TX90p) / cold nights (TN10p) use the same 1961–1990 window as the ETCCDI base period, hardcoded in `temp_func.py` (`BASE_PERIOD_START`/`BASE_PERIOD_END`).
-- Sea level has no fixed WMO reference period; each notebook uses the available UHSLC/CMEMS record window (commonly 1993–2022/2025) for trends, and the station's own monthly climatology (not 1961–1990) for anomalies.
 - Regional SST uses the 1981–2020 DJF climatology for five-year boreal-winter anomalies; period labels are half-open (`1985–1990` contains winters 1985–1989).
 
 ### QC applied in the shared `00_site_setup.ipynb`
@@ -96,8 +80,7 @@ Rainfall notebooks `b_Consecutive_dry_days.ipynb` and `c_Heavy_rainfall.ipynb` d
 
 ### Hard rules
 
-- Always attribute sources in narrative outputs ("Source: GHCN-Daily station <id>", "Source: NOAA OISST v2", "Source: NOAA IBTrACS v04r01", "Source: NOAA ONI", "Source: UHSLC station <id>", "Source: CMEMS L4 SSH").
-- Never invent GHCN station IDs; resolve via site config and `GHCN.get_country_code`. Never invent UHSLC station IDs; resolve via `select_uhslc_station` / the saved site config.
-- Always state units: **mm**, **mm/day**, **mm/year**, **°C**, **°C/decade**, **days/year** (rainfall/temperature); **kt**, **cyclones/year**, **ACE/decade** (cyclones); **mm/yr**, **cm** (sea level).
+- Always attribute sources in narrative outputs ("Source: GHCN-Daily station <id>", "Source: NOAA OISST v2", "Source: NOAA IBTrACS v04r01", "Source: NOAA ONI").
+- Never invent GHCN station IDs; resolve via site config and `GHCN.get_country_code`.
+- Always state units: **mm**, **mm/day**, **mm/year**, **°C**, **°C/decade**, **days/year** (rainfall/temperature); **kt**, **cyclones/year**, **ACE/decade** (cyclones).
 - Never present user-uploaded data as primary without explicit user instruction.
-- Do not claim `download_uhslc_data` fetches new data from UHSLC — it only serves an already-cached local file (`data/sea_level/d<id>.nc` / `h<id>.nc`); automatic download was lost in the PICCM_Atmosphere/PICCM_SeaLevel merge and has not been restored.

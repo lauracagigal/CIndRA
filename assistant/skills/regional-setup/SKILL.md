@@ -8,7 +8,7 @@ description: Scan every GHCN-Daily station inside the Pacific EEZ area, quality-
 ### Purpose
 Scan **every** GHCN-Daily station inside the Pacific EEZ area of interest, quality-filter each one, and collect the stations that pass — together with their cleaned daily data — into a single dictionary. This is the multi-station counterpart of the single-site `notebooks/historical/National/00_site_setup.ipynb`: that notebook sets up **one** station picked interactively; this one sets up **many** at once so `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` and `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb` can build multi-station/regional maps without repeating the single-site workflow by hand.
 
-Rainfall and air-temperature share this one setup notebook (both variables are pulled from the same GHCN daily record per station). **Sea level has no regional setup notebook** — see `assistant/skills/regional-sea-level/SKILL.md` for what that would take.
+Rainfall and air-temperature share this one setup notebook (both variables are pulled from the same GHCN daily record per station).
 
 ### Required inputs / parameters
 - `region_key` — short name used in every output filename (e.g. `"pacific"`).

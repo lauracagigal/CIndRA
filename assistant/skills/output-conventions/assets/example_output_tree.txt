@@ -1,6 +1,5 @@
-Real example output tree, captured from three already-run sites in this repo:
+Real example output tree, captured from already-run sites in this repo:
   - Atmosphere (rainfall + air temperature) site: palau_psw00040309_lat7p337_lon134p477
-  - Sea level site:                              palau_lat7p340_lon134p620
   - Regional (rainfall + air temperature):       region_key = "pacific"
   - Sea-surface temperature:                     legacy matrix_cc/figures layout
 
@@ -116,45 +115,11 @@ outputs/
 │       ├── R_heavy_days_per_year_palau_psw00040309_lat7p337_lon134p477.csv
 │       ├── R_heavy_summary_table_palau_psw00040309_lat7p337_lon134p477.csv
 │       └── R_heavy_summary_metrics_palau_psw00040309_lat7p337_lon134p477.json
-│
-└── palau_lat7p340_lon134p620/                          # sea level: no figures/tables split, everything in one folder
-    │  # --- a_sea_level_trend.ipynb ---
-    ├── F10_SeaLevel_map_palau_lat7p340_lon134p620.png
-    ├── F10_SeaLevel_trends_palau_lat7p340_lon134p620.png
-    ├── SL_magnitude_map_palau_lat7p340_lon134p620.png
-    ├── SL_magnitude_timeseries_palau_lat7p340_lon134p620.png
-    ├── SL_magnitude_results_palau_lat7p340_lon134p620.csv
-    ├── SL_trend_summary_metrics_palau_lat7p340_lon134p620.json
-    ├── SL_ONI_scatter_palau_lat7p340_lon134p620.png
-    ├── ENSO_SL_influence_summary_palau_lat7p340_lon134p620.csv
-    │
-    │  # --- b_sea_level_anomaly.ipynb ---
-    ├── 1_2_2_SL_anomaly_annual_map_decadal_palau_lat7p340_lon134p620.png
-    ├── SL_anomaly_yearly_mean_palau_lat7p340_lon134p620.csv
-    ├── SL_anomaly_monthly_series_palau_lat7p340_lon134p620.csv
-    ├── SL_anomaly_summary_metrics_palau_lat7p340_lon134p620.json
-    │
-    │  # --- c_sea_level_ff.ipynb ---
-    ├── F11_Minor_flood_matrix_palau_lat7p340_lon134p620.png
-    ├── SL_FloodFrequency_threshold_counts_days_palau_lat7p340_lon134p620.png
-    ├── SL_FloodFrequency_threshold_counts_heatmap_palau_lat7p340_lon134p620.png
-    ├── SL_flood_days_per_year_palau_lat7p340_lon134p620.csv
-    ├── SL_flood_hours_per_year_palau_lat7p340_lon134p620.csv
-    ├── SL_flood_frequency_summary_metrics_palau_lat7p340_lon134p620.json
-    │
-    │  # --- d_sea_level_rankings.ipynb ---
-    ├── SL_rankings_Malakal_palau_lat7p340_lon134p620.png
-    ├── SL_top_10_table_palau_lat7p340_lon134p620.csv
-    └── SL_top_10_table_palau_lat7p340_lon134p620.json
 
 Key pattern differences to notice:
   - Rainfall/air-temperature: figures and tables/JSON are split into
     outputs/figures/<site_tag>/ and outputs/tables/<site_tag>/, and every
     filename is suffixed with _<site_tag> via build_output_filename().
-  - Sea level: everything (PNG, HTML, CSV, JSON) lands directly in
-    outputs/<site_tag>/, and filenames are NOT suffixed with _<site_tag>
-    (no build_output_filename() call) -- the per-site folder is what
-    prevents collisions instead.
   - Regional: no per-site folder at all -- one shared outputs/figures/regional_<region_key>/
     folder, filenames suffixed with _<region_key> instead of a site tag.
   - SST currently uses the legacy matrix_cc/figures/ folder rather than outputs/:

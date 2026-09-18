@@ -1,6 +1,6 @@
 ---
 name: product-assembly
-description: Generate, assemble, or audit a traceable CIndRA National/Regional report across atmosphere, SST, marine heatwaves, marine biochemistry, sea level and cyclones. Use only executed outputs from the canonical repository; do not add unsupported analyses or figures.
+description: Generate, assemble, or audit a traceable CIndRA National/Regional report across atmosphere, SST, marine heatwaves, marine biochemistry and cyclones. Use only executed outputs from the canonical repository; do not add unsupported analyses or figures.
 ---
 
 # CIndRA product assembly
@@ -104,8 +104,6 @@ Use these cross-domain checks:
 - Temperature units distinguish °C, °C/decade, days/year and percentile/base-period definitions.
 - SST states NOAA OISST product/resolution, °C or °C/decade, EEZ mask or Pacific extent, and climatology/anomaly period.
 - Tropical-cyclone products state radius, box-entry or genesis selection; wind thresholds; missing-wind treatment; count/ACE units; and whether the final year is complete.
-- Tide-gauge sea level is relative; altimetry is absolute. Combined displays do not imply the quantities were merged. State datum, mm/yr or cm, and flood threshold/time convention where applicable.
-- Regional sea level remains unavailable unless a real workflow has been added; never turn the placeholder or experimental helpers into a reported result.
 
 ## Phase F — Report assembly
 

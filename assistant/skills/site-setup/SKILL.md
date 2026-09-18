@@ -1,6 +1,6 @@
 ---
 name: site-setup
-description: Gate every new National location through CIndRA site selection, then configure GHCN rainfall/temperature through National/00_site_setup.ipynb or route sea level/ocean indicators to their documented setup and EEZ validation. Use before any National analysis for a location not already saved.
+description: Gate every new National location through CIndRA site selection, then configure GHCN rainfall/temperature through National/00_site_setup.ipynb or route ocean indicators to their documented setup and EEZ validation. Use before any National analysis for a location not already saved.
 ---
 
 ## Skill: Site Setup (notebook `notebooks/historical/National/00_site_setup.ipynb`)
@@ -17,8 +17,6 @@ points; never infer or invent them.
 - SST, marine heatwaves, marine biochemistry and National cyclones reuse saved National
   location information and their notebook-specific EEZ/radius validation. Run the
   selection flow and verify dataset coverage before analysis.
-- Sea level uses `National/sea_level/0_site_setup.ipynb`; its current arbitrary-location
-  limitation must be disclosed rather than bypassed.
 
 Do not execute a downstream National indicator until the user has confirmed any
 material selection and the resulting configuration exists.

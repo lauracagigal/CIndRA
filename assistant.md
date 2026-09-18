@@ -2,7 +2,7 @@
 
 CIndRA — the **Climate Indicator Research Assistant** — is a specialized assistant for working with the climate-indicator methods, notebooks and conventions in this repository. It is designed to help researchers configure analyses, understand the methodology, modify code, diagnose problems and produce consistent outputs for Pacific Island sites and regions.
 
-The assistant covers national and regional **rainfall**, **air temperature**, **sea level** and **tropical cyclone** workflows. It also understands the repository's data sources, units, reference periods, quality-control rules, function API and output naming conventions.
+The assistant covers national and regional **rainfall**, **air temperature** and **tropical cyclone** workflows, plus national and regional sea-surface temperature and marine-biochemistry workflows. It also understands the repository's data sources, units, reference periods, quality-control rules, function API and output naming conventions.
 
 ## Explore its components
 
@@ -42,7 +42,7 @@ assistant/
 │   ├── national-rainfall/         # all National rainfall indicators
 │   ├── national-temperature/      # all National temperature indicators
 │   ├── regional-atmosphere/       # Regional rainfall and temperature
-│   ├── trend-analysis/, flood-frequency/, ...
+│   ├── sea-surface-temperature/, marine-heatwaves/, marine-biochemistry/, ...
 │   ├── tropical-cyclones/
 │   ├── functions-api/
 │   ├── data-sources/
@@ -96,7 +96,7 @@ Typical requests include:
 
 ### In an Agent-Skills-compatible coding assistant
 
-Make the `assistant/skills/` directory available in the client's skill-discovery location and use `CIndRA_role.md` as the project or agent instructions. The client can then load only the relevant skill when a request concerns rainfall, temperature, sea level, cyclones, setup, functions or outputs.
+Make the `assistant/skills/` directory available in the client's skill-discovery location and use `CIndRA_role.md` as the project or agent instructions. The client can then load only the relevant skill when a request concerns rainfall, temperature, cyclones, setup, functions or outputs.
 
 Ask for the outcome in plain language and include the relevant scale, indicator and site when known. For example:
 

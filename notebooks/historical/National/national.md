@@ -13,11 +13,6 @@ Select a section below to open its overview and access the corresponding noteboo
   <p>Select the country and station, configure the analysis period, and prepare the daily temperature and rainfall observations shared by the atmosphere indicators.</p>
 </a>
 
-<a href="sea_level/0_site_setup.html" class="dashboard-card setup">
-  <h3>Sea-level site setup</h3>
-  <p>Configure tide-gauge and satellite-altimetry inputs before running the national sea-level indicators.</p>
-</a>
-
 </div>
 
 ## Explore the indicators
@@ -49,11 +44,6 @@ Select a section below to open its overview and access the corresponding noteboo
   <p>Ocean pH, chlorophyll-a, phytoplankton size and dissolved oxygen, including trends, seasonal variability and ENSO patterns inside the selected EEZ.</p>
 </a>
 
-<a href="sea_level/sea_level.html" class="dashboard-card ocean">
-  <h3>Sea level</h3>
-  <p>Relative and absolute sea-level trends, anomalies, minor flooding and rankings of extreme water levels.</p>
-</a>
-
 </div>
 
 ## Recommended workflow
@@ -64,5 +54,5 @@ Select a section below to open its overview and access the corresponding noteboo
 4. Save the refreshed notebook outputs and rebuild the book for publication.
 
 ```{note}
-Air temperature and rainfall share the atmosphere setup. Tropical-cyclone, sea-surface-temperature and biochemistry notebooks reuse the configured national site coordinates, while sea level has a separate setup because it uses tide-gauge and satellite products.
+Air temperature and rainfall share the atmosphere setup. Tropical-cyclone, sea-surface-temperature and biochemistry notebooks reuse the configured national site coordinates.
 ```

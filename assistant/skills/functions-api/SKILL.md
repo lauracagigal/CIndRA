@@ -1,6 +1,6 @@
 ---
 name: functions-api
-description: Reference for the reviewed CIndRA calculation and plotting functions, including atmosphere, SST, marine heatwaves, biochemistry, cyclones and sea level. Use before any supported analysis to locate and execute repository code; do not use it to invent an analysis absent from the repository.
+description: Reference for the reviewed CIndRA calculation and plotting functions, including atmosphere, SST, marine heatwaves, biochemistry and cyclones. Use before any supported analysis to locate and execute repository code; do not use it to invent an analysis absent from the repository.
 ---
 
 ## Skill: Functions API Reference (repository indicator modules + `indicators_setup`)
@@ -22,8 +22,6 @@ For PICCM plotting and styling (rainfall and air temperature alike), look for an
 - Canonical interactive time-series function: `plot_timeseries_interactive` (`ind_setup.plotting_int`)
 
 `plot_bar_probs` is the preferred helper for published PICCM bar charts: accumulated annual rainfall, dry-day counts, consecutive dry-day metrics, wet-day counts, heavy-rainfall counts, and annual mean-temperature trends. `plot_timeseries_interactive` is preferred for annual TMIN/TMAX, diurnal range, and hot-day/cold-night time series.
-
-**Sea level does not use `indicators_setup` at all.** Its plotting/styling is entirely repository-local in `functions/sea_level_plotting.py`, and its calculations live in `functions/sea_level.py`. Do not search `indicators_setup` for sea-level helpers; go straight to those two modules (see the dedicated sections below).
 
 ---
 
@@ -63,12 +61,10 @@ Search bounded local paths:
 - `functions/marineHeatWaves.py`
 - `functions/ocean.py`
 - `functions/build_regional_biochemistry_notebooks.py`
-- `functions/sea_level.py`
-- `functions/sea_level_plotting.py`
 
-Look for: `plot_bar_probs`, `plot_bar_probs_ONI`, `plot_timeseries_interactive`, `add_oni_cat`, `get_df_col`, `style_matrix`, `table_rain_21`, `table_rain_22`, `table_rain_23`, `table_temp_11`, `table_temp_12`, `table_temp_13`, `table_temp_13b` (rainfall/air-temperature); any of the functions listed in the `sea_level.py`/`sea_level_plotting.py` sections below (sea level).
+Look for: `plot_bar_probs`, `plot_bar_probs_ONI`, `plot_timeseries_interactive`, `add_oni_cat`, `get_df_col`, `style_matrix`, `table_rain_21`, `table_rain_22`, `table_rain_23`, `table_temp_11`, `table_temp_12`, `table_temp_13`, `table_temp_13b` (rainfall/air-temperature).
 
-Notebooks typically add the package via `sys.path.append("../../../../../../indicators_setup")` (rainfall/air-temperature analysis notebooks under `notebooks/historical/National/<domain>/`, four levels deeper than the repository root, six levels from `indicators_setup`). Sea-level notebooks do not add `indicators_setup` to `sys.path` at all — they only need `sys.path.append("../../../../functions")`.
+Notebooks typically add the package via `sys.path.append("../../../../../../indicators_setup")` (rainfall/air-temperature analysis notebooks under `notebooks/historical/National/<domain>/`, four levels deeper than the repository root, six levels from `indicators_setup`).
 
 ### 3. Clone `indicators_setup` if missing
 
@@ -108,8 +104,6 @@ Only QC figures already implemented in setup notebooks may bypass published plot
 
 `rainfall.py` and `air_temp.py` both re-export everything in this module (`from rainfall import site_config_filename` and `from air_temp import site_config_filename` are the same function) -- it exists so the two domain modules don't maintain two silently-diverging copies of the same code. Import from whichever domain module matches the notebook; there is no reason to import `site_common` directly.
 
-`sea_level.py` also imports `save_site_config`, `build_site_tag`, `build_output_filename`, and `save_dict_json` from this module (identical logic, single source of truth after the PICCM_Atmosphere/PICCM_SeaLevel merge deduplication) — but keeps its **own** `load_site_config` (error message points at the sea-level setup notebook, not `00_site_setup.ipynb`) and its own `save_table_to_csv` (defaults to `index=False`, vs. `site_common.save_table_to_csv`'s `index=True` default). Do not "fix" `sea_level.py`'s `save_table_to_csv` default to match `site_common.py` — sea-level notebooks depend on `index=False`.
-
 **Site configuration**
 - `site_config_filename(site_key)` → JSON filename (slugified: lowercase, non-alphanumeric → `_`). `site_key` is normally `<country_slug>_<ghcn_station_id>`, e.g. `"palau_PSW00040309"` → `"palau_psw00040309.json"`.
 - `save_site_config(config_dict, output_path)` → write site JSON; creates parent directory.
@@ -136,7 +130,7 @@ Only QC figures already implemented in setup notebooks may bypass published plot
 - `rainfall.py`: `persist_total_rainfall_outputs(...)` (`a_Total_rainfall.ipynb`: CSVs + `R_mean_summary_metrics_*.json`), `persist_dry_days_outputs(...)` (`b_Consecutive_dry_days.ipynb`: CSVs + `R_dry_summary_metrics_*.json`), `persist_heavy_rainfall_outputs(...)` (`c_Heavy_rainfall.ipynb`: CSVs + `R_heavy_summary_metrics_*.json`).
 - `air_temp.py`: `persist_mean_temperature_outputs(...)` (`a`: CSVs + `T_mean_summary_metrics_*.json`), `persist_minmax_temperature_outputs(...)` (`b`: CSVs + `T_minmax_summary_metrics_*.json`), `persist_hot_cold_outputs(...)` (`c`: CSVs + `T_hot_cold_summary_metrics_*.json`).
 
-Station ranking/selection in the atmosphere `00_site_setup.ipynb` is currently a plain alphabetical station table (`sort_values(["Name", "ID"])`) — there is no distance-based ranking helper for GHCN stations in `functions/`. (Sea level's `select_uhslc_station` in `sea_level.py` *does* rank by distance via an internal `_haversine_km` — that one is real and in active use; do not confuse it with the removed atmosphere-side dead code.)
+Station ranking/selection in the atmosphere `00_site_setup.ipynb` is currently a plain alphabetical station table (`sort_values(["Name", "ID"])`) — there is no distance-based ranking helper for GHCN stations in `functions/`.
 
 ---
 
@@ -158,15 +152,14 @@ Station ranking/selection in the atmosphere `00_site_setup.ipynb` is currently a
 - `extract_dict_data_var(GHCND_dir, var, df_country_stations)` → `(records, station_ids)`. Downloads per-station CSV; divides `TMIN`/`TMAX`/`PRCP` by 10. Returns plot-ready dicts plus ID list.
 
 **Standalone functions**
-- `download_oni_index(url)` → monthly ONI DataFrame; `-99.9` → NaN. Used by rainfall, air-temperature, *and* sea-level notebooks.
+- `download_oni_index(url)` → monthly ONI DataFrame; `-99.9` → NaN. Used by rainfall and air-temperature notebooks.
 - `filter_by_time_completeness(df, time_col, month_threshold, year_threshold)` → `(df_filtered, removed_months, removed_years)`.
-- `download_uhslc_data(data_dir, uhslc_id, resolution="daily")` → `Path` to the cached UHSLC NetCDF (`d<uhslc_id>.nc` / `h<uhslc_id>.nc`, zero-padded to 3 digits). **Cache lookup only** — raises `FileNotFoundError` (with the exact expected path and a manual-download pointer to `https://uhslc.soest.hawaii.edu/data/?rq`) if the file isn't already cached under `data/sea_level/`. Automatic download was lost when this module was merged from the two source repos (the atmosphere-only version silently overwrote the sea-level one) and has not been restored — do not claim it fetches new stations.
 
 ---
 
 ## `functions/rainfall_regional.py` — regional (multi-station) Pacific maps
 
-Used by `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` and `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb`, both of which build on the multi-station dictionary `notebooks/historical/Regional/00_regional_setup.ipynb` produces (`data/regional/<region_key>_stations.pkl`). Not part of the single-site `00_site_setup.ipynb` → `a/b/c` workflow the rest of this file describes, and not related to sea level (there is no regional sea-level workflow yet — see `cindra_regional_plotting_helpers.py` below).
+Used by `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` and `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb`, both of which build on the multi-station dictionary `notebooks/historical/Regional/00_regional_setup.ipynb` produces (`data/regional/<region_key>_stations.pkl`). Not part of the single-site `00_site_setup.ipynb` → `a/b/c` workflow the rest of this file describes.
 
 **Regional indicators** (per-station annual DataFrames, mirroring the National single-site notebooks' formulas)
 - `compute_regional_rainfall_indicators(stations_data, ...)` → `(dict_lon_lat, annual_data, heavy_thresholds)`. Columns: `total_annual_mm`, `dry_days`, `wet_days`, `max_consecutive_dry_days`, `mean_consecutive_dry_days`, `heavy_days` (`RAINFALL_INDICATOR_LABELS`/`RAINFALL_INDICATOR_UNITS`).
@@ -214,51 +207,6 @@ Use `assistant/skills/sea-surface-temperature/SKILL.md` for workflow and period 
 - `functions/build_regional_biochemistry_notebooks.py`: maintenance generator for the five Regional biochemistry notebooks; running it rewrites those notebooks from the reviewed common template.
 - Detailed routing and scientific invariants live in `assistant/skills/marine-heatwaves/SKILL.md` and `assistant/skills/marine-biochemistry/SKILL.md`.
 
-## `functions/sea_level.py` — sea-level calculations, station selection, persistence
-
-Used by all four sea-level notebooks (`0_site_setup.ipynb` through `d_sea_level_rankings.ipynb`). Not part of the atmosphere `site_common.py`/`rainfall.py`/`air_temp.py` family, though it re-uses four of `site_common.py`'s functions directly (see the `site_common.py` note above) rather than keeping fully independent copies.
-
-**Data acquisition / station selection**
-- `get_CMEMS_data(data_dir, minlon, maxlon, minlat, maxlat, start_date_str, end_date_str)` → cached CMEMS L4 SSH NetCDF path (downloads via `copernicusmarine` on a cache miss).
-- `select_uhslc_station(site_lon, site_lat, station_country_filter=None, selected_uhslc_id=None, selected_station_name=None, ...)` → nearest/matching UHSLC station dict, querying `https://uhslc.soest.hawaii.edu/data/meta.geojson`.
-- `get_uhslc_datum(uhslc_id, datum_name)` → `(datum_value_mm, datum_table)` for a UHSLC station (e.g. `"MSL"`, `"MHHW"`).
-- `prepare_site_data(site_config, data_dir)` → resolves the UHSLC station, updates the config, and pre-downloads UHSLC (via `download_uhslc_data` in `data_downloaders.py`) + ONI + CMEMS data. Called once from `0_site_setup.ipynb`.
-
-**Trend fitting**
-- `process_trend_with_nan(sea_level_anomaly)` → `(trend_mag, sea_level_trend, trend_rate, p_value, trend_err)` for an `xarray.DataArray`, preserving NaNs.
-- `process_trend_single_series(data, var)` → `(coefficients, trendline, trend_per_year)` via `np.polyfit` on a single `xarray` variable.
-- `get_trend_info(x, y, timescale="days")` → `(trend_counts, trend_label, linestyle_trend, slope, p_value)` for flood-count trend chips.
-
-**ENSO**
-- `detect_enso_events(oni_df)` → adds `ONI Mode` (`"El Nino"`/`"La Nina"`/`"Neutral"`), `year_storm`, `El Nino`, `La Nina` columns. El Niño/La Niña require 5 consecutive months with `ONI > 0.5` / `< -0.5`.
-- `get_dominant_enso(series)` → majority ENSO mode in a grouped series.
-
-**Rankings**
-- `get_top_ten(rsl, record_id, mode="max"|"min")` → top/bottom 10 events at least 3 days apart.
-- `get_top_10_table(rsl, record_id)` → combined top-10 high/low table joined with the nearest-month ONI state.
-
-**Summary tables / persistence**
-- `build_enso_summary_table(slope, nino_1997, nina_1998, r_value, p_value)`, `build_sl_magnitude_results(...)` → styled summary DataFrames for the trend notebook.
-- `save_site_config`, `load_site_config`, `build_site_tag`, `build_output_filename`, `save_table_to_csv`, `save_dict_json` — see the `site_common.py` note above for which of these are re-used vs. kept local.
-
----
-
-## `functions/sea_level_plotting.py` — every sea-level figure
-
-The sea-level equivalent of `indicators_setup`: **every** published sea-level figure comes from here, not from ad-hoc matplotlib/plotly code. A missing chart type remains unsupported until a repository maintainer adds and reviews it.
-
-- **Maps**: `plot_map`, `plot_map_base`, `plot_station_vs_grid_map`, `plot_magnitude_map`, `plot_magnitude_map_background`, `plot_anomaly_decadal_maps`, `add_zebra_frame`/`plot_zebra_frame` (map border styling), `pacific_all_west_formatter` (Pacific-centric longitude tick labels — required on any decadal/regional map).
-- **Trend timeseries**: `plot_altimetry_scatter`, `plot_altimetry_trend_timeseries`, `plot_tide_gauge_scatter`, `plot_tide_gauge_trend_timeseries`, `plot_combined_trends` (single-panel altimetry + tide-gauge comparison), `plot_enso_scatter` (ENSO sensitivity scatter + regression).
-- **Anomaly**: `plot_tg_rsl_anomaly_annual`, `plot_anomaly_station_series`, `plot_annual_range_fill`.
-- **Flood frequency**: `plot_histogram_with_threshold`, `plot_flood_counts_with_trend`, `plot_flood_counts_with_oni`, `plot_flood_days_heatmap`, `plot_flood_matrix_summary`, `plot_flood_count_per_year`, `plot_trend`, `plot_oni_segments`, `plot_oni_only`, `plot_monthly_contribution`, `plot_monthly_contribution_vertical`, `plot_simple_timeseries`, `plot_daily_max_timeseries`.
-- **Rankings**: `style_oni_based` (pandas Styler row-coloring by ONI mode), `make_plotly_figure_rankings`, `make_rankings_static_figure`.
-
----
-
-## `functions/cindra_regional_plotting_helpers.py` — draft, not wired into any notebook
-
-Two regional sea-level plotting helpers prepared ahead of a not-yet-built regional sea-level workflow: `plot_regional_altimetry_trend_map_filled_tide_gauges` (gridded absolute altimetry trend + optional filled tide-gauge markers) and `plot_regional_flood_frequency_overview` (station-year flood-day heatmap + regional annual totals). The module docstring marks them "Draft / Experimental"; `grep` confirms no notebook imports them. `notebooks/historical/Regional/regional_plots.ipynb` is a markdown-only Jupyter Book placeholder. Do not present output from these helpers as published/repo-styled figures until they are wired into a reviewed analysis.
-
 ---
 
 ## External plotting / tables (`indicators_setup`, rainfall/air-temperature only)
@@ -276,7 +224,5 @@ Two regional sea-level plotting helpers prepared ahead of a not-yet-built region
 - Never redefine helpers that exist in `functions/`, and never invent a replacement for a missing indicator or analysis.
 - Execute repository functions before reporting computed results; clone `indicators_setup` if missing for rainfall/air-temperature styling only.
 - Do not fabricate repository functions or claim repo styling was used unless the function was actually imported and called.
-- Do not claim `download_uhslc_data` downloads a new station's data — it only serves an already-cached local file.
-- Do not present output from `functions/cindra_regional_plotting_helpers.py` as a finished/published figure — it is draft code not wired into any notebook.
-- After editing modules, reload in the notebook: `import importlib; import rainfall as rf; importlib.reload(rf)` (or `air_temp`, `temp_func`, `sst`, `rainfall_regional`, `sea_level`, `sea_level_plotting`).
+- After editing modules, reload in the notebook: `import importlib; import rainfall as rf; importlib.reload(rf)` (or `air_temp`, `temp_func`, `sst`, `rainfall_regional`).
 - Keep this file in sync when `functions/` or `indicators_setup` usage changes.
