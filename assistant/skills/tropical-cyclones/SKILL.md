@@ -39,7 +39,7 @@ Use repository functions for every calculation and published figure. Keep notebo
 
 - Call plotting helpers in `functions/tcs.py`; do not place complete matplotlib/cartopy figure construction in notebooks.
 - Return `fig` and axes from helpers; call `fig.savefig(...)` before `plt.show()`.
-- Use `dpi=300, bbox_inches="tight"`.
+- Use `dpi=150, bbox_inches="tight"`.
 - Regional figures go to `outputs/figures/regional_<region_key>/` with `region_key="pacific"` and `TC_regional_*_<region_key>.png` filenames.
 - Preserve the four regional colors and derive light/medium/dark intensity shades with `regional_intensity_colors`.
 - Use readable publication sizing: panel titles at least 15 pt, axis labels 14 pt, ticks 12 pt, legends 11 pt; increase when panels remain legible.

@@ -31,6 +31,9 @@ CIndRA/
 ├── notebooks/historical/
 │   ├── National/                 # site-based indicator workflows
 │   └── Regional/                 # Pacific multi-station/subregion workflows
+├── notebooks/projections/
+│   ├── National/                 # site-based CMIP6 projections at global warming levels
+│   └── Regional/                 # EEZ and ocean-region projections
 ├── functions/                    # reusable calculations, plotting and I/O
 ├── assistant/                    # CIndRA role, skills and knowledge builder
 ├── data/                         # local source-data caches and site settings

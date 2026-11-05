@@ -395,7 +395,7 @@ def build(filename, cfg):
 
         climatology = field.sel(time=slice(str(reference_period[0]), str(reference_period[1]))).mean('time')
         fig_mean = map_field(climatology, f'{label} mean ({reference_period[0]}–{reference_period[1]})', cmap, units)
-        fig_mean.savefig(fig_dir / f'regional_{variable}_mean.png', dpi=180, bbox_inches='tight')
+        fig_mean.savefig(fig_dir / f'regional_{variable}_mean.png', dpi=150, bbox_inches='tight')
         """),
         md("## 3. Linear trend"),
         code("""
@@ -405,7 +405,7 @@ def build(filename, cfg):
                              dims=('latitude', 'longitude'))
         fig_trend = map_field(trend, f'{label} linear trend ({trend_period[0]}–{trend_period[1]})',
                               'RdBu_r', f'{units} per decade', symmetric=True)
-        fig_trend.savefig(fig_dir / f'regional_{variable}_trend.png', dpi=180, bbox_inches='tight')
+        fig_trend.savefig(fig_dir / f'regional_{variable}_trend.png', dpi=150, bbox_inches='tight')
         """),
         md("## 4. Seasonal climatology and anomalies"),
         code("""
@@ -434,9 +434,9 @@ def build(filename, cfg):
             return fig
 
         fig_season = seasonal_panels(seasonal, f'Seasonal climatology of {label}', cmap)
-        fig_season.savefig(fig_dir / f'regional_{variable}_seasonal.png', dpi=180, bbox_inches='tight')
+        fig_season.savefig(fig_dir / f'regional_{variable}_seasonal.png', dpi=150, bbox_inches='tight')
         fig_season_anom = seasonal_panels(seasonal_anomaly, f'Seasonal anomalies of {label}', 'RdBu_r', True)
-        fig_season_anom.savefig(fig_dir / f'regional_{variable}_seasonal_anomaly.png', dpi=180, bbox_inches='tight')
+        fig_season_anom.savefig(fig_dir / f'regional_{variable}_seasonal_anomaly.png', dpi=150, bbox_inches='tight')
         """),
         md("## 5. Area-weighted regional time series"),
         code("""
@@ -524,7 +524,7 @@ def build(filename, cfg):
             shrink=0.55, aspect=35,
         )
         cb.set_label(f'Anomaly from full-period mean ({units})', fontsize=14)
-        fig.savefig(fig_dir / f'regional_{variable}_enso_anomalies.png', dpi=180, bbox_inches='tight')
+        fig.savefig(fig_dir / f'regional_{variable}_enso_anomalies.png', dpi=150, bbox_inches='tight')
         """),
         md("## 7. EEZ summaries"),
         code("""

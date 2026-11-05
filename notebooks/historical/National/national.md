@@ -21,7 +21,7 @@ Select a section below to open its overview and access the corresponding noteboo
 
 <a href="air_temperature/surface_temperature.html" class="dashboard-card atmosphere">
   <h3>Air temperature</h3>
-  <p>Mean temperature, minimum and maximum temperature, diurnal range, hot days and cold nights.</p>
+  <p>Mean temperature, minimum and maximum temperature, diurnal range, hot and cold days and nights.</p>
 </a>
 
 <a href="rainfall/rainfall.html" class="dashboard-card rainfall">

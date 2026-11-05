@@ -266,6 +266,8 @@ TEMPERATURE_INDICATOR_LABELS = {
     "diff_annual": "mean annual diurnal temperature range",
     "hot_days_pct": "hot days (> station's 90th percentile)",
     "cold_nights_pct": "cold nights (< station's 10th percentile)",
+    "warm_nights_pct": "warm nights (> station's 90th percentile)",
+    "cold_days_pct": "cold days (< station's 10th percentile)",
 }
 
 TEMPERATURE_INDICATOR_UNITS = {
@@ -275,7 +277,19 @@ TEMPERATURE_INDICATOR_UNITS = {
     "diff_annual": "°C / decade",
     "hot_days_pct": "% / decade",
     "cold_nights_pct": "% / decade",
+    "warm_nights_pct": "% / decade",
+    "cold_days_pct": "% / decade",
 }
+
+# Fixed-percentile extremes: (indicator, variable, percentile, above threshold?, threshold key).
+# Hot days ~ TX90p, cold nights ~ TN10p, warm nights ~ TN90p, cold days ~ TX10p, but with one
+# station-wide reference-period percentile instead of the ETCCDI calendar-day climatology.
+TEMPERATURE_EXTREME_INDICATORS = (
+    ("hot_days_pct", "TMAX", 0.9, True, "tmax_q90"),
+    ("cold_nights_pct", "TMIN", 0.1, False, "tmin_q10"),
+    ("warm_nights_pct", "TMIN", 0.9, True, "tmin_q90"),
+    ("cold_days_pct", "TMAX", 0.1, False, "tmax_q10"),
+)
 
 
 def _year_completeness_mask(daily_series: pd.Series, min_year_completeness: float) -> pd.Index:
@@ -298,9 +312,11 @@ def _station_temperature_indicators(
     Reproduces ``a_mean_temperature.ipynb`` (``tmean_annual``),
     ``b_min_max_temperature.ipynb`` (``tmin_annual``, ``tmax_annual``,
     ``diff_annual``) and the **fixed-percentile companion metric** from
-    ``c_hot_cold_days.ipynb`` (``hot_days_pct``, ``cold_nights_pct``): a single
-    station-wide 90th/10th percentile threshold of ``TMAX``/``TMIN`` over the
-    reference period, not the full calendar-day ETCCDI TX90p/TN10p climatology.
+    ``c_hot_cold_days.ipynb`` (``hot_days_pct``, ``cold_nights_pct``) plus its
+    complementary pair (``warm_nights_pct``: ``TMIN`` above the 90th percentile;
+    ``cold_days_pct``: ``TMAX`` below the 10th percentile): a single station-wide
+    percentile threshold over the reference period, not the full calendar-day
+    ETCCDI TX90p/TN10p/TN90p/TX10p climatology.
     The ETCCDI method (``functions/temp_func.py``) estimates a percentile per
     calendar day from a centred 5-day window scanned with nested Python loops
     over the whole base period -- fine for one station, far too slow to run
@@ -316,9 +332,10 @@ def _station_temperature_indicators(
 
     Returns ``(annual_df, thresholds)``: ``annual_df`` has a ``Year`` column
     plus ``tmean_annual``, ``tmin_annual``, ``tmax_annual``, ``diff_annual``
-    (°C) and ``hot_days_pct``, ``cold_nights_pct`` (percent of days in the
-    year, 0-100); ``thresholds`` is ``{"tmax_q90": ..., "tmin_q10": ...}``,
-    the station's own reference-period thresholds (°C).
+    (°C) and ``hot_days_pct``, ``cold_nights_pct``, ``warm_nights_pct``,
+    ``cold_days_pct`` (percent of days in the year, 0-100); ``thresholds`` is
+    ``{"tmax_q90", "tmin_q10", "tmin_q90", "tmax_q10"}``, the station's own
+    reference-period thresholds (°C).
     """
     cols = [c for c in ("TMIN", "TMAX", "TMEAN", "diff") if c in daily_df.columns]
     temp = daily_df[cols].copy()
@@ -345,24 +362,18 @@ def _station_temperature_indicators(
         )
         annuals["diff_annual"] = series.loc[series.index.isin(complete_diff_years)]
 
-    thresholds = {"tmax_q90": None, "tmin_q10": None}
+    thresholds = {key: None for *_, key in TEMPERATURE_EXTREME_INDICATORS}
     ref = temp.loc[str(reference_period_start):str(reference_period_end)]
 
-    if "TMAX" in temp.columns and ref["TMAX"].notna().sum() >= 30:
-        tmax_q90 = float(ref["TMAX"].quantile(0.9))
-        thresholds["tmax_q90"] = tmax_q90
-        hot = (temp["TMAX"] > tmax_q90).astype(float)
-        hot[temp["TMAX"].isna()] = np.nan
-        hot_pct = hot.groupby(temp.index.year).mean() * 100
-        annuals["hot_days_pct"] = hot_pct.loc[hot_pct.index.isin(_year_completeness_mask(temp["TMAX"], min_year_completeness))]
-
-    if "TMIN" in temp.columns and ref["TMIN"].notna().sum() >= 30:
-        tmin_q10 = float(ref["TMIN"].quantile(0.1))
-        thresholds["tmin_q10"] = tmin_q10
-        cold = (temp["TMIN"] < tmin_q10).astype(float)
-        cold[temp["TMIN"].isna()] = np.nan
-        cold_pct = cold.groupby(temp.index.year).mean() * 100
-        annuals["cold_nights_pct"] = cold_pct.loc[cold_pct.index.isin(_year_completeness_mask(temp["TMIN"], min_year_completeness))]
+    for indicator, variable, q, above, key in TEMPERATURE_EXTREME_INDICATORS:
+        if variable not in temp.columns or ref[variable].notna().sum() < 30:
+            continue
+        threshold = float(ref[variable].quantile(q))
+        thresholds[key] = threshold
+        flag = (temp[variable] > threshold if above else temp[variable] < threshold).astype(float)
+        flag[temp[variable].isna()] = np.nan
+        pct = flag.groupby(temp.index.year).mean() * 100
+        annuals[indicator] = pct.loc[pct.index.isin(_year_completeness_mask(temp[variable], min_year_completeness))]
 
     annual_df = pd.DataFrame(annuals)
     annual_df.index.name = "Year"
@@ -387,7 +398,7 @@ def compute_regional_temperature_indicators(
     - ``dict_lon_lat`` / ``annual_data`` plug directly into
       ``build_sites_map_dataframe`` / ``plot_annual_regional_map`` — pass
       ``variable`` as one of the keys in :data:`TEMPERATURE_INDICATOR_LABELS`.
-    - ``thresholds`` maps ``station_id`` to ``{"tmax_q90", "tmin_q10"}`` (°C).
+    - ``thresholds`` maps ``station_id`` to ``{"tmax_q90", "tmin_q10", "tmin_q90", "tmax_q10"}`` (°C).
     """
     dict_lon_lat = {}
     annual_data = {}
@@ -453,6 +464,68 @@ def compute_regional_temperature_anomaly_series(
     annual_anomaly = combined.mean(axis=1).sort_index()
     smoothed = annual_anomaly.rolling(window=smooth_years, center=True, min_periods=1).mean()
     return annual_anomaly, smoothed
+
+
+def plot_regional_station_mean_series(
+    annual_data: dict[str, pd.DataFrame],
+    variable: str,
+    period_start: int = 1951,
+    period_end: int = 2024,
+    min_stations: int = 5,
+    significance_level: float = 0.05,
+    color: str = "tab:red",
+    ylabel: str | None = None,
+    title: str | None = None,
+    trend_units: str = "",
+):
+    """Station-average annual series of one indicator with its linear trend.
+
+    Simple unweighted mean of ``variable`` across all stations reporting it in
+    each year of ``period_start``-``period_end``; years with fewer than
+    ``min_stations`` stations are dropped. The trend line is solid when
+    significant at ``significance_level`` and dashed otherwise.
+
+    Returns ``(fig, ax, series, n_stations, trend)`` where ``trend`` is a dict
+    with ``slope_per_decade``, ``p_value`` and ``significant``.
+    """
+    columns = [
+        df.set_index("Year")[variable] for df in annual_data.values() if variable in df.columns
+    ]
+    combined = pd.concat(columns, axis=1).sort_index()
+    combined = combined.loc[(combined.index >= period_start) & (combined.index <= period_end)]
+    n_stations = combined.notna().sum(axis=1)
+    series = combined.mean(axis=1)[n_stations >= min_stations].dropna()
+    n_stations = n_stations.loc[series.index]
+
+    years = series.index.to_numpy(dtype=float)
+    fit = stats.linregress(years, series.to_numpy())
+    significant = fit.pvalue < significance_level
+    trend = {
+        "slope_per_decade": fit.slope * 10,
+        "p_value": fit.pvalue,
+        "significant": bool(significant),
+    }
+
+    fig, ax = plt.subplots(figsize=(11, 5))
+    ax.plot(series.index, series.values, color=color, marker="o", markersize=4, linewidth=1, label="Station average")
+    ax.plot(
+        years, fit.intercept + fit.slope * years, color="black",
+        linestyle="-" if significant else "--", linewidth=1.6,
+        label=(
+            f"Trend: {trend['slope_per_decade']:+.2f}{(' ' + trend_units) if trend_units else ''} / decade "
+            f"({'p < 0.001' if fit.pvalue < 0.001 else f'p = {fit.pvalue:.3f}'}"
+            f"{', significant' if significant else ', not significant'})"
+        ),
+    )
+    ax.set_xlabel("Year")
+    ax.set_ylabel(ylabel or variable)
+    ax.set_title(
+        title or f"Regional station-average {variable}",
+    )
+    ax.legend(loc="best", frameon=True, framealpha=0.9, edgecolor="none")
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
+    return fig, ax, series, n_stations, trend
 
 
 def load_or_compute_era5_annual_temperature(

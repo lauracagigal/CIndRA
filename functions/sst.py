@@ -338,7 +338,7 @@ def plot_pacific_sst_field(
     cbar = fig.colorbar(im, ax=ax, orientation="horizontal", pad=0.08, shrink=0.78, aspect=40)
     cbar.set_label(label)
     if filename:
-        fig.savefig(filename, dpi=300, bbox_inches="tight")
+        fig.savefig(filename, dpi=150, bbox_inches="tight")
     return fig, ax
 
 
@@ -403,7 +403,7 @@ def plot_pacific_sst_panels(
     )
     cbar.set_label(label)
     if filename:
-        fig.savefig(filename, dpi=300, bbox_inches="tight")
+        fig.savefig(filename, dpi=150, bbox_inches="tight")
     return fig
 
 
@@ -447,7 +447,7 @@ def plot_map(
     setup_map(ax, title, region, projection)
     fig.colorbar(im, ax=ax, pad=0.04, label=label)
     if filename:
-        fig.savefig(filename, dpi=300, bbox_inches="tight")
+        fig.savefig(filename, dpi=150, bbox_inches="tight")
     return fig, ax
 
 

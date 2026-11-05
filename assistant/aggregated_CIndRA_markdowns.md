@@ -1,6 +1,6 @@
 # CIndRA — Aggregated Training Material
 
-Single-file concatenation of all CIndRA assistant markdowns. Generated on 2026-09-18. Source files live in `assistant/` and `assistant/skills/`; regenerate with `python assistant/build_aggregated_CIndRA.py`.
+Single-file concatenation of all CIndRA assistant markdowns. Generated on 2026-09-29. Source files live in `assistant/` and `assistant/skills/`; regenerate with `python assistant/build_aggregated_CIndRA.py`.
 
 ---
 
@@ -315,7 +315,7 @@ When plotting: (1) load the cleaned pickle; (2) compute normalised annual accumu
   - If the user asks for a figure that the current data/analysis cannot support, say so explicitly instead of producing a placeholder.
 - The QC plots in the setup notebooks (daily/monthly/annual overlay, one per domain) are the only exception — they live inline because they are sanity checks, not published figures.
 - Do not return ad-hoc analytical plots. Inline QC plots already present in setup notebooks remain valid only as diagnostics and must not be presented as published indicator figures.
-- Save with `plt.savefig(..., dpi=300, bbox_inches='tight')` (matplotlib) or `fig.write_html(...)` + `fig.write_image(...)` (plotly), or via `persist_*_outputs` helpers (rainfall/air-temperature).
+- Save with `plt.savefig(..., dpi=150, bbox_inches='tight')` (matplotlib) or `fig.write_html(...)` + `fig.write_image(...)` (plotly), or via `persist_*_outputs` helpers (rainfall/air-temperature).
 - Feed figures to Jupyter Book via `glue("<name>", fig, display=False)`.
 
 ---
@@ -960,7 +960,7 @@ Use repository functions for every calculation and published figure. Keep notebo
 
 - Call plotting helpers in `functions/tcs.py`; do not place complete matplotlib/cartopy figure construction in notebooks.
 - Return `fig` and axes from helpers; call `fig.savefig(...)` before `plt.show()`.
-- Use `dpi=300, bbox_inches="tight"`.
+- Use `dpi=150, bbox_inches="tight"`.
 - Regional figures go to `outputs/figures/regional_<region_key>/` with `region_key="pacific"` and `TC_regional_*_<region_key>.png` filenames.
 - Preserve the four regional colors and derive light/medium/dark intensity shades with `regional_intensity_colors`.
 - Use readable publication sizing: panel titles at least 15 pt, axis labels 14 pt, ticks 12 pt, legends 11 pt; increase when panels remain legible.
@@ -1547,7 +1547,7 @@ Optional diagnostic filename for accumulated rainfall: `F5_Rain_accum_plot_bar_p
 | `c_hot_cold_days.ipynb` | `F4_ST_hot_cold` | `.html` + `.png` |
 | `c_hot_cold_days.ipynb` | `F4_ST_hot_cold_percentiles` | `.html` + `.png` |
 
-Save matplotlib: `plt.savefig(site_figures_dir / build_output_filename(...), dpi=300, bbox_inches='tight')`.
+Save matplotlib: `plt.savefig(site_figures_dir / build_output_filename(...), dpi=150, bbox_inches='tight')`.
 Save plotly: `fig.write_html(site_figures_dir / build_output_filename(..., ext='html'))` and, where applicable, `fig.write_image(site_figures_dir / build_output_filename(...))`.
 
 ### Canonical table / JSON filenames — rainfall (`R_*` prefix)

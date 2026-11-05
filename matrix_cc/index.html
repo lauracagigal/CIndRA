@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIndRA Indicator Matrix</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface-2: #eef2f6;
+    --border: #dde3ea;
+    --text: #15202b;
+    --muted: #5b6877;
+    --accent: #0e7c86;
+    --accent-soft: #d9f0f1;
+    --atmo: #c2410c;
+    --atmo-soft: #fdebdd;
+    --ocean: #1d5fa8;
+    --ocean-soft: #dde9f7;
+    --warn: #8a6100;
+    --warn-soft: #fbf0d3;
+    --shadow: 0 1px 2px rgba(16,24,40,.05), 0 4px 16px rgba(16,24,40,.06);
+    --radius: 14px;
+    --reg-accent: #4f46e5;
+    --reg-soft: #e7e6fd;
+    --mat-accent: #b45309;
+    --mat-soft: #fdf0dc;
+    --mat-hero: linear-gradient(135deg, #1f2937 0%, #57534e 55%, #b45309 100%);
+    --nat-hero: linear-gradient(135deg, #0b3d5c 0%, #0e7c86 55%, #3aa17e 100%);
+    --reg-hero: linear-gradient(135deg, #1e1b4b 0%, #3730a3 50%, #7c3aed 100%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e141b; --surface: #16202a; --surface-2: #1d2a36; --border: #2a3947;
+      --text: #e6edf3; --muted: #93a3b3; --accent: #3cc3cc; --accent-soft: #123a3e;
+      --atmo: #f59e62; --atmo-soft: #3a2517; --ocean: #6aa9ec; --ocean-soft: #16293e;
+      --warn: #e6b94a; --warn-soft: #3a2f12;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+      --reg-accent: #a5a1ff; --reg-soft: #28264f; --mat-accent: #f5b454; --mat-soft: #3a2a12;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e141b; --surface: #16202a; --surface-2: #1d2a36; --border: #2a3947;
+    --text: #e6edf3; --muted: #93a3b3; --accent: #3cc3cc; --accent-soft: #123a3e;
+    --atmo: #f59e62; --atmo-soft: #3a2517; --ocean: #6aa9ec; --ocean-soft: #16293e;
+    --warn: #e6b94a; --warn-soft: #3a2f12;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.25);
+    --reg-accent: #a5a1ff; --reg-soft: #28264f; --mat-accent: #f5b454; --mat-soft: #3a2a12;
+  }
+  body[data-scale="regional"] { --accent: var(--reg-accent); --accent-soft: var(--reg-soft); }
+  body[data-scale="matrix"] { --accent: var(--mat-accent); --accent-soft: var(--mat-soft); }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 150px; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  button { font: inherit; color: inherit; }
+
+  /* ── Header ── */
+  .hero {
+    background: var(--nat-hero); color: #fff; padding: 28px 16px 84px; transition: background .4s;
+  }
+  .wrap { max-width: 1320px; margin: 0 auto; padding: 0 16px; }
+  .hero .wrap { padding: 0; }
+  .hero-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .brand { font-weight: 700; letter-spacing: .08em; font-size: 13px; opacity: .85; text-transform: uppercase; }
+  .hero h1 { margin: 14px 0 6px; font-size: clamp(26px, 4vw, 38px); line-height: 1.15; letter-spacing: -.01em; }
+  .hero p { margin: 0; max-width: 760px; opacity: .9; }
+  .hero-links { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill-link {
+    display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 999px;
+    background: rgba(255,255,255,.14); color: #fff; font-size: 13px; font-weight: 500; border: 1px solid rgba(255,255,255,.25); cursor: pointer;
+  }
+  .pill-link:hover { background: rgba(255,255,255,.24); text-decoration: none; }
+  .notice { margin-top: 14px; display: inline-block; font-size: 12.5px; background: rgba(0,0,0,.18); padding: 4px 10px; border-radius: 6px; }
+
+  body[data-scale="regional"] .hero { background: var(--reg-hero); }
+
+  /* ── Scale switch (hero) ── */
+  .scale-switch { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 22px 0 22px; max-width: 1120px; }
+  .scale-btn {
+    display: flex; gap: 12px; align-items: flex-start; text-align: left; cursor: pointer; padding: 14px 16px; border-radius: 14px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.22); color: #fff; transition: background .15s, transform .15s;
+  }
+  .scale-btn:hover { background: rgba(255,255,255,.16); }
+  .scale-btn.on { background: #fff; color: #15202b; border-color: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  .scale-btn svg { width: 26px; height: 26px; flex: none; margin-top: 2px; }
+  .scale-btn.on svg { color: var(--accent); }
+  .scale-btn b { display: block; font-size: 16px; }
+  .scale-btn small { display: block; font-size: 12.5px; opacity: .8; line-height: 1.4; margin-top: 2px; }
+  .scale-btn.on small { opacity: .7; }
+
+  .scale-meta, .scale-cta { display: none; }
+  .brand { background: none; border: 0; padding: 0; color: #fff; cursor: pointer; }
+
+  /* ── Landing: nothing chosen yet ── */
+  body[data-scale="none"] .hero {
+    background: linear-gradient(120deg, #0b3d5c 0%, #0e7c86 38%, #3730a3 72%, #7c3aed 100%);
+    min-height: 100vh; padding-bottom: 48px; display: flex; flex-direction: column;
+  }
+  body[data-scale="none"] .hero .wrap { width: 100%; flex: 1; display: flex; flex-direction: column; }
+  body[data-scale="none"] .hero h1 { margin-top: 12vh; font-size: clamp(32px, 5vw, 52px); }
+  body[data-scale="none"] .hero p { font-size: 17px; }
+  body[data-scale="none"] .notice { align-self: flex-start; }
+  body[data-scale="none"] .scale-switch { max-width: 1240px; gap: 20px; margin: 36px 0 28px; }
+  body[data-scale="none"] .scale-btn {
+    flex-direction: column; gap: 8px; padding: 16px 20px; border-radius: 16px; background: rgba(255,255,255,.1);
+    backdrop-filter: blur(6px);
+  }
+  body[data-scale="none"] .scale-btn:hover { background: #fff; color: #15202b; transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.25); }
+  body[data-scale="none"] .scale-btn[data-scale="national"]:hover svg { color: #0e7c86; }
+  body[data-scale="none"] .scale-btn[data-scale="regional"]:hover svg { color: #4f46e5; }
+  body[data-scale="none"] .scale-btn[data-scale="matrix"]:hover svg { color: #b45309; }
+  body[data-scale="none"] .scale-btn svg { width: 28px; height: 28px; }
+  body[data-scale="none"] .scale-btn b { font-size: 20px; }
+  body[data-scale="none"] .scale-btn small { font-size: 13.5px; margin-top: 3px; }
+  /* Landing layout: Matrix full width on top, National + Regional half each below */
+  body[data-scale="none"] .scale-switch { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  body[data-scale="none"] .scale-btn[data-scale="matrix"] {
+    order: -1; grid-column: 1 / -1; flex-direction: row; align-items: center; gap: 18px; padding: 20px 26px;
+    background: linear-gradient(120deg, #312e81 0%, #4338ca 50%, #6d28d9 100%);
+    border-color: rgba(255,255,255,.4); box-shadow: 0 10px 30px rgba(67,56,202,.4);
+  }
+  body[data-scale="none"] .scale-btn[data-scale="matrix"]:hover {
+    background: linear-gradient(120deg, #3730a3 0%, #4f46e5 50%, #7c3aed 100%); color: #fff;
+    box-shadow: 0 16px 38px rgba(79,70,229,.5);
+  }
+  body[data-scale="none"] .scale-btn[data-scale="matrix"]:hover svg { color: #fff; }
+  body[data-scale="none"] .scale-btn[data-scale="matrix"] svg { width: 42px; height: 42px; }
+  body[data-scale="none"] .scale-btn[data-scale="matrix"] b { font-size: 26px; }
+  body[data-scale="none"] .scale-btn[data-scale="matrix"] small { font-size: 14.5px; opacity: .92; }
+  @media (max-width: 900px) {
+    body[data-scale="none"] .scale-switch { grid-template-columns: minmax(0, 1fr); }
+    body[data-scale="none"] .scale-btn[data-scale="matrix"] { flex-direction: column; align-items: flex-start; padding: 16px 20px; }
+  }
+  body[data-scale="none"] .scale-meta { display: block; font-style: normal; font-size: 13px; opacity: .75; margin-top: 6px; }
+  body[data-scale="none"] .scale-cta { display: inline-block; margin-top: 8px; font-weight: 600; font-size: 13.5px; }
+  body[data-scale="none"] .scope,
+  body[data-scale="none"] .matrix-view,
+  body[data-scale="none"] .panel,
+  body[data-scale="none"] .layout,
+  body[data-scale="none"] footer { display: none; }
+
+  /* ── Matrix overview tab (like the original CC_indicators matrix) ── */
+  body[data-scale="matrix"] .hero { background: var(--mat-hero); }
+  body[data-scale="matrix"] .scope,
+  body[data-scale="matrix"] .panel,
+  body[data-scale="matrix"] .layout { display: none; }
+  .matrix-view { display: none; margin-top: -64px; position: relative; z-index: 5; margin-bottom: 40px; }
+  body[data-scale="matrix"] .matrix-view { display: block; }
+  .mx-pick {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 18px 20px; margin-bottom: 16px; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px;
+  }
+  .mx-step { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .mx-step-h { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--text); }
+  .mx-num { width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: #fff; display: inline-grid; place-items: center; font-size: 12px; letter-spacing: 0; }
+  .mx-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mx-opts button {
+    display: flex; gap: 12px; align-items: center; text-align: left; padding: 12px 14px; border-radius: 12px; cursor: pointer;
+    border: 2px solid var(--border); background: var(--surface-2); color: var(--muted); font: inherit; transition: border-color .15s, background .15s;
+  }
+  .mx-opts button:hover { border-color: var(--accent); }
+  .mx-opts button svg { width: 24px; height: 24px; flex: none; }
+  .mx-opts button b { display: block; font-size: 16px; color: var(--text); }
+  .mx-opts button small { font-size: 12.5px; }
+  .mx-opts button.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  #mxSite { font-size: 16px; font-weight: 600; padding: 13px 14px; border: 2px solid var(--accent); border-radius: 12px; width: 100%; }
+  .mx-domain { font-size: 15px; font-weight: 600; padding: 13px 14px; border-radius: 12px; background: var(--surface-2); }
+  .mx-current { font-size: 14px; color: var(--muted); }
+  .mx-current b { color: var(--text); }
+  @media (max-width: 760px) { .mx-pick, .mx-opts { grid-template-columns: minmax(0, 1fr); } }
+  .mx-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+  .mx-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .mx-legend { margin-left: auto; display: flex; gap: 14px; align-items: center; font-size: 12.5px; color: var(--muted); flex-wrap: wrap; }
+  .mx-legend .ico { width: 24px; height: 24px; cursor: default; }
+  .mx-legend .ico svg { width: 13px; height: 13px; }
+  .mx-scroll { overflow-x: auto; }
+  table.mx { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; min-width: 860px; }
+  .mx th {
+    position: sticky; top: 0; background: var(--surface-2); color: var(--muted); font-size: 11.5px; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase; padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--border); z-index: 1;
+  }
+  .mx th.grp { text-align: center; border-left: 1px solid var(--border); }
+  .mx th.sub { text-align: center; font-size: 10.5px; }
+  .mx th.sub.first { border-left: 1px solid var(--border); }
+  .mx td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  .mx tr:hover td.mx-ind, .mx tr:hover td.mx-c { background: var(--surface-2); }
+  .mx td.mx-dom { width: 44px; padding: 0; text-align: center; font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .mx td.mx-dom span { writing-mode: vertical-rl; transform: rotate(180deg); display: inline-block; padding: 10px 0; }
+  .mx td.mx-dom.Atmosphere { background: var(--atmo-soft); color: var(--atmo); }
+  .mx td.mx-dom.Ocean { background: var(--ocean-soft); color: var(--ocean); }
+  .mx td.mx-var { width: 210px; font-weight: 600; border-right: 1px solid var(--border); }
+  .mx td.mx-var a { color: var(--text); display: flex; gap: 10px; align-items: center; }
+  .mx td.mx-var .var-icon { width: 30px; height: 30px; border-radius: 8px; }
+  .mx td.mx-var .var-icon svg { width: 17px; height: 17px; }
+  .mx td.mx-var.Atmosphere .var-icon { background: var(--atmo-soft); color: var(--atmo); }
+  .mx td.mx-var.Ocean .var-icon { background: var(--ocean-soft); color: var(--ocean); }
+  .mx td.mx-ind .code { display: inline-block; min-width: 42px; }
+  .mx td.mx-ind a { color: var(--text); font-weight: 500; }
+  .mx td.mx-ind a:hover { color: var(--accent); }
+  .mx td.mx-c { text-align: center; width: 64px; }
+  .mx td.mx-c.first { border-left: 1px solid var(--border); }
+  .ico {
+    position: relative; width: 34px; height: 34px; border-radius: 9px; display: inline-grid; place-items: center; padding: 0;
+    border: 1px solid transparent; background: var(--accent-soft); color: var(--accent); cursor: pointer; transition: background .15s, color .15s, transform .15s;
+  }
+  .ico svg { width: 17px; height: 17px; }
+  .ico:hover { background: var(--accent); color: #fff; transform: translateY(-1px); }
+  .ico.off { background: transparent; color: var(--muted); border: 1px dashed var(--border); opacity: .55; cursor: not-allowed; }
+  .ico.off:hover { transform: none; background: transparent; color: var(--muted); }
+  .ico .n {
+    position: absolute; top: -6px; right: -6px; min-width: 17px; height: 17px; border-radius: 9px; padding: 0 4px;
+    background: var(--accent); color: #fff; font-size: 10.5px; font-weight: 700; line-height: 17px; border: 2px solid var(--surface);
+  }
+  .tlist { display: flex; flex-wrap: wrap; gap: 10px; padding: 28px; justify-content: center; }
+  .tlist .tbtn { background: #eef2f6; border-color: #dde3ea; color: #15202b; font-size: 14px; padding: 9px 14px; }
+  .tlist .tbtn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Scope card (site / region + map) ── */
+  .scope { margin-top: -64px; position: relative; z-index: 5; }
+  .scope-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow);
+    display: grid; grid-template-columns: 340px minmax(0, 1fr); overflow: hidden;
+  }
+  .scope-info { padding: 20px; display: flex; flex-direction: column; gap: 14px; border-right: 1px solid var(--border); }
+  .scope-kicker { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+  .scope-info h2 { margin: 2px 0 0; font-size: 26px; letter-spacing: -.01em; line-height: 1.15; }
+  .scope-info dl { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13.5px; }
+  .scope-info dt { color: var(--muted); }
+  .scope-info dd { margin: 0; font-weight: 500; }
+  .site-list { display: flex; flex-direction: column; gap: 6px; }
+  .site-opt {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface); cursor: pointer; text-align: left;
+  }
+  .site-opt:hover { border-color: var(--accent); }
+  .site-opt.on { background: var(--accent-soft); border-color: var(--accent); }
+  .site-opt .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); flex: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+  .site-opt span { font-size: 13.5px; font-weight: 600; }
+  .site-opt small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+  .hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+  #map { min-height: 380px; background: var(--surface-2); }
+  .leaflet-container { font: 13px Inter, system-ui, sans-serif; }
+  .leaflet-tooltip.site-label { background: var(--accent); color: #fff; border: 0; font-weight: 600; box-shadow: 0 2px 6px rgba(0,0,0,.25); }
+  .leaflet-tooltip.site-label::before { display: none; }
+  @media (max-width: 900px) {
+    .scope-card { grid-template-columns: minmax(0, 1fr); }
+    .scope-info { border-right: 0; border-bottom: 1px solid var(--border); }
+    #map { min-height: 300px; }
+    .scale-switch { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* ── Control panel ── */
+  .panel {
+    position: sticky; top: 0; z-index: 20; margin-top: 16px;
+  }
+  .scope-pill {
+    display: inline-flex; align-items: center; gap: 8px; padding: 7px 12px; border-radius: 10px; font-weight: 600; font-size: 13.5px;
+    background: var(--accent-soft); color: var(--accent); white-space: nowrap;
+  }
+  .scope-pill svg { width: 16px; height: 16px; }
+  .panel-inner {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 12px; display: grid; gap: 10px;
+  }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .seg { display: inline-flex; background: var(--surface-2); border-radius: 10px; padding: 3px; }
+  .seg button {
+    border: 0; background: transparent; padding: 7px 16px; border-radius: 8px; cursor: pointer; font-weight: 600; color: var(--muted);
+  }
+  .seg button.on { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
+  .search {
+    flex: 1 1 220px; display: flex; align-items: center; gap: 8px; background: var(--surface-2);
+    border-radius: 10px; padding: 0 12px; min-width: 0;
+  }
+  .search input { border: 0; outline: 0; background: transparent; padding: 9px 0; width: 100%; color: var(--text); font: inherit; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    border: 1px solid var(--border); background: var(--surface); padding: 5px 12px; border-radius: 999px;
+    cursor: pointer; font-size: 13px; font-weight: 500; color: var(--muted);
+  }
+  .chip.on { background: var(--accent-soft); color: var(--accent); border-color: transparent; }
+  .label-sm { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  select {
+    font: inherit; color: var(--text); background: var(--surface-2); border: 0; border-radius: 10px; padding: 8px 12px; cursor: pointer;
+  }
+  .stats { display: flex; gap: 18px; font-size: 13px; color: var(--muted); margin-left: auto; }
+  .stats b { color: var(--text); font-size: 15px; }
+
+  /* ── Layout ── */
+  .layout { display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 24px; margin: 24px auto 40px; }
+  nav.toc { position: sticky; top: 170px; align-self: start; font-size: 14px; }
+  nav.toc .grp { margin-bottom: 14px; }
+  nav.toc a { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-radius: 8px; color: var(--text); }
+  nav.toc a:hover { background: var(--surface-2); text-decoration: none; }
+  nav.toc a .n { margin-left: auto; font-size: 12px; color: var(--muted); }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .seg button { padding: 7px 12px; }
+    .panel { position: static; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+    nav.toc { display: none; }
+    .stats { margin-left: 0; }
+  }
+
+  /* ── Variable section ── */
+  section.var { margin-bottom: 28px; }
+  .var-head { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .var-icon { width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center; flex: none; }
+  .var-icon svg { width: 22px; height: 22px; }
+  .Atmosphere .var-icon { background: var(--atmo-soft); color: var(--atmo); }
+  .Ocean .var-icon { background: var(--ocean-soft); color: var(--ocean); }
+  .var-head h2 { margin: 0; font-size: 21px; letter-spacing: -.01em; }
+  .dom { font-size: 11.5px; font-weight: 600; padding: 2px 8px; border-radius: 6px; text-transform: uppercase; letter-spacing: .05em; }
+  .Atmosphere .dom { background: var(--atmo-soft); color: var(--atmo); }
+  .Ocean .dom { background: var(--ocean-soft); color: var(--ocean); }
+  .var-head .book { margin-left: auto; font-size: 13px; font-weight: 500; }
+
+  .ind {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden;
+  }
+  .ind-head {
+    display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; flex-wrap: wrap; user-select: none;
+  }
+  .ind-head:hover { background: var(--surface-2); }
+  .code { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13px; color: var(--muted); min-width: 36px; }
+  .ind-head h3 { margin: 0; font-size: 16px; font-weight: 600; }
+  .ind-meta { margin-left: auto; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12.5px; }
+  .badge { padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-weight: 500; white-space: nowrap; }
+  .badge.ok { background: var(--accent-soft); color: var(--accent); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .chev { transition: transform .2s; color: var(--muted); }
+  .ind.closed .chev { transform: rotate(-90deg); }
+  .ind.closed .ind-body { display: none; }
+  .ind-body { padding: 4px 16px 16px; border-top: 1px solid var(--border); }
+  .col-label { display: flex; justify-content: space-between; align-items: center; margin: 12px 0 8px; gap: 8px; flex-wrap: wrap; }
+  .col-label a { font-size: 13px; font-weight: 500; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  .card {
+    border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface);
+    cursor: pointer; transition: transform .15s, box-shadow .15s, border-color .15s; display: flex; flex-direction: column;
+    text-align: left; padding: 0;
+  }
+  .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); border-color: var(--accent); }
+  .thumb { aspect-ratio: 16 / 10; background: #fff; display: grid; place-items: center; overflow: hidden; position: relative; }
+  .thumb img { width: 100%; height: 100%; object-fit: contain; }
+  .thumb.iframe-thumb { background: linear-gradient(135deg, var(--accent-soft), var(--surface-2)); color: var(--accent); }
+  .thumb.iframe-thumb svg { width: 38px; height: 38px; }
+  .kind-tag {
+    position: absolute; top: 8px; left: 8px; font-size: 10.5px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase;
+    background: rgba(15,23,32,.72); color: #fff; padding: 2px 7px; border-radius: 5px;
+  }
+  .card-body { padding: 9px 11px 11px; font-size: 13px; font-weight: 500; line-height: 1.35; border-top: 1px solid var(--border); }
+  .card.missing { cursor: default; opacity: .7; }
+  .card.missing:hover { transform: none; box-shadow: none; border-color: var(--border); }
+  .card.missing .thumb { background: repeating-linear-gradient(45deg, var(--surface-2), var(--surface-2) 8px, var(--surface) 8px, var(--surface) 16px); color: var(--muted); font-size: 12px; }
+  .card.missing .thumb img { display: none; }
+
+  .tables { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .tbtn {
+    display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--surface-2);
+    padding: 5px 11px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  }
+  .tbtn:hover { border-color: var(--accent); color: var(--accent); }
+  .tbtn svg { width: 14px; height: 14px; }
+
+  .proj {
+    margin-top: 14px; padding: 10px 12px; border-radius: 10px; border: 1px dashed var(--border);
+    font-size: 13px; color: var(--muted); display: flex; gap: 8px; align-items: center;
+  }
+  .empty { padding: 40px; text-align: center; color: var(--muted); }
+
+  /* ── Modal ── */
+  .modal { position: fixed; inset: 0; z-index: 50; display: none; background: rgba(6,12,18,.72); backdrop-filter: blur(4px); padding: 16px; }
+  .modal.open { display: grid; place-items: center; }
+  .dialog {
+    background: var(--surface); border-radius: 16px; width: min(1200px, 100%); max-height: calc(100vh - 32px);
+    display: grid; grid-template-rows: auto minmax(0, 1fr) auto; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.4);
+  }
+  .dialog-head { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .dialog-head h4 { margin: 0; font-size: 16px; flex: 1; min-width: 0; }
+  .dialog-head .sub { font-size: 12.5px; color: var(--muted); font-weight: 500; display: block; }
+  .iconbtn {
+    border: 0; background: var(--surface-2); width: 34px; height: 34px; border-radius: 9px; cursor: pointer;
+    display: grid; place-items: center; flex: none;
+  }
+  .iconbtn:hover { background: var(--accent-soft); color: var(--accent); }
+  .iconbtn svg { width: 18px; height: 18px; }
+  .stage { background: #fff; overflow: auto; display: grid; place-items: center; min-height: 300px; }
+  .stage img { max-width: 100%; max-height: calc(100vh - 220px); display: block; }
+  .stage iframe { width: 100%; height: min(70vh, 640px); border: 0; background: #fff; }
+  .stage table { border-collapse: collapse; font-size: 13px; color: #15202b; margin: 16px; }
+  .stage th, .stage td { border: 1px solid #dde3ea; padding: 5px 10px; text-align: right; white-space: nowrap; }
+  .stage th { background: #eef2f6; position: sticky; top: 0; }
+  .stage td:first-child, .stage th:first-child { text-align: left; }
+  .stage .msg { padding: 32px; color: #5b6877; text-align: center; max-width: 520px; }
+  .dialog-foot { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
+  .dialog-foot .cap { flex: 1 1 380px; font-size: 13.5px; color: var(--muted); margin: 0; }
+  .dialog-foot .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    background: var(--accent); color: #fff; border: 0; cursor: pointer;
+  }
+  .btn:hover { text-decoration: none; filter: brightness(1.08); }
+  .btn.ghost { background: var(--surface-2); color: var(--text); }
+  .btn svg { width: 15px; height: 15px; }
+  .counter { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* Product record (CMPLV source-of-record) */
+  .rec { align-self: start; width: 100%; max-width: 980px; margin: 0 auto; padding: 22px 26px 30px; color: #15202b; font-size: 14px; line-height: 1.5; }
+  .rec h5 { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0e7c86; margin: 22px 0 8px; display: flex; align-items: center; gap: 8px; }
+  .rec h5 .eid { font-weight: 600; color: #5b6877; letter-spacing: .02em; text-transform: none; font-size: 12px; }
+  .rec p { margin: 0 0 8px; }
+  .rec ul { margin: 0 0 8px; padding-left: 20px; }
+  .rec li { margin: 2px 0; }
+  .rec .muted { color: #5b6877; }
+  .rec code { font-size: 12px; background: #eef2f6; padding: 1px 5px; border-radius: 5px; word-break: break-all; }
+  .rec table { margin: 0; width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rec th, .rec td { text-align: left !important; white-space: normal; vertical-align: top; border: 1px solid #dde3ea; padding: 6px 10px; }
+  .rec th { position: static; width: 210px; font-weight: 600; background: #f5f7fa; }
+  .rec table.rtab th { width: auto; background: #eef2f6; }
+  .rec table.inv { table-layout: fixed; }
+  .rec table.inv th:nth-child(1) { width: 22%; } .rec table.inv th:nth-child(2) { width: 42%; }
+  .rec table.inv th:nth-child(3) { width: 15%; } .rec table.inv th:nth-child(4) { width: 8%; } .rec table.inv th:nth-child(5) { width: 13%; }
+  .rec .cover { border: 1px solid #dde3ea; border-radius: 12px; overflow: hidden; }
+  .rec .cover-head { padding: 14px 16px; background: #f5f7fa; border-bottom: 1px solid #dde3ea; display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+  .rec .cover-head b { font-size: 16px; flex: 1 1 300px; }
+  .rec .cover table th, .rec .cover table td { border-width: 0 0 1px 0; }
+  .rec .cover table tr:last-child th, .rec .cover table tr:last-child td { border-bottom: 0; }
+  .rstat { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+  .rstat.pass { background: #dcf3e4; color: #17633a; }
+  .rstat.flag { background: #fdf0d2; color: #835c00; }
+  .rstat.fail { background: #fbdcdc; color: #9b1c1c; }
+  .rstat.info { background: #e3ecf7; color: #234e85; }
+  .rec .chk td:first-child { width: 92px; }
+  .rec .tbtn { margin: 0 6px 6px 0; }
+  .rec .issue { border-left: 3px solid #d39b00; background: #fffaf0; padding: 8px 12px; border-radius: 0 8px 8px 0; margin-bottom: 8px; }
+
+  footer { border-top: 1px solid var(--border); padding: 20px 16px; text-align: center; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      <button type="button" class="brand" id="homeBtn" title="Back to the start page">CIndRA · Climate Indicators</button>
+      <div class="hero-links">
+        <a class="pill-link" id="bookLink" target="_blank" rel="noopener">Jupyter Book ↗</a>
+        <a class="pill-link" href="https://github.com/lauracagigal/CIndRA" target="_blank" rel="noopener">GitHub ↗</a>
+        <button class="pill-link" id="themeBtn" type="button" aria-label="Toggle colour theme">◐ Theme</button>
+      </div>
+    </div>
+    <h1 id="heroTitle">Climate indicator product matrix</h1>
+    <p id="heroText"></p>
+    <div class="scale-switch" role="tablist" id="scaleTabs">
+      <button type="button" class="scale-btn" role="tab" data-scale="national">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        <span><b>National</b><small>One country: its weather station and its EEZ</small>
+          <em class="scale-meta" id="metaNational"></em><span class="scale-cta">Choose a site →</span></span>
+      </button>
+      <button type="button" class="scale-btn" role="tab" data-scale="regional">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.8 3.8 5.8 3.8 9s-1.3 6.2-3.8 9c-2.5-2.8-3.8-5.8-3.8-9S9.5 5.8 12 3Z"/></svg>
+        <span><b>Regional</b><small>The Pacific basin: station networks, gridded fields and every EEZ</small>
+          <em class="scale-meta" id="metaRegional"></em><span class="scale-cta">Explore the Pacific →</span></span>
+      </button>
+      <button type="button" class="scale-btn" role="tab" data-scale="matrix">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+        <span><b>Matrix</b><small>Every indicator in one table: which maps, plots and tables exist</small>
+          <em class="scale-meta" id="metaMatrix"></em><span class="scale-cta">Open the overview →</span></span>
+      </button>
+    </div>
+    <span class="notice">For internal use only — products are in development.</span>
+  </div>
+</header>
+
+<section class="matrix-view">
+  <div class="wrap">
+    <div class="mx-pick">
+      <div class="mx-step">
+        <div class="mx-step-h"><span class="mx-num">1</span>Choose the scale</div>
+        <div class="mx-opts" id="mxScale" role="tablist">
+          <button type="button" data-m="national" role="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
+            <span><b>National</b><small>One country: its station and EEZ</small></span>
+          </button>
+          <button type="button" data-m="regional" role="tab">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+            <span><b>Regional</b><small>The whole Pacific basin and every EEZ</small></span>
+          </button>
+        </div>
+      </div>
+      <div class="mx-step" id="mxSiteWrap">
+        <div class="mx-step-h"><span class="mx-num">2</span>Choose the site</div>
+        <select id="mxSite" aria-label="Site"></select>
+      </div>
+      <div class="mx-step mx-step-note" id="mxRegionNote">
+        <div class="mx-step-h"><span class="mx-num">2</span>Domain</div>
+        <div class="mx-domain">Pacific basin — all stations, gridded fields and EEZs</div>
+      </div>
+    </div>
+    <div class="mx-card">
+      <div class="mx-toolbar">
+        <div class="mx-current" id="mxCurrent"></div>
+        <div class="mx-legend" id="mxLegend"></div>
+      </div>
+      <div class="mx-scroll" id="mxTable"></div>
+    </div>
+  </div>
+</section>
+
+<section class="scope">
+  <div class="wrap">
+    <div class="scope-card">
+      <div class="scope-info" id="scopeInfo"></div>
+      <div id="map" role="application" aria-label="Map of the Pacific EEZs"></div>
+    </div>
+  </div>
+</section>
+
+<div class="panel">
+  <div class="wrap">
+    <div class="panel-inner">
+      <div class="row">
+        <span class="scope-pill" id="scopePill"></span>
+        <div class="search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color:var(--muted)"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="q" type="search" placeholder="Search indicators or products… (e.g. ENSO, trend, pH)">
+        </div>
+      </div>
+      <div class="row">
+        <div class="chips" id="domChips">
+          <button type="button" class="chip on" data-dom="all">All domains</button>
+          <button type="button" class="chip" data-dom="Atmosphere">Atmosphere</button>
+          <button type="button" class="chip" data-dom="Ocean">Ocean</button>
+        </div>
+        <div class="chips" id="kindChips">
+          <button type="button" class="chip on" data-kind="all">All types</button>
+          <button type="button" class="chip" data-kind="map">Maps</button>
+          <button type="button" class="chip" data-kind="plot">Plots</button>
+          <button type="button" class="chip" data-kind="interactive">Interactive</button>
+          <button type="button" class="chip" data-kind="enso">ENSO</button>
+        </div>
+        <div class="stats" id="stats"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap layout">
+  <nav class="toc" id="toc"></nav>
+  <main id="main"></main>
+</div>
+
+<footer>
+  Developed by <strong>Laura Cagigal</strong> ·
+  <a href="https://github.com/lauracagigal/CIndRA" target="_blank" rel="noopener">CIndRA repository</a> ·
+  <a href="https://github.com/lauracagigal/CC_indicators" target="_blank" rel="noopener">CC_indicators</a>
+</footer>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="dialog-head">
+      <button class="iconbtn" id="mPrev" type="button" aria-label="Previous"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg></button>
+      <button class="iconbtn" id="mNext" type="button" aria-label="Next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 18 6-6-6-6"/></svg></button>
+      <h4 id="mTitle"></h4>
+      <span class="counter" id="mCount"></span>
+      <button class="iconbtn" id="mClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg></button>
+    </div>
+    <div class="stage" id="mStage"></div>
+    <div class="dialog-foot">
+      <p class="cap" id="mCap"></p>
+      <div class="acts" id="mActs"></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="products.js"></script>
+<script src="tables.js"></script>
+<script src="records.js"></script>
+<script src="inventory.js"></script>
+<script src="eez.js"></script>
+<script>
+(() => {
+  const C = window.CINDRA;
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+  const ICONS = {
+    thermo: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 14.8V4a2 2 0 1 0-4 0v10.8a4 4 0 1 0 4 0Z"/></svg>',
+    rain: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 15.5A4.5 4.5 0 0 0 17.5 7 6 6 0 0 0 6 8.5a4 4 0 0 0-.5 7.9"/><path d="M8 19v2M12 17v2M16 19v2"/></svg>',
+    cyclone: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 4H9a6 6 0 0 0 0 12"/><path d="M3 20h12a6 6 0 0 0 0-12"/><circle cx="12" cy="12" r="1.5"/></svg>',
+    wave: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 8c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 14c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/><path d="M2 20c2 0 2-2 4-2s2 2 4 2 2-2 4-2 2 2 4 2 2-2 4-2"/></svg>',
+    leaf: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 20A7 7 0 0 1 4 13c0-6 5-9 16-9 0 11-3 16-9 16Z"/><path d="M4 21c4-5 8-8 12-10"/></svg>',
+    chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 3v18h18"/><path d="m7 15 4-5 3 3 5-7"/></svg>',
+    table: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M9 10v10"/></svg>',
+    dl: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 3v12m0 0-4-4m4 4 4-4M4 19h16"/></svg>',
+    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 19V5a2 2 0 0 1 2-2h14v16H6a2 2 0 0 0-2 2Zm0 0a2 2 0 0 0 2 2h14"/></svg>',
+    pin: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 22s7-6.2 7-12a7 7 0 1 0-14 0c0 5.8 7 12 7 12Z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+    globe: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.8 3.8 5.8 3.8 9s-1.3 6.2-3.8 9c-2.5-2.8-3.8-5.8-3.8-9S9.5 5.8 12 3Z"/></svg>',
+    map: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 4-6 2v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>',
+    doc: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-6-6Z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></svg>',
+    ext: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>',
+  };
+  const KIND_LABEL = { map: 'Map', plot: 'Plot', interactive: 'Interactive' };
+
+  // ── State (persisted in the URL hash: #scale/site) ──
+  // scale is null until the user picks National or Regional on the start page.
+  // mScale is the National/Regional toggle inside the Matrix tab.
+  const state = { scale: null, mScale: 'national', site: C.sites[0].id, dom: 'all', kind: 'all', q: '' };
+  function readHash() {
+    let [hScale, hSite, hSite2] = location.hash.slice(1).split('/');
+    if (hScale === 'matrix') {
+      state.mScale = hSite === 'regional' ? 'regional' : 'national';
+      hSite = hSite2;
+    }
+    state.scale = ['national', 'regional', 'matrix'].includes(hScale) ? hScale : null;
+    if (C.sites.some(s => s.id === hSite)) state.site = hSite;
+  }
+  readHash();
+
+  const missing = new Set();   // resolved paths that failed to load
+  let viewList = [];            // products currently visible, for prev/next
+
+  $('#bookLink').href = C.book;
+
+  function resolve(path, product, siteId = state.site, scale = state.scale === 'matrix' ? state.mScale : state.scale) {
+    if (scale === 'national' && product && product.sites && !product.sites.includes(siteId)) return null;
+    const site = C.sites.find(s => s.id === siteId);
+    let ok = true;
+    const out = path.replace(/\{(\w+)\}/g, (_, k) => {
+      if (C.roots[k]) return C.roots[k];
+      const v = scale === 'national' ? site.tokens[k] : undefined;
+      if (v === undefined) ok = false;
+      return v || '';
+    });
+    return ok ? encodeURI(out) : null;
+  }
+  const bookUrl = p => C.book + p + '.html';
+
+  function matches(group, ind, p) {
+    if (state.dom !== 'all' && group.domain !== state.dom) return false;
+    if (state.kind === 'enso' && !p.enso) return false;
+    if (!['all', 'enso'].includes(state.kind) && p.kind !== state.kind) return false;
+    if (state.q) {
+      const hay = [group.variable, group.domain, ind.code, ind.name, p.title, p.caption, p.enso ? 'enso oni el niño la niña' : ''].join(' ').toLowerCase();
+      if (!state.q.split(/\s+/).every(t => hay.includes(t))) return false;
+    }
+    return true;
+  }
+
+  function render() {
+    const groups = C[state.scale];
+    const site = C.sites.find(s => s.id === state.site);
+    $('#scopePill').innerHTML = state.scale === 'national'
+      ? `${ICONS.pin}National · ${esc(site.label)}` : `${ICONS.globe}Regional · Pacific basin`;
+
+    viewList = [];
+    let nInd = 0, nProd = 0, nAvail = 0;
+    const toc = { Atmosphere: [], Ocean: [] };
+    let html = '';
+
+    groups.forEach((g, gi) => {
+      let body = '';
+      let gCount = 0;
+      g.indicators.forEach((ind, ii) => {
+        const projSrc = ind.projections || null;
+        const hist = ind.products.filter(p => matches(g, ind, p));
+        const proj = projSrc ? projSrc.products.filter(p => matches(g, ind, p)) : [];
+        if (!hist.length && !proj.length) return;
+        nInd++;
+        let avail = 0;
+        const card = (nb, part) => p => {
+          nProd++;
+          const url = resolve(p.path, p);
+          remember(url, p, false, g, ind, part);
+          const isMissing = !url || missing.has(url);
+          if (!isMissing) { avail++; nAvail++; }
+          const idx = isMissing ? -1 : viewList.push({ p, url, g, ind, nb }) - 1;
+          const thumb = !url
+            ? `<div class="thumb">Not available for this site</div>`
+            : p.kind === 'interactive'
+              ? `<div class="thumb iframe-thumb">${ICONS.chart}<span class="kind-tag">Interactive</span></div>`
+              : `<div class="thumb"><img loading="lazy" src="${url}" alt="${esc(p.title)}" data-url="${url}"><span class="kind-tag">${KIND_LABEL[p.kind]}</span></div>`;
+          return `<button type="button" class="card${isMissing ? ' missing' : ''}" data-idx="${idx}" ${isMissing ? 'tabindex="-1"' : ''}>
+              ${missing.has(url) ? '<div class="thumb">Not generated yet</div>' : thumb}
+              <div class="card-body">${esc(p.title)}</div></button>`;
+        };
+        const histCards = hist.map(card(ind.notebook, 'hist')).join('');
+        const projCards = proj.map(card(projSrc && projSrc.notebook, 'proj')).join('');
+        const total = hist.length + proj.length;
+        gCount += total;
+
+        const tablesOf = (list, part) => (state.kind === 'all' ? (list || []) : [])
+          .map(t => ({ ...t, url: resolve(t.path, t) })).filter(t => t.url && tableOk(t.url))
+          .map(t => { remember(t.url, t, true, g, ind, part); return t; });
+        const tablesHtml = (tables, prefix) => tables.length
+          ? `<div class="tables">${tables.map(t => `<button type="button" class="tbtn" data-csv="${t.url}" data-title="${esc(ind.name + ' — ' + prefix + t.title)}">${ICONS.table}${esc(t.title)}</button>`).join('')}</div>`
+          : '';
+        const tHist = tablesOf(ind.tables, 'hist');
+        const tProj = tablesOf(projSrc && projSrc.tables, 'proj');
+        const nTables = tHist.length + tProj.length;
+        const badge = avail === total ? `<span class="badge ok">${avail} products</span>`
+          : `<span class="badge warn">${avail} / ${total} available</span>`;
+
+        const histBlock = hist.length
+          ? `<div class="col-label"><span class="label-sm">Historical</span>
+              <a href="${bookUrl(ind.notebook)}" target="_blank" rel="noopener">Open notebook ↗</a></div>
+            <div class="grid">${histCards}</div>${tablesHtml(tHist, '')}`
+          : ind.products.length ? '' : `<div class="proj"><span class="label-sm">Historical</span> Not available</div>`;
+        const projBlock = !ind.projections
+          ? `<div class="proj"><span class="label-sm">Projections</span> In development</div>`
+          : proj.length
+            ? `<div class="col-label" style="margin-top:16px"><span class="label-sm">Projections</span>
+                <a href="${bookUrl(projSrc.notebook)}" target="_blank" rel="noopener">Open notebook ↗</a></div>
+              <div class="grid">${projCards}</div>${tablesHtml(tProj, 'Projections · ')}`
+            : '';
+
+        body += `<article class="ind" id="ind-${gi}-${ii}">
+          <div class="ind-head" role="button" tabindex="0" aria-expanded="true">
+            <span class="code">${esc(ind.code)}</span><h3>${esc(ind.name)}</h3>
+            <div class="ind-meta">${badge}${nTables ? `<span class="badge">${nTables} tables</span>` : ''}
+              <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+          </div>
+          <div class="ind-body">
+            ${histBlock}
+            ${projBlock}
+          </div>
+        </article>`;
+      });
+      if (!body) return;
+      toc[g.domain].push(`<a href="#var-${gi}"><span class="var-icon" style="width:24px;height:24px;border-radius:6px">${ICONS[g.icon]}</span>${esc(g.variable)}<span class="n">${gCount}</span></a>`);
+      html += `<section class="var ${g.domain}" id="var-${gi}">
+        <div class="var-head"><div class="var-icon">${ICONS[g.icon]}</div>
+          <h2>${esc(g.variable)}</h2><span class="dom">${g.domain}</span>
+          <a class="book" href="${bookUrl(g.page)}" target="_blank" rel="noopener">Chapter in the book ↗</a></div>
+        ${body}</section>`;
+    });
+
+    $('#main').innerHTML = html || '<div class="empty">No products match these filters.</div>';
+    $('#toc').innerHTML = Object.entries(toc).filter(([, v]) => v.length)
+      .map(([d, v]) => `<div class="grp ${d}"><div class="label-sm" style="padding:0 10px 4px">${d}</div>${v.join('')}</div>`).join('');
+    $('#stats').innerHTML = `<span><b>${nInd}</b> indicators</span><span><b>${nAvail}</b>/${nProd} products available</span>`;
+
+    // Flag figures that fail to load, then re-render once they have all settled.
+    let pending = 0;
+    document.querySelectorAll('#main img[data-url]').forEach(img => {
+      if (img.complete && img.naturalWidth === 0 && img.src) { missing.add(img.dataset.url); pending = -1; }
+      img.addEventListener('error', () => { missing.add(img.dataset.url); scheduleRerender(); }, { once: true });
+    });
+    if (pending < 0) scheduleRerender();
+  }
+  let rr;
+  function scheduleRerender() { clearTimeout(rr); rr = setTimeout(render, 150); }
+
+  // ── Modal ──
+  const modal = $('#modal');
+  let cur = -1;
+  function openProduct(i) {
+    if (i < 0 || i >= viewList.length) return;
+    cur = i;
+    const { p, url, g, ind, nb } = viewList[i];
+    $('#mTitle').innerHTML = `${esc(p.title)}<span class="sub">${esc(g.variable)} · ${esc(ind.code)} ${esc(ind.name)}</span>`;
+    $('#mStage').innerHTML = p.kind === 'interactive'
+      ? `<iframe src="${url}" title="${esc(p.title)}"></iframe>`
+      : `<img src="${url}" alt="${esc(p.title)}">`;
+    $('#mCap').textContent = p.caption || '';
+    $('#mActs').innerHTML = `
+      <a class="btn" href="${url}" download>${ICONS.dl}Download</a>
+      <a class="btn ghost" href="${url}" target="_blank" rel="noopener">${ICONS.ext}Open</a>
+      <a class="btn ghost" href="${bookUrl(nb || ind.notebook)}" target="_blank" rel="noopener">${ICONS.book}Notebook</a>
+      ${ctx.has(url) ? `<button type="button" class="btn ghost" data-rec="${url}">${ICONS.doc}Product record</button>` : ''}`;
+    lastView = { type: 'product', i };
+    $('#mCount').textContent = `${i + 1} / ${viewList.length}`;
+    $('#mPrev').style.visibility = $('#mNext').style.visibility = '';
+    showModal();
+  }
+  function openTable(url, title) {
+    cur = -1;
+    $('#mTitle').innerHTML = `${esc(title)}<span class="sub">${esc(decodeURI(url).split('/').pop())}</span>`;
+    $('#mCount').textContent = '';
+    $('#mPrev').style.visibility = $('#mNext').style.visibility = 'hidden';
+    $('#mCap').textContent = '';
+    $('#mActs').innerHTML = `<a class="btn" href="${url}" download>${ICONS.dl}Download CSV</a>
+      ${ctx.has(url) ? `<button type="button" class="btn ghost" data-rec="${url}">${ICONS.doc}Product record</button>` : ''}`;
+    lastView = { type: 'table', url, title };
+    $('#mStage').innerHTML = '<div class="msg">Loading…</div>';
+    showModal();
+    const cached = tableCache.get(url);
+    (cached && cached.data ? Promise.resolve(cached.data)
+      : tableText(url).then(txt => { if (txt === '') throw new Error('unavailable'); return Papa.parse(txt.trim(), { skipEmptyLines: true }).data; })
+    ).then(data => {
+      const [head, ...rows] = data;
+      const fmt = v => { const n = Number(v); return v !== '' && isFinite(n) && /\./.test(v) ? n.toFixed(3).replace(/\.?0+$/, '') : esc(v); };
+      $('#mStage').innerHTML = `<div style="width:100%;overflow:auto;align-self:start"><table><thead><tr>${head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
+        <tbody>${rows.map(r => `<tr>${r.map(fmt).map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }).catch(() => {
+      $('#mStage').innerHTML = `<div class="msg">The table could not be loaded. Rebuild <code>tables.js</code> (<code>build_tables_js.py</code>), serve the repository over HTTP
+        (for example <code>python -m http.server</code> from the repository root) or use the download button.</div>`;
+    });
+  }
+  // Tables are only listed once their CSV has been read and holds at least one value.
+  // Each CSV is read once (from tables.js, or fetched over HTTP); unreadable or empty tables are hidden.
+  const tableCache = new Map();  // url -> 'pending' | { ok, data }
+  let tableTimer;
+  function tableOk(url) {
+    const c = tableCache.get(url);
+    if (c === undefined) probeTable(url);
+    return !!(c && c !== 'pending' && c.ok);
+  }
+  // CSV text: from tables.js (bundled by build_tables_js.py, works from file://) or fetched over HTTP.
+  const BUNDLED = window.CINDRA_TABLES || {};
+  function tableText(url) {
+    const key = decodeURI(url);
+    if (key in BUNDLED) return Promise.resolve(BUNDLED[key]);
+    if (location.protocol === 'file:') return Promise.resolve('');
+    return fetch(url).then(r => r.ok ? r.text() : '').catch(() => '');
+  }
+  function probeTable(url) {
+    if (!window.Papa) { tableCache.set(url, { ok: false }); return; }
+    tableCache.set(url, 'pending');
+    tableText(url).then(txt => {
+      const data = txt.trim() ? Papa.parse(txt.trim(), { skipEmptyLines: true }).data : [];
+      const hasValue = v => v.trim() !== '' && !/^(nan|none|null|na)$/i.test(v.trim());
+      const ok = data.length > 1 && data.slice(1).some(r => r.slice(r.length > 1 ? 1 : 0).some(hasValue));
+      tableCache.set(url, { ok, data });
+      clearTimeout(tableTimer);
+      tableTimer = setTimeout(() => {
+        if (state.scale === 'matrix') renderMatrix();
+        else if (state.scale) render();
+      }, 120);
+    });
+  }
+  // ── Product records (CIndRA CMPLV "source of record") ──
+  // Hand-written content: records.js (methods, limitations, sources, review). Automatic part: inventory.js
+  // (run dates, file inventory, code version, local data copies; build_inventory_js.py). The context of every
+  // product / table drawn on the page (indicator, historical or projection, scale, site) is kept in `ctx`.
+  const REC = window.CINDRA_RECORDS || { sources: {}, indicators: {}, issues: {} };
+  const INV = window.CINDRA_INVENTORY || null;
+  const ctx = new Map();  // url -> { item, isTable, g, ind, part, scale, siteId }
+  let lastView = null;    // view to return to from a record
+  function remember(url, item, isTable, g, ind, part) {
+    if (url) ctx.set(url, { item, isTable, g, ind, part, scale: state.scale === 'matrix' ? state.mScale : state.scale, siteId: state.site });
+  }
+  const fmtDate = s => s ? s.replace('T', ' ').slice(0, 16) : '—';
+  const nowLocal = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16); };
+  const fmtSize = n => n == null ? '—' : n < 1024 ? `${n} B` : n < 1048576 ? `${(n / 1024).toFixed(0)} KB` : `${(n / 1048576).toFixed(1)} MB`;
+  const STAT = { pass: 'Passed', flag: 'Flagged', fail: 'Failed', info: 'Info' };
+
+  function buildRecord(url) {
+    const c = ctx.get(url);
+    const { item, isTable, g, ind, part, scale, siteId } = c;
+    const site = C.sites.find(s => s.id === siteId);
+    const national = scale === 'national';
+    const base = REC.indicators[ind.code] || {};
+    const meta = part === 'proj' ? (base.projections || {}) : base;
+    const pmeta = (meta.products || {})[item.title] || {};
+    const tok = s => (s || '').replace(/\{site\}/g, national ? site.label : 'Pacific basin').replace(/\{station\}/g, national ? site.station : 'regional station set');
+    const key = decodeURI(url);
+    const file = INV && INV.files[key];
+    const nb = part === 'proj' ? ind.projections && ind.projections.notebook : ind.notebook;
+
+    // Supporting tables (the data behind the product) and their inventory entries.
+    const tdefs = (part === 'proj' ? ind.projections && ind.projections.tables : ind.tables) || [];
+    const tables = tdefs.filter(t => !t.enso || isTable || item.enso).map(t => {
+      const u = resolve(t.path, t, siteId, scale);
+      const k = u && decodeURI(u);
+      return u && { title: t.title, url: u, key: k, file: INV && INV.files[k], info: INV && INV.tables[k], current: u === url };
+    }).filter(Boolean);
+
+    // Period: from this table, else from the supporting tables.
+    const periods = (isTable ? tables.filter(t => t.current) : tables).map(t => t.info && t.info.period).filter(Boolean);
+    const period = periods.length ? [Math.min(...periods.map(p => p[0])), Math.max(...periods.map(p => p[1]))] : null;
+
+    // Data sources and the date of their local copy.
+    const sources = (meta.sources || []).map(k => {
+      const s = REC.sources[k] || { dataset: k };
+      const copies = (s.copy || []).map(p => {
+        let ok = true;
+        const path = p.replace(/\{(\w+)\}/g, (_, t) => { const v = national ? site.tokens[t] : undefined; if (v === undefined) ok = false; return v || ''; });
+        return ok ? { path, data: INV && INV.data[path] } : null;
+      }).filter(Boolean);
+      return { key: k, ...s, copies };
+    });
+
+    const code = ind.code;
+    const packageId = `CIndRA-${national ? 'NAT' : 'REG'}-${national ? site.id : 'pacific'}-${code}-${part === 'proj' ? 'P' : 'H'}`;
+    const productId = `${packageId}-${key.split('/').pop().replace(/\.[^.]+$/, '')}`;
+    const issues = Object.entries(REC.issues || {}).filter(([, x]) =>
+      (!x.codes || x.codes.includes(code)) && (!x.sites || (national && x.sites.includes(site.id)))).map(([id, x]) => ({ id, ...x }));
+    const review = meta.review || { status: 'pending', notes: 'No review recorded.' };
+    const repo = INV && INV.repo || {};
+
+    // Validation record.
+    const checks = [];
+    const chk = (status, label, detail) => checks.push({ status, label, detail });
+    if (!INV) chk('fail', 'Inventory', 'inventory.js not found: run build_inventory_js.py to record run dates, files and code version.');
+    else chk(file ? 'pass' : 'fail', 'Product file', file ? `Found (${fmtSize(file.size)}, generated ${fmtDate(file.modified)}).` : 'Product file missing from the inventory.');
+    chk(item.caption ? 'pass' : 'flag', 'Caption', item.caption ? 'Caption tied to the product.' : 'No caption for this product.');
+    chk(meta.methods && meta.methodId ? 'pass' : 'flag', 'Methods note', meta.methods ? `Method ${meta.methodId || '(no ID)'} documented.` : 'Methods note not written yet (records.js).');
+    chk(meta.limitations && meta.limitations.length ? 'pass' : 'flag', 'Limitations note', meta.limitations && meta.limitations.length ? `${meta.limitations.length} limitations documented.` : 'Limitations not written yet (records.js).');
+    chk(pmeta.units || meta.units ? 'pass' : 'flag', 'Units', pmeta.units || meta.units || 'Units not declared.');
+    chk(period ? 'pass' : 'flag', 'Period', period ? `${period[0]}–${period[1]} (from the supporting tables).` : 'Period not identified from the tables.');
+    const srcOk = sources.length && sources.every(s => s.provider && s.version && s.url);
+    chk(srcOk ? 'pass' : 'flag', 'Data sources', sources.length ? (srcOk ? `${sources.length} source(s) with provider, version and URL.` : 'Some sources lack provider, version or URL.') : 'No data source documented.');
+    const copies = sources.flatMap(s => s.copies);
+    const missingCopies = copies.filter(x => !x.data);
+    chk(copies.length && !missingCopies.length ? 'pass' : 'flag', 'Source data copy',
+      !copies.length ? 'Local copy of the source data not documented.' : missingCopies.length ? `Not found: ${missingCopies.map(x => x.path).join(', ')}` : `${copies.length} local file(s) found; dates recorded.`);
+    chk(!repo.commit ? 'flag' : repo.dirty ? 'flag' : 'pass', 'Code version',
+      !repo.commit ? 'No git commit recorded.' : repo.dirty ? `Commit ${repo.short} with uncommitted changes when the inventory was built: the outputs may not be reproducible from the commit alone.` : `Commit ${repo.short}, clean working tree.`);
+    const tMissing = tables.filter(t => !t.file), tEmpty = tables.filter(t => t.info && !t.info.rows);
+    chk(!tables.length ? 'flag' : tEmpty.length ? 'fail' : tMissing.length ? 'flag' : 'pass', 'Supporting tables',
+      !tables.length ? 'No data table linked to this product.' : tEmpty.length ? `Empty: ${tEmpty.map(t => t.title).join(', ')}` : tMissing.length ? `Not generated: ${tMissing.map(t => t.title).join(', ')}` : `${tables.length} table(s) present with header and data rows.`);
+    chk(meta.qc ? 'pass' : 'flag', 'QC traceability', meta.qc ? 'QC reference documented.' : 'QC reference not documented.');
+    const open = issues.filter(x => x.status !== 'closed');
+    chk(open.length ? 'flag' : 'pass', 'Issue log', open.length ? `Open: ${open.map(x => x.id).join(', ')}` : 'No open issues.');
+    chk(review.status === 'approved' ? 'pass' : 'flag', 'Scientific review', review.status === 'approved' ? `Approved${review.by ? ' by ' + review.by : ''}${review.date ? ', ' + review.date : ''}.` : 'Human scientific review pending.');
+    const worst = checks.some(x => x.status === 'fail') ? 'fail' : checks.some(x => x.status === 'flag') ? 'flag' : 'pass';
+    const statusLabel = review.status === 'approved' && worst === 'pass' ? ['pass', 'Approved for report use']
+      : review.status === 'approved' ? ['fail', 'Approval on hold: validation not passed']
+      : review.status === 'in-review' ? ['info', 'In scientific review']
+      : worst === 'fail' ? ['fail', 'Draft: validation failed']
+      : !meta.methods || !(meta.limitations || []).length ? ['flag', 'Draft: record incomplete'] : ['flag', 'Generated: pending scientific review'];
+
+    return {
+      productId, packageId, title: item.title, kind: isTable ? 'Table (CSV)' : (KIND_LABEL[item.kind] || item.kind),
+      indicator: `${code} ${ind.name}`, variable: `${g.domain} · ${g.variable}`,
+      profile: `${national ? 'National' : 'Regional'} · ${part === 'proj' ? 'Projections' : 'Historical'}`,
+      spatial: tok(meta.spatial) || (national ? `${site.label} (${site.station})` : 'Pacific basin'),
+      period, units: pmeta.units || meta.units || '', runDate: file && file.modified,
+      caption: item.caption || '', methodId: meta.methodId || '', methods: meta.methods || '', limitations: meta.limitations || [],
+      parameters: meta.parameters || {}, qc: meta.qc || '', sources, issues, review, statusLabel, worst, checks,
+      notebook: nb, notebookUrl: nb ? bookUrl(nb) : '', repo, workflow: REC.workflow || '', inventoryDate: INV && INV.generated,
+      url, key, file, tables,
+      outputs: [{ title: item.title, key, file }, ...tables.filter(t => !t.current).map(t => ({ title: t.title, key: t.key, file: t.file }))],
+    };
+  }
+
+  function recordHtml(r) {
+    const row = (k, v) => `<tr><th>${esc(k)}</th><td>${v}</td></tr>`;
+    const repoLink = r.repo.commit ? `<a href="${esc(r.repo.remote)}/commit/${r.repo.commit}" target="_blank" rel="noopener">${esc(r.repo.short)}</a> (${esc(r.repo.branch)}, ${esc(fmtDate(r.repo.commitDate))})${r.repo.dirty ? ' · <span class="rstat flag">uncommitted changes</span>' : ''}` : '—';
+    return `<div class="rec">
+      <div class="cover">
+        <div class="cover-head"><b>${esc(r.title)}<span class="muted" style="display:block;font-size:13px;font-weight:500">${esc(r.indicator)} · ${esc(r.variable)}</span></b>
+          <span class="rstat ${r.statusLabel[0]}">${esc(r.statusLabel[1])}</span></div>
+        <table>
+          ${row('Product ID', `<code>${esc(r.productId)}</code>`)}
+          ${row('Package ID', `<code>${esc(r.packageId)}</code>`)}
+          ${row('Product profile', esc(r.profile) + ' · ' + esc(r.kind))}
+          ${row('Spatial scope', esc(r.spatial))}
+          ${row('Period', r.period ? `${r.period[0]}–${r.period[1]}` : '<span class="muted">Not identified</span>')}
+          ${row('Units', r.units ? esc(r.units) : '<span class="muted">Not declared</span>')}
+          ${row('Run date', esc(fmtDate(r.runDate)) + ' <span class="muted">(product file generated)</span>')}
+          ${row('Review status', `${esc(r.statusLabel[1])}${r.review.notes ? ` <span class="muted">— ${esc(r.review.notes)}</span>` : ''}`)}
+        </table>
+      </div>
+
+      <h5>Caption</h5>
+      <p>${r.caption ? esc(r.caption) : '<span class="muted">No caption.</span>'}</p>
+
+      <h5>Methods note ${r.methodId ? `<span class="eid">${esc(r.methodId)}</span>` : ''}</h5>
+      ${r.methods ? `<p>${esc(r.methods)}</p>` : '<p class="muted">Not documented yet (matrix_cc/records.js).</p>'}
+      <table>
+        ${Object.entries(r.parameters).map(([k, v]) => row(k, esc(v))).join('')}
+        ${r.qc ? row('QC reference', esc(r.qc)) : ''}
+        ${row('Notebook', r.notebookUrl ? `<a href="${r.notebookUrl}" target="_blank" rel="noopener">${esc(r.notebook)}</a>` : '—')}
+        ${row('Repository', r.repo.remote ? `<a href="${esc(r.repo.remote)}" target="_blank" rel="noopener">${esc(r.repo.remote)}</a>` : '—')}
+      </table>
+
+      <h5>Limitations note</h5>
+      ${r.limitations.length ? `<ul>${r.limitations.map(l => `<li>${esc(l)}</li>`).join('')}</ul>` : '<p class="muted">Not documented yet (matrix_cc/records.js).</p>'}
+      ${r.issues.map(x => `<div class="issue"><b>${esc(x.id)}</b> · ${esc(x.title)} <span class="rstat ${x.status === 'closed' ? 'pass' : 'flag'}">${esc(x.status)}</span><br>${esc(x.text)}</div>`).join('')}
+
+      <h5>Data tables</h5>
+      ${r.tables.length ? `<div>${r.tables.map(t => `<button type="button" class="tbtn" data-rec-table="${t.url}" data-title="${esc(r.indicator + ' — ' + t.title)}">${ICONS.table}${esc(t.title)}${t.current ? ' (this table)' : ''}</button>`).join('')}</div>
+        <p class="muted" style="font-size:12.5px">Tables computed with the same notebook run as this product.</p>` : '<p class="muted">No table linked to this indicator.</p>'}
+
+      <h5>Metadata and provenance</h5>
+      <table class="rtab">
+        <thead><tr><th>Dataset</th><th>Provider</th><th>Version</th><th>Local copy (date)</th></tr></thead>
+        <tbody>${r.sources.length ? r.sources.map(s => `<tr><td>${s.url ? `<a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.dataset)}</a>` : esc(s.dataset)}${s.citation ? `<br><span class="muted" style="font-size:12px">${esc(s.citation)}</span>` : ''}</td>
+          <td>${esc(s.provider || '—')}</td><td>${esc(s.version || '—')}</td>
+          <td>${s.copies.length ? s.copies.map(x => `<code>${esc(x.path.replace(/^\.\.\//, ''))}</code> ${x.data ? esc(fmtDate(x.data.modified)) : '<span class="rstat flag">not found</span>'}`).join('<br>') : '—'}</td></tr>`).join('')
+          : '<tr><td colspan="4" class="muted">No data source documented yet.</td></tr>'}</tbody>
+      </table>
+      <table style="margin-top:10px">
+        ${row('Code version', repoLink)}
+        ${row('Workflow version', esc(r.workflow))}
+        ${row('Record assembled', `${esc(fmtDate(nowLocal()))} <span class="muted">(inventory built ${esc(fmtDate(r.inventoryDate))})</span>`)}
+      </table>
+      <table class="rtab inv" style="margin-top:10px">
+        <thead><tr><th>Output inventory</th><th>File</th><th>Generated</th><th>Size</th><th>SHA-256</th></tr></thead>
+        <tbody>${r.outputs.map(o => `<tr><td>${esc(o.title)}</td><td><code>${esc(o.key.split('/').pop())}</code></td><td>${o.file ? esc(fmtDate(o.file.modified)) : '<span class="rstat fail">missing</span>'}</td>
+          <td>${o.file ? fmtSize(o.file.size) : '—'}</td><td>${o.file ? `<code title="${o.file.sha256}">${o.file.sha256.slice(0, 12)}</code>` : '—'}</td></tr>`).join('')}</tbody>
+      </table>
+
+      <h5>Validation record <span class="rstat ${r.worst}">${STAT[r.worst]}</span></h5>
+      <table class="chk">${r.checks.map(x => `<tr><td><span class="rstat ${x.status}">${STAT[x.status]}</span></td><th>${esc(x.label)}</th><td>${esc(x.detail)}</td></tr>`).join('')}</table>
+    </div>`;
+  }
+
+  function recordMarkdown(r) {
+    const L = [];
+    L.push(`# Product record: ${r.title}`, '', `**${r.statusLabel[1]}**`, '');
+    [['Product ID', r.productId], ['Package ID', r.packageId], ['Indicator', r.indicator], ['Variable', r.variable],
+     ['Product profile', `${r.profile} · ${r.kind}`], ['Spatial scope', r.spatial], ['Period', r.period ? `${r.period[0]}–${r.period[1]}` : 'not identified'],
+     ['Units', r.units || 'not declared'], ['Run date', fmtDate(r.runDate)], ['Review', `${r.review.status}${r.review.by ? ', ' + r.review.by : ''}${r.review.date ? ', ' + r.review.date : ''}${r.review.notes ? ' — ' + r.review.notes : ''}`]]
+      .forEach(([k, v]) => L.push(`- **${k}:** ${v}`));
+    L.push('', '## Caption', '', r.caption || '_No caption._', '', `## Methods note${r.methodId ? ` (${r.methodId})` : ''}`, '', r.methods || '_Not documented._', '');
+    Object.entries(r.parameters).forEach(([k, v]) => L.push(`- **${k}:** ${v}`));
+    if (r.qc) L.push(`- **QC reference:** ${r.qc}`);
+    L.push(`- **Notebook:** ${r.notebookUrl || '—'}`, `- **Repository:** ${r.repo.remote || '—'}`, '', '## Limitations note', '');
+    (r.limitations.length ? r.limitations : ['_Not documented._']).forEach(l => L.push(`- ${l}`));
+    r.issues.forEach(x => L.push(`- **${x.id}** (${x.status}) ${x.title}: ${x.text}`));
+    L.push('', '## Metadata and provenance', '', '| Dataset | Provider | Version | URL | Local copy |', '|---|---|---|---|---|');
+    r.sources.forEach(s => L.push(`| ${s.dataset} | ${s.provider || ''} | ${s.version || ''} | ${s.url || ''} | ${s.copies.map(x => `${x.path} (${x.data ? fmtDate(x.data.modified) : 'not found'})`).join('; ')} |`));
+    L.push('', `- **Code version:** ${r.repo.commit ? `${r.repo.commit} (${r.repo.branch})${r.repo.dirty ? ', uncommitted changes' : ''}` : '—'}`,
+      `- **Workflow version:** ${r.workflow}`, `- **Inventory built:** ${fmtDate(r.inventoryDate)}`, '',
+      '| Output | File | Generated | Size | SHA-256 |', '|---|---|---|---|---|');
+    r.outputs.forEach(o => L.push(`| ${o.title} | ${o.key} | ${o.file ? fmtDate(o.file.modified) : 'missing'} | ${o.file ? fmtSize(o.file.size) : ''} | ${o.file ? o.file.sha256 : ''} |`));
+    L.push('', `## Validation record: ${STAT[r.worst]}`, '', '| Status | Check | Detail |', '|---|---|---|');
+    r.checks.forEach(x => L.push(`| ${STAT[x.status]} | ${x.label} | ${x.detail} |`));
+    return L.join('\n') + '\n';
+  }
+
+  function download(name, text, type) {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  }
+
+  let curRecord = null;
+  function openRecord(url) {
+    if (!ctx.has(url)) return;
+    const r = curRecord = buildRecord(url);
+    cur = -1;
+    $('#mTitle').innerHTML = `Product record<span class="sub">${esc(r.title)} · ${esc(r.indicator)}</span>`;
+    $('#mCount').textContent = '';
+    $('#mPrev').style.visibility = $('#mNext').style.visibility = 'hidden';
+    $('#mCap').textContent = 'Source-of-record information (CIndRA CMPLV): caption, methods, limitations, metadata, provenance and validation.';
+    $('#mActs').innerHTML = `
+      ${lastView ? `<button type="button" class="btn ghost" data-rec-back>${lastView.type === 'table' ? ICONS.table + 'Back to table' : ICONS.chart + 'Back to product'}</button>` : ''}
+      <button type="button" class="btn" data-rec-dl="md">${ICONS.dl}Record (.md)</button>
+      <button type="button" class="btn ghost" data-rec-dl="json">${ICONS.dl}Record (.json)</button>`;
+    $('#mStage').innerHTML = recordHtml(r);
+    $('#mStage').scrollTop = 0;
+    showModal();
+  }
+  $('#mActs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.rec) return openRecord(b.dataset.rec);
+    if ('recBack' in b.dataset && lastView) return lastView.type === 'table' ? openTable(lastView.url, lastView.title) : openProduct(lastView.i);
+    if (b.dataset.recDl && curRecord) {
+      const name = curRecord.productId;
+      if (b.dataset.recDl === 'md') download(`${name}_record.md`, recordMarkdown(curRecord), 'text/markdown');
+      else { const { file, ...rest } = curRecord; download(`${name}_record.json`, JSON.stringify(rest, null, 2), 'application/json'); }
+    }
+  });
+
+  function showModal() { modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
+  function closeModal() { modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; $('#mStage').innerHTML = ''; }
+
+  // ── Events ──
+  $('#main').addEventListener('click', e => {
+    const card = e.target.closest('.card');
+    if (card && card.dataset.idx >= 0) return openProduct(+card.dataset.idx);
+    const t = e.target.closest('.tbtn');
+    if (t) return openTable(t.dataset.csv, t.dataset.title);
+    const head = e.target.closest('.ind-head');
+    if (head && !e.target.closest('a')) {
+      const art = head.parentElement;
+      art.classList.toggle('closed');
+      head.setAttribute('aria-expanded', !art.classList.contains('closed'));
+    }
+  });
+  $('#main').addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.classList.contains('ind-head')) { e.preventDefault(); e.target.click(); }
+  });
+  $('#mClose').onclick = closeModal;
+  $('#mPrev').onclick = () => openProduct((cur - 1 + viewList.length) % viewList.length);
+  $('#mNext').onclick = () => openProduct((cur + 1) % viewList.length);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', e => {
+    if (!modal.classList.contains('open')) return;
+    if (e.key === 'Escape') closeModal();
+    if (cur >= 0 && e.key === 'ArrowLeft') $('#mPrev').click();
+    if (cur >= 0 && e.key === 'ArrowRight') $('#mNext').click();
+  });
+
+  const hashFor = () => {
+    if (!state.scale) return location.pathname;
+    if (state.scale === 'matrix') return `#matrix/${state.mScale}${state.mScale === 'national' ? '/' + state.site : ''}`;
+    return `#${state.scale}${state.scale === 'national' ? '/' + state.site : ''}`;
+  };
+  // Leaving or returning to the start page adds a history entry, so the browser Back button works.
+  function update(push = false) {
+    history[push ? 'pushState' : 'replaceState'](null, '', hashFor());
+    renderScope();
+    if (state.scale === 'matrix') renderMatrix();
+    else if (state.scale) { drawMap(); render(); }
+    if (push || state.scale) window.scrollTo({ top: 0 });
+  }
+  window.addEventListener('popstate', () => { readHash(); update(); });
+  $('#homeBtn').onclick = () => { if (state.scale) { state.scale = null; update(true); } };
+  function selectSite(id) { if (id !== state.site) { state.site = id; update(); } }
+  $('#scaleTabs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.dataset.scale === state.scale) return;
+    const fromStart = !state.scale;
+    state.scale = b.dataset.scale; update(fromStart);
+  });
+  $('#scopeInfo').addEventListener('click', e => { const b = e.target.closest('.site-opt'); if (b) selectSite(b.dataset.site); });
+  const chipGroup = (id, key) => $(id).addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    state[key] = b.dataset[key === 'dom' ? 'dom' : 'kind'];
+    $(id).querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b));
+    render();
+  });
+  chipGroup('#domChips', 'dom');
+  chipGroup('#kindChips', 'kind');
+  let qt;
+  $('#q').addEventListener('input', e => { clearTimeout(qt); qt = setTimeout(() => { state.q = e.target.value.trim().toLowerCase(); render(); }, 120); });
+
+  // Theme toggle (preference kept per browser)
+  const root = document.documentElement;
+  try { const t = localStorage.getItem('cindra-theme'); if (t) root.dataset.theme = t; } catch (_) {}
+  $('#themeBtn').onclick = () => {
+    const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+    root.dataset.theme = dark ? 'light' : 'dark';
+    try { localStorage.setItem('cindra-theme', root.dataset.theme); } catch (_) {}
+    drawMap();
+  };
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawMap);
+
+  // ── Scope card: site / region summary ──
+  const productCount = siteId => {
+    let n = 0;
+    C.national.forEach(g => g.indicators.forEach(ind => [...ind.products, ...(ind.projections ? ind.projections.products : [])]
+      .forEach(p => { if (resolve(p.path, p, siteId, 'national')) n++; })));
+    return n;
+  };
+  const fmtLon = x => x <= 180 ? `${x.toFixed(2)}°E` : `${(360 - x).toFixed(2)}°W`;
+  const fmtLat = y => `${Math.abs(y).toFixed(2)}°${y >= 0 ? 'N' : 'S'}`;
+  const EEZ = window.CINDRA_EEZ || { features: [] };
+
+  function renderScope() {
+    document.body.dataset.scale = state.scale || 'none';
+    if (!state.scale) {
+      const count = groups => groups.reduce((n, g) => n + g.indicators.length, 0);
+      $('#heroTitle').textContent = 'Climate indicator product matrix';
+      $('#heroText').textContent = 'Every figure and table produced by the CIndRA notebooks, organised by variable and indicator. Choose the scale you want to explore.';
+      $('#metaNational').textContent = `${C.sites.length} sites · ${count(C.national)} indicators`;
+      $('#metaRegional').textContent = `${(window.CINDRA_EEZ || { features: [] }).features.length} EEZs · ${count(C.regional)} indicators`;
+      $('#metaMatrix').textContent = `${count(C.national) + count(C.regional)} indicators · national & regional`;
+      document.querySelectorAll('#scaleTabs .scale-btn').forEach(b => { b.classList.remove('on'); b.setAttribute('aria-selected', false); });
+      return;
+    }
+    document.querySelectorAll('#scaleTabs .scale-btn').forEach(b => {
+      b.classList.toggle('on', b.dataset.scale === state.scale);
+      b.setAttribute('aria-selected', b.dataset.scale === state.scale);
+    });
+    if (state.scale === 'matrix') {
+      $('#heroTitle').textContent = 'Product matrix';
+      $('#heroText').textContent = 'One row per indicator. Active buttons show which maps, plots and tables are available for the historical period and projections; click one to open it.';
+      return;
+    }
+    if (state.scale === 'national') {
+      const s = C.sites.find(x => x.id === state.site);
+      $('#heroTitle').textContent = 'National indicators';
+      $('#heroText').textContent = 'Station-based atmosphere indicators and EEZ-scale ocean indicators for one country at a time. Pick a site on the map to see its products.';
+      $('#scopeInfo').innerHTML = `
+        <div><div class="scope-kicker">National scale · selected site</div><h2>${esc(s.label)}</h2></div>
+        <dl><dt>Station</dt><dd>${esc(s.station)}</dd>
+            <dt>Location</dt><dd>${fmtLat(s.lat)}, ${fmtLon(s.lon)}</dd>
+            <dt>EEZ</dt><dd>${esc(s.eezName)}</dd>
+            <dt>Products</dt><dd>${productCount(s.id)}</dd></dl>
+        <div class="site-list">
+          <span class="label-sm">Available sites</span>
+          ${C.sites.map(x => `<button type="button" class="site-opt${x.id === s.id ? ' on' : ''}" data-site="${x.id}">
+             <i class="dot"></i><span>${esc(x.label)}<small>${esc(x.station)} · ${productCount(x.id)} products</small></span></button>`).join('')}
+        </div>
+        <p class="hint">Click a highlighted EEZ or station on the map to switch site. Grey EEZs have no national products yet.</p>`;
+    } else {
+      const e = C.regionalExtent;
+      let n = 0;
+      C.regional.forEach(g => g.indicators.forEach(ind => { n += ind.products.length; }));
+      $('#heroTitle').textContent = 'Regional indicators';
+      $('#heroText').textContent = 'Basin-wide indicators for the Pacific: station networks, ERA5 and satellite fields mapped over the whole region and summarised for every EEZ.';
+      $('#scopeInfo').innerHTML = `
+        <div><div class="scope-kicker">Regional scale · study domain</div><h2>Pacific basin</h2></div>
+        <dl><dt>Domain</dt><dd>${fmtLon(e.lonMin)} – ${fmtLon(e.lonMax)}<br>${fmtLat(e.latMin)} – ${fmtLat(e.latMax)}</dd>
+            <dt>EEZs</dt><dd>${EEZ.features.length} Pacific EEZs</dd>
+            <dt>Stations</dt><dd>GHCN-Daily inside the EEZs</dd>
+            <dt>Gridded</dt><dd>ERA5 · NOAA OISST · Copernicus Marine · IBTrACS</dd>
+            <dt>Products</dt><dd>${n}</dd></dl>
+        <p class="hint">Regional products cover the whole domain outlined on the map. Hover an EEZ to see its name.</p>`;
+    }
+  }
+
+  // ── Map ──
+  let map, tiles, layers = [];
+  const cssVar = n => getComputedStyle(document.body).getPropertyValue(n).trim();
+  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches;
+  const tileUrl = () => 'https://server.arcgisonline.com/ArcGIS/rest/services/'
+    + (isDark() ? 'Canvas/World_Dark_Gray_Base' : 'Ocean/World_Ocean_Base') + '/MapServer/tile/{z}/{y}/{x}';
+
+  function drawMap() {
+    if (!state.scale || state.scale === 'matrix') return;
+    if (!window.L) { $('#map').innerHTML = '<p class="hint" style="padding:20px">The map needs an internet connection (Leaflet).</p>'; return; }
+    if (!map) {
+      map = L.map('map', { zoomSnap: 0.25, scrollWheelZoom: false, worldCopyJump: false }).setView([5, 170], 3);
+      tiles = L.tileLayer(tileUrl(), { maxZoom: 10, attribution: 'Tiles &copy; Esri — GEBCO, NOAA, Garmin, HERE' }).addTo(map);
+    }
+    tiles.setUrl(tileUrl());
+    layers.forEach(l => l.remove());
+    layers = [];
+    const accent = cssVar('--accent');
+    const grey = isDark() ? '#6b7a8a' : '#94a3b3';
+
+    if (state.scale === 'national') {
+      const siteByEez = Object.fromEntries(C.sites.map(s => [s.eezName, s]));
+      const styleFor = f => {
+        const s = siteByEez[f.properties.name];
+        if (!s) return { color: grey, weight: 0.8, fillColor: grey, fillOpacity: 0.05 };
+        const on = s.id === state.site;
+        return { color: accent, weight: on ? 2.5 : 1.4, fillColor: accent, fillOpacity: on ? 0.35 : 0.12 };
+      };
+      const eez = L.geoJSON(EEZ, {
+        style: styleFor,
+        onEachFeature: (f, l) => {
+          const s = siteByEez[f.properties.name];
+          l.bindTooltip(s ? `<b>${esc(s.label)}</b><br>${productCount(s.id)} products · click to select`
+                          : `<b>${esc(f.properties.name)}</b><br>No national products yet`, { sticky: true });
+          if (!s) return;
+          l.on('click', () => selectSite(s.id));
+          l.on('mouseover', () => l.setStyle({ weight: 3, fillOpacity: 0.45 }));
+          l.on('mouseout', () => l.setStyle(styleFor(f)));
+        },
+      }).addTo(map);
+      layers.push(eez);
+      C.sites.forEach(s => {
+        const on = s.id === state.site;
+        const m = L.circleMarker([s.lat, s.lon], { radius: on ? 8 : 6, color: '#fff', weight: 2, fillColor: accent, fillOpacity: 1 })
+          .bindTooltip(on ? `${esc(s.label)}` : `${esc(s.label)} — ${esc(s.station)}`,
+                       on ? { permanent: true, direction: 'top', offset: [0, -8], className: 'site-label' } : { direction: 'top' })
+          .on('click', () => selectSite(s.id)).addTo(map);
+        layers.push(m);
+      });
+      const siteEez = eez.getLayers().filter(l => siteByEez[l.feature.properties.name]);
+      const b = siteEez.length ? L.featureGroup(siteEez).getBounds() : eez.getBounds();
+      map.fitBounds(b.pad(0.35));
+    } else {
+      const e = C.regionalExtent;
+      const eez = L.geoJSON(EEZ, {
+        style: { color: accent, weight: 1, fillColor: accent, fillOpacity: 0.22 },
+        onEachFeature: (f, l) => {
+          l.bindTooltip(`<b>${esc(f.properties.name)}</b>${f.properties.sovereign && f.properties.sovereign !== f.properties.name ? '<br>' + esc(f.properties.sovereign) : ''}`, { sticky: true });
+          l.on('mouseover', () => l.setStyle({ weight: 2.5, fillOpacity: 0.45 }));
+          l.on('mouseout', () => l.setStyle({ weight: 1, fillOpacity: 0.22 }));
+        },
+      }).addTo(map);
+      const box = L.rectangle([[e.latMin, e.lonMin], [e.latMax, e.lonMax]],
+        { color: accent, weight: 2, dashArray: '6 6', fill: false, interactive: false }).addTo(map);
+      layers.push(eez, box);
+      map.fitBounds(box.getBounds(), { padding: [10, 10] });
+    }
+  }
+
+  // ── Matrix overview tab ──
+  $('#mxSite').innerHTML = C.sites.map(s => `<option value="${s.id}">${esc(s.label)} — ${esc(s.station)}</option>`).join('');
+  $('#mxLegend').innerHTML = `
+    <span class="row" style="gap:6px"><span class="ico">${ICONS.map}</span>Available</span>
+    <span class="row" style="gap:6px"><span class="ico off">${ICONS.map}</span>Not available</span>
+    <span class="row" style="gap:6px">${ICONS.map.replace('<svg', '<svg width="15" height="15"')}Map</span>
+    <span class="row" style="gap:6px">${ICONS.chart.replace('<svg', '<svg width="15" height="15"')}Plot</span>
+    <span class="row" style="gap:6px">${ICONS.table.replace('<svg', '<svg width="15" height="15"')}Table</span>`;
+  const MX_KINDS = [['map', 'Map', ICONS.map], ['plot', 'Plot', ICONS.chart], ['table', 'Table', ICONS.table]];
+
+  function mxItems(ind, kind, part = 'hist') {
+    const src = part === 'proj' ? ind.projections : ind;
+    if (!src) return [];
+    if (kind === 'table') {
+      return (src.tables || []).filter(t => !t.enso).map(t => ({ t, url: resolve(t.path, t) })).filter(x => x.url && tableOk(x.url));
+    }
+    return src.products
+      .filter(p => p.mx !== false && !p.enso)
+      .filter(p => kind === 'plot' ? p.kind === 'plot' || p.kind === 'interactive' : p.kind === kind)
+      .map(p => ({ p, url: resolve(p.path, p) })).filter(x => x.url && !missing.has(x.url));
+  }
+
+  function renderMatrix() {
+    const ms = state.mScale;
+    $('#mxScale').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.m === ms));
+    $('#mxSiteWrap').style.display = ms === 'national' ? '' : 'none';
+    $('#mxRegionNote').style.display = ms === 'national' ? 'none' : '';
+    $('#mxSite').value = state.site;
+    const cur = C.sites.find(s => s.id === state.site);
+    $('#mxCurrent').innerHTML = ms === 'national'
+      ? `Showing <b>National</b> products for <b>${esc(cur ? cur.label : state.site)}</b>`
+      : `Showing <b>Regional</b> products for the <b>Pacific basin</b>`;
+    const groups = C[ms];
+    const domRows = {};
+    groups.forEach(g => { domRows[g.domain] = (domRows[g.domain] || 0) + g.indicators.length; });
+    const seenDom = new Set();
+    let rows = '';
+    groups.forEach((g, gi) => g.indicators.forEach((ind, ii) => {
+      let tr = '<tr>';
+      if (!seenDom.has(g.domain)) {
+        seenDom.add(g.domain);
+        tr += `<td rowspan="${domRows[g.domain]}" class="mx-dom ${g.domain}"><span>${g.domain}</span></td>`;
+      }
+      if (ii === 0) {
+        tr += `<td rowspan="${g.indicators.length}" class="mx-var ${g.domain}"><a href="${bookUrl(g.page)}" target="_blank" rel="noopener">
+          <span class="var-icon">${ICONS[g.icon]}</span>${esc(g.variable)}</a></td>`;
+      }
+      tr += `<td class="mx-ind"><span class="code">${esc(ind.code)}</span><a href="${bookUrl(ind.notebook)}" target="_blank" rel="noopener">${esc(ind.name)}</a></td>`;
+      ['hist', 'proj'].forEach(part => MX_KINDS.forEach(([k, label, icon], j) => {
+        const items = mxItems(ind, k, part);
+        items.forEach(x => remember(x.url, x.p || x.t, !x.p, g, ind, part));
+        const names = items.map(x => (x.p || x.t).title).join(', ');
+        const offTitle = part === 'proj' && !ind.projections ? 'Projections: in development' : `No ${label.toLowerCase()} available`;
+        tr += `<td class="mx-c${j === 0 ? ' first' : ''}">` + (items.length
+          ? `<button type="button" class="ico" data-g="${gi}" data-i="${ii}" data-k="${k}" data-p="${part}" title="${esc(label)}: ${esc(names)}" aria-label="${esc(label)} (${items.length}) — ${esc(ind.name)}">${icon}${items.length > 1 ? `<span class="n">${items.length}</span>` : ''}</button>`
+          : `<span class="ico off" title="${offTitle}">${icon}</span>`) + '</td>';
+      }));
+      rows += tr + '</tr>';
+    }));
+    $('#mxTable').innerHTML = `<table class="mx">
+      <thead>
+        <tr><th rowspan="2" colspan="2">Variable</th><th rowspan="2">Indicator</th><th colspan="3" class="grp">Historical</th><th colspan="3" class="grp">Projections</th></tr>
+        <tr>${[0, 1].map(() => MX_KINDS.map(([, l], j) => `<th class="sub${j === 0 ? ' first' : ''}">${l}</th>`).join('')).join('')}</tr>
+      </thead><tbody>${rows}</tbody></table>`;
+  }
+
+  function openTableList(items, ind, nb = ind.notebook) {
+    cur = -1;
+    $('#mTitle').innerHTML = `Tables<span class="sub">${esc(ind.code)} ${esc(ind.name)}</span>`;
+    $('#mCount').textContent = '';
+    $('#mPrev').style.visibility = $('#mNext').style.visibility = 'hidden';
+    $('#mCap').textContent = 'Choose a table to view it.';
+    $('#mActs').innerHTML = `<a class="btn ghost" href="${bookUrl(nb)}" target="_blank" rel="noopener">${ICONS.book}Notebook</a>`;
+    $('#mStage').innerHTML = `<div class="tlist">${items.map(x => `<button type="button" class="tbtn" data-csv="${x.url}" data-title="${esc(ind.name + ' — ' + x.t.title)}">${ICONS.table}${esc(x.t.title)}</button>`).join('')}</div>`;
+    showModal();
+  }
+  $('#mStage').addEventListener('click', e => {
+    const t = e.target.closest('.tlist .tbtn'); if (t) return openTable(t.dataset.csv, t.dataset.title);
+    const r = e.target.closest('[data-rec-table]'); if (r) openTable(r.dataset.recTable, r.dataset.title);
+  });
+
+  $('#mxTable').addEventListener('click', e => {
+    const b = e.target.closest('button.ico'); if (!b) return;
+    const g = C[state.mScale][+b.dataset.g], ind = g.indicators[+b.dataset.i];
+    const part = b.dataset.p;
+    const nb = part === 'proj' ? ind.projections.notebook : ind.notebook;
+    const items = mxItems(ind, b.dataset.k, part);
+    if (b.dataset.k === 'table') return items.length === 1 ? openTable(items[0].url, ind.name + ' — ' + items[0].t.title) : openTableList(items, ind, nb);
+    viewList = items.map(x => ({ ...x, g, ind, nb }));
+    openProduct(0);
+  });
+  $('#mxScale').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.dataset.m === state.mScale) return;
+    state.mScale = b.dataset.m; update();
+  });
+  $('#mxSite').addEventListener('change', e => { state.site = e.target.value; update(); });
+
+  update();
+})();
+</script>
+</body>
+</html>

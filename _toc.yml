@@ -30,11 +30,42 @@ parts:
               - file: notebooks/historical/National/biochemistry/b_chlorophyll
               - file: notebooks/historical/National/biochemistry/c_phytoplankton
               - file: notebooks/historical/National/biochemistry/d_dissolved_o2
+  - caption: NATIONAL PROJECTIONS
+    chapters:
+      - file: notebooks/projections/National/national
+        sections:
+          - file: notebooks/projections/National/00_warming_levels
+            title: Global warming levels
+          - file: notebooks/projections/National/air_temperature/surface_temperature
+            sections:
+              - file: notebooks/projections/National/air_temperature/a_mean_temperature
+              - file: notebooks/projections/National/air_temperature/b_min_max_temperature
+              - file: notebooks/projections/National/air_temperature/c_hot_cold_days
+          - file: notebooks/projections/National/rainfall/rainfall
+            sections:
+              - file: notebooks/projections/National/rainfall/a_Total_rainfall
+              - file: notebooks/projections/National/rainfall/b_Dry_days
+              - file: notebooks/projections/National/rainfall/c_Heavy_rainfall
+          - file: notebooks/projections/National/tropical_cyclones/tropical_cyclones
+            sections:
+              - file: notebooks/projections/National/tropical_cyclones/a_tropical_cyclones
+          - file: notebooks/projections/National/sea_surface_temperature/sea_surface_temperature
+            sections:
+              - file: notebooks/projections/National/sea_surface_temperature/a_Mean_Temperature
+              - file: notebooks/projections/National/sea_surface_temperature/c_MHW
+          - file: notebooks/projections/National/biochemistry/biochemistry
+            sections:
+              - file: notebooks/projections/National/biochemistry/a_oceanic_pH
+              - file: notebooks/projections/National/biochemistry/b_aragonite
+              - file: notebooks/projections/National/biochemistry/c_salinity
   - caption: REGIONAL INDICATORS
     chapters:
       - file: notebooks/historical/Regional/regional
         sections:
           - file: notebooks/historical/Regional/00_regional_setup
+          - file: notebooks/historical/Regional/greenhouse_gases/greenhouse_gases
+            sections:
+              - file: notebooks/historical/Regional/greenhouse_gases/co2_mauna_loa
           - file: notebooks/historical/Regional/air_temperature/air_temperature
             sections:
               - file: notebooks/historical/Regional/air_temperature/regional_indicators
@@ -55,6 +86,30 @@ parts:
               - file: notebooks/historical/Regional/biochemistry/c_phytoplankton
               - file: notebooks/historical/Regional/biochemistry/c2_phytoplankton
               - file: notebooks/historical/Regional/biochemistry/d_dissolved_o2
+
+  - caption: REGIONAL PROJECTIONS
+    chapters:
+      - file: notebooks/projections/Regional/regional
+        sections:
+          - file: notebooks/projections/Regional/00_regional_setup
+          - file: notebooks/projections/Regional/greenhouse_gases/greenhouse_gases
+            sections:
+              - file: notebooks/projections/Regional/greenhouse_gases/co2_ssps
+          - file: notebooks/projections/Regional/air_temperature/air_temperature
+            sections:
+              - file: notebooks/projections/Regional/air_temperature/regional_indicators
+          - file: notebooks/projections/Regional/rainfall/rainfall
+            sections:
+              - file: notebooks/projections/Regional/rainfall/regional_indicators
+          - file: notebooks/projections/Regional/sea_surface_temperature/sea_surface_temperature
+            sections:
+              - file: notebooks/projections/Regional/sea_surface_temperature/regional_indicators
+              - file: notebooks/projections/Regional/sea_surface_temperature/mhw_regional
+          - file: notebooks/projections/Regional/biochemistry/biochemistry
+            sections:
+              - file: notebooks/projections/Regional/biochemistry/a_oceanic_pH
+              - file: notebooks/projections/Regional/biochemistry/b_aragonite
+              - file: notebooks/projections/Regional/biochemistry/c_salinity
 
   - caption: CINDRA ASSISTANT
     chapters:

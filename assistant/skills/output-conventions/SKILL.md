@@ -67,7 +67,7 @@ Optional diagnostic filename for accumulated rainfall: `F5_Rain_accum_plot_bar_p
 | `c_hot_cold_days.ipynb` | `F4_ST_hot_cold` | `.html` + `.png` |
 | `c_hot_cold_days.ipynb` | `F4_ST_hot_cold_percentiles` | `.html` + `.png` |
 
-Save matplotlib: `plt.savefig(site_figures_dir / build_output_filename(...), dpi=300, bbox_inches='tight')`.
+Save matplotlib: `plt.savefig(site_figures_dir / build_output_filename(...), dpi=150, bbox_inches='tight')`.
 Save plotly: `fig.write_html(site_figures_dir / build_output_filename(..., ext='html'))` and, where applicable, `fig.write_image(site_figures_dir / build_output_filename(...))`.
 
 ### Canonical table / JSON filenames — rainfall (`R_*` prefix)

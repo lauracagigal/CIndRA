@@ -25,7 +25,7 @@ mpl.rcParams.update({
     'ytick.labelsize': 12,
     'legend.fontsize': 13,
     'figure.dpi': 100,
-    'savefig.dpi': 300,
+    'savefig.dpi': 150,
 })"""
 
 

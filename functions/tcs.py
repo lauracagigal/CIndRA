@@ -849,9 +849,9 @@ def table_tcs_32a(tcs_sel_params, oni):
         n_years = _tc_enso_year_count(oni, oni_category)
         counts[name] = (
             len(storms.storm) / n_years,
-            storm_counts.std(),
+            storm_counts.std() if storm_counts.size else 0.0,
             len(severe.storm) / n_years,
-            severe_counts.std(),
+            severe_counts.std() if severe_counts.size else 0.0,
         )
 
     years, annual_counts = np.unique(
@@ -871,8 +871,8 @@ def table_tcs_32a(tcs_sel_params, oni):
             f"Minimum number of storms in a year {years[np.argmin(annual_counts)]}",
             "Major Hurricanes (Category 3+) per year",
             "Standard deviation of major hurricanes per year",
-            f"Maximum number of major hurricanes in a year {severe_years[np.argmax(severe_annual_counts)]}",
-            f"Minimum number of major hurricanes in a year {severe_years[np.argmin(severe_annual_counts)]}",
+            f"Maximum number of major hurricanes in a year {severe_years[np.argmax(severe_annual_counts)] if severe_years.size else ''}".rstrip(),
+            f"Minimum number of major hurricanes in a year {severe_years[np.argmin(severe_annual_counts)] if severe_years.size else ''}".rstrip(),
             " ", "EL NIÑO",
             "Total number of storm per year",
             "Standard deviation of storms per year",
@@ -894,8 +894,9 @@ def table_tcs_32a(tcs_sel_params, oni):
             len(tcs_sel_params.storm) / len(years),
             annual_counts.std(), annual_counts.max(), annual_counts.min(),
             len(severe.storm) / len(years),
-            severe_annual_counts.std(),
-            severe_annual_counts.max(), severe_annual_counts.min(),
+            severe_annual_counts.std() if severe_annual_counts.size else 0.0,
+            severe_annual_counts.max() if severe_annual_counts.size else 0,
+            severe_annual_counts.min() if severe_annual_counts.size else 0,
             np.nan, np.nan, *counts["nino"],
             np.nan, np.nan, *counts["nina"],
             np.nan, np.nan, *counts["neutral"],
@@ -1586,7 +1587,7 @@ def plot_bar_probs_ONI(df2, var, y_label=''):
     return fig
 
 
-def plot_tc_categories_trend(tcs_sel_params, trendline_plot=True):
+def plot_tc_categories_trend(tcs_sel_params, trendline_plot=True, first_year=1950, last_year=2025):
 
     fig, ax = plt.subplots(1, figsize=(15, 4))
     df_tcs = tcs_sel_params.to_dataframe()
@@ -1601,7 +1602,9 @@ def plot_tc_categories_trend(tcs_sel_params, trendline_plot=True):
         .reindex(columns=categories, fill_value=0))
 
     # --- Ensure every year in full range appears ---
-    years = range(df_tcs['year'].min(), 2025 + 1)
+    # (first_year/last_year fall back to 1950/2025 when there are no storms, e.g. no severe TC near the site)
+    first_year = int(df_tcs['year'].min()) if df_tcs['year'].notna().any() else first_year
+    years = range(first_year, last_year + 1)
     counts = counts.reindex(years, fill_value=0)
 
     # --- Plot with colors aligned to category order ---
@@ -1612,9 +1615,18 @@ def plot_tc_categories_trend(tcs_sel_params, trendline_plot=True):
     ax.legend(title='Category', ncols=7, prop={'size': 12})
 
     ax.grid(':', color='lightgrey', alpha=0.5)
+    if df_tcs.empty:
+        ax.set_ylim(0, 1)
+        ax.text(0.5, 0.5, 'No tropical cyclones in this selection', transform=ax.transAxes,
+                ha='center', va='center', fontsize=14, color='0.4')
+        ax.legend(fontsize=12, ncol=7)
+        return fig
     # trendline
     x = df_tcs.groupby('year').count().index - df_tcs.groupby('year').count().index[0]
     y = df_tcs.groupby('year').month.count().values
+    if len(x) < 2:  # not enough years with storms for a trend
+        ax.legend(fontsize=12, ncol=7)
+        return fig
 
     coefficients = np.polyfit(x, y, 1)  # Linear fit
     trendline = np.poly1d(coefficients)  # Create trendline function

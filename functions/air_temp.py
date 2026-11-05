@@ -312,3 +312,93 @@ def persist_hot_cold_outputs(
         build_output_filename("T_hot_cold_summary_metrics", site_name, site_lon, site_lat, ext="json"),
     )
     return site_tables_dir
+
+
+def warm_nights_cold_days_summary_table(annual, trends):
+    """Summary table for warm nights (TN90p) and cold days (TX10p).
+
+    Same metrics as ``ind_setup.tables.table_temp_13`` for hot days / cold nights.
+
+    Parameters
+    ----------
+    annual : dict[str, pandas.DataFrame]
+        ``{"Warm Nights": df, "Cold Days": df}``; each frame has a yearly
+        ``DatetimeIndex`` and a ``Perc_Anom`` column in days/year (anomaly vs
+        the 1961-1990 base-period mean).
+    trends : sequence of float
+        Linear trend (days/year per year) of each entry of ``annual``, same order.
+    """
+    rows = []
+    for (name, df), trend in zip(annual.items(), trends):
+        s = df["Perc_Anom"]
+        rows += [
+            (f"Average number of {name.lower()}", np.nanmean(s), np.nan),
+            (f"Change in Average Annual Number of {name}", float(trend), np.nan),
+            (f"Average Annual Number of {name}: 1961-1971", np.nanmean(s.loc["1961":"1971"]), np.nan),
+            (f"Average Annual Number of {name}: 2001-2011", np.nanmean(s.loc["2001":"2011"]), np.nan),
+            (f"Average Annual Number of {name}: 2011-2021", np.nanmean(s.loc["2011":"2021"]), np.nan),
+            (f"Maximum number of {name.lower()}", int(np.nanmax(s)), int(s.idxmax().year)),
+            (f"Minimum number of {name.lower()}", int(np.nanmin(s)), int(s.idxmin().year)),
+            (" ", np.nan, np.nan),
+        ]
+    return pd.DataFrame(rows, columns=["Metric", "Value", "Year"])
+
+
+def persist_warm_nights_cold_days_outputs(
+    outputs_dir,
+    site_name,
+    site_lon,
+    site_lat,
+    ghcn_station_id,
+    ghcn_station_name,
+    country,
+    df_exceed,
+    annual_warm_nights,
+    annual_cold_days,
+    summary_table,
+    trends,
+    show_table=True,
+):
+    """Display the summary table and persist warm-night (TN90p) / cold-day (TX10p) CSV/JSON outputs.
+
+    ``trends`` follows the plotting order of the notebook: ``[warm nights, cold days]``.
+    """
+    if show_table:
+        _display_site_table(summary_table)
+
+    site_tables_dir = build_site_tables_dir(outputs_dir, site_name, site_lon, site_lat)
+
+    per_year = {}
+    for flag, column, stem in (("WARM_NIGHT", "warm_nights", "T_warm_nights_per_year"),
+                               ("COLD_DAY", "cold_days", "T_cold_days_per_year")):
+        counts = df_exceed.groupby("YEAR")[flag].sum().reset_index()
+        counts.columns = ["year", column]
+        save_table_to_csv(counts, site_tables_dir,
+                          build_output_filename(stem, site_name, site_lon, site_lat, ext="csv"), index=False)
+        per_year[column] = counts.set_index("year")[column]
+
+    save_table_to_csv(
+        table_to_dataframe(summary_table),
+        site_tables_dir,
+        build_output_filename("T_warm_cold_summary_table_etccdi", site_name, site_lon, site_lat, ext="csv"),
+    )
+
+    summary_metrics = {
+        **_site_meta(site_name, site_lon, site_lat, ghcn_station_id, ghcn_station_name, country),
+        "period": {"start": int(df_exceed["YEAR"].min()), "end": int(df_exceed["YEAR"].max())},
+        "etccdi": {
+            "threshold_definition": "TN90p / TX10p (1961-1990 base period)",
+            "warm_nights_per_year_stats": _series_stats(per_year["warm_nights"]),
+            "cold_days_per_year_stats": _series_stats(per_year["cold_days"]),
+            "slope_warm_nights_per_year": float(trends[0]),
+            "p_value_warm_nights": _trend_pvalue(annual_warm_nights["Perc_Anom"]),
+            "slope_cold_days_per_year": float(trends[1]),
+            "p_value_cold_days": _trend_pvalue(annual_cold_days["Perc_Anom"]),
+        },
+    }
+    save_dict_json(
+        summary_metrics,
+        site_tables_dir,
+        build_output_filename("T_warm_cold_summary_metrics", site_name, site_lon, site_lat, ext="json"),
+    )
+    return site_tables_dir
