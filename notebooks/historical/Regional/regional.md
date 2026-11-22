@@ -42,8 +42,13 @@ Regional workflows describe climate variability and change across Pacific statio
   <p>Compare pH, chlorophyll-a, phytoplankton size and biomass, and dissolved oxygen, including trends, full-period ENSO anomalies and EEZ summaries.</p>
 </a>
 
+<a href="sea_level/sea_level.html" class="dashboard-card ocean regional">
+  <h3>Regional sea level</h3>
+  <p>Map altimetry trends with tide-gauge trends, regional-mean sea level, five-year anomalies, the ENSO response and minor-flood days at Pacific tide gauges.</p>
+</a>
+
 </div>
 
 ## Data flow
 
-Rainfall and air temperature use the multi-station dataset produced by the [regional setup](00_regional_setup.ipynb). Tropical cyclones independently load the all-basin IBTrACS archive and allocate observations to four Pacific subregions. Sea-surface temperature and marine heatwaves use NOAA OISST. Marine-biochemistry notebooks use Pacific-wide regional NetCDF caches from Copernicus Marine and NOAA PIFSC; they never substitute a national subset.
+Rainfall and air temperature use the multi-station dataset produced by the [regional setup](00_regional_setup.ipynb). Tropical cyclones independently load the all-basin IBTrACS archive and allocate observations to four Pacific subregions. Sea-surface temperature and marine heatwaves use NOAA OISST. Marine-biochemistry notebooks use Pacific-wide regional NetCDF caches from Copernicus Marine and NOAA PIFSC; they never substitute a national subset. Sea level combines monthly CMEMS altimetry over the Pacific window with every UHSLC tide gauge located inside a Pacific EEZ.

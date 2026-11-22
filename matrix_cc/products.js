@@ -8,6 +8,7 @@
 //   {station}  station slug of the selected national site
 //   {eez}      EEZ slug of the selected national site
 //   {natfig}   per-site subfolder of {FIG} for TC / SST / biochemistry products ('' = {FIG} itself)
+//   {sealevel} per-site tag of the national sea-level outputs (<country>_uhslc<id>_lat.._lon..)
 // An indicator may carry `projections: { notebook, products, tables }` (national and regional scales);
 // these are attached by indicator code at the end of this file.
 // A product with `mx: false` is listed in the National/Regional views but hidden in the Matrix tab;
@@ -33,11 +34,11 @@ window.CINDRA = {
   sites: [
     {
       id: 'palau', label: 'Palau', station: 'Koror (GSN 91408)', eezName: 'Palau', lat: 7.337, lon: 134.477,
-      tokens: { station: 'palau_psw00040309_lat7p337_lon134p477', ghcn: 'PSW00040309', eez: 'palau', ocean: 'palau', natfig: '' },
+      tokens: { station: 'palau_psw00040309_lat7p337_lon134p477', ghcn: 'PSW00040309', eez: 'palau', ocean: 'palau', natfig: '', sealevel: 'palau_uhslc007_lat7p329_lon134p450' },
     },
     {
       id: 'marshall', label: 'Marshall Islands', station: 'Majuro (GSN 91376)', eezName: 'Marshall Islands', lat: 7.065, lon: 171.272,
-      tokens: { station: 'marshall_islands_rmw00040710_lat7p065_lon171p272', ghcn: 'RMW00040710', eez: 'marshall_islands', natfig: 'marshall_islands_rmw00040710_lat7p065_lon171p272/' },
+      tokens: { station: 'marshall_islands_rmw00040710_lat7p065_lon171p272', ghcn: 'RMW00040710', eez: 'marshall_islands', natfig: 'marshall_islands_rmw00040710_lat7p065_lon171p272/', sealevel: 'marshall_islands_uhslc005_lat7p108_lon171p372' },
     },
   ],
 
@@ -284,6 +285,72 @@ window.CINDRA = {
         { code: '5.6', name: 'Sea surface salinity', notebook: 'notebooks/projections/National/biochemistry/c_salinity', products: [] },
       ],
     },
+    {
+      domain: 'Ocean', variable: 'Sea Level', icon: 'tide',
+      page: 'notebooks/historical/National/sea_level/sea_level',
+      indicators: [
+        {
+          code: '6.1', name: 'Absolute and relative sea-level change',
+          notebook: 'notebooks/historical/National/sea_level/a_sea_level_trend',
+          products: [
+            { kind: 'map', title: 'Sea-level change map', path: '{OUT}/{sealevel}/SL_magnitude_map_{sealevel}.png',
+              caption: 'Absolute sea-level change from CMEMS altimetry over the EEZ (shading) and relative change at the UHSLC tide gauge (circle), 1993–2024.' },
+            { kind: 'plot', title: 'Altimetry vs tide gauge', path: '{OUT}/{sealevel}/SL_magnitude_timeseries_{sealevel}.png',
+              caption: 'Absolute (altimetry, nearest cell) and relative (tide gauge) sea level with linear trends (solid when significant, p < 0.05).' },
+            { kind: 'plot', mx: false, title: 'EEZ-mean sea level', path: '{OUT}/{sealevel}/SL_eez_mean_timeseries_{sealevel}.png',
+              caption: 'Area-weighted monthly sea-level anomaly over the EEZ from altimetry, with linear trend.' },
+            { kind: 'plot', title: 'Sea level vs ONI', path: '{OUT}/{sealevel}/SL_ONI_scatter_{sealevel}.png', enso: true,
+              caption: 'Detrended, de-seasoned tide-gauge sea level against the Oceanic Niño Index, with the regression slope (cm per °C).' },
+          ],
+          tables: [
+            { title: 'Trend results', path: '{TAB}/{sealevel}/SL_magnitude_results_{sealevel}.csv' },
+            { title: 'ENSO influence', enso: true, path: '{TAB}/{sealevel}/ENSO_SL_influence_summary_{sealevel}.csv' },
+          ],
+        },
+        {
+          code: '6.2', name: 'Sea-level anomalies',
+          notebook: 'notebooks/historical/National/sea_level/b_sea_level_anomaly',
+          products: [
+            { kind: 'plot', title: 'Storm-year anomalies & ENSO', path: '{OUT}/{sealevel}/SL_anomaly_station_timeseries_{sealevel}.png',
+              caption: 'Detrended, de-seasoned storm-year (May–April) mean, range and monthly sea-level anomalies at the tide gauge, with El Niño / La Niña periods.' },
+            { kind: 'map', mx: false, title: 'Period-mean anomaly maps', path: '{OUT}/{sealevel}/SL_anomaly_period_maps_{sealevel}.png',
+              caption: 'Mean detrended altimetry anomaly over the EEZ for groups of storm years, with the tide-gauge anomaly on the same scale.' },
+          ],
+          tables: [
+            { title: 'Storm-year anomalies', path: '{TAB}/{sealevel}/SL_anomaly_yearly_mean_{sealevel}.csv' },
+          ],
+        },
+        {
+          code: '6.3', name: 'Minor (high-tide) flooding',
+          notebook: 'notebooks/historical/National/sea_level/c_sea_level_ff',
+          products: [
+            { kind: 'plot', title: 'Flood days & ENSO', path: '{OUT}/{sealevel}/SL_FloodFrequency_threshold_counts_days_{sealevel}.png',
+              caption: 'Days per storm year with hourly sea level more than 30 cm above MHHW, coloured by ENSO phase, with linear trend and the ONI below.' },
+            { kind: 'plot', title: 'Monthly flood-day matrix', path: '{OUT}/{sealevel}/SL_FloodFrequency_threshold_counts_heatmap_{sealevel}.png',
+              caption: 'Flood days per month and storm year, annual totals and the monthly share of all flood days.' },
+            { kind: 'plot', mx: false, title: 'Flood hours', path: '{OUT}/{sealevel}/SL_FloodFrequency_threshold_counts_hours_{sealevel}.png',
+              caption: 'Hours per storm year above the minor-flood threshold, with linear trend.' },
+          ],
+          tables: [
+            { title: 'Flood days per storm year', path: '{TAB}/{sealevel}/SL_flood_days_per_year_{sealevel}.csv' },
+            { title: 'Decadal means', path: '{TAB}/{sealevel}/SL_flood_days_decadal_{sealevel}.csv' },
+          ],
+        },
+        {
+          code: '6.4', name: 'Extreme sea-level rankings',
+          notebook: 'notebooks/historical/National/sea_level/d_sea_level_rankings',
+          products: [
+            { kind: 'plot', title: 'Top-10 extremes', path: '{OUT}/{sealevel}/SL_rankings_{sealevel}.png',
+              caption: 'Ten highest and ten lowest hourly sea levels (m above MHHW) on the monthly envelope, marked by ENSO phase.' },
+            { kind: 'interactive', mx: false, title: 'Top-10 extremes (interactive)', path: '{OUT}/{sealevel}/SL_top_10_plot_{sealevel}.html',
+              caption: 'Interactive version of the ranked extremes.' },
+          ],
+          tables: [
+            { title: 'Top-10 table', path: '{TAB}/{sealevel}/SL_top_10_table_{sealevel}.csv' },
+          ],
+        },
+      ],
+    },
   ],
 
   regional: [
@@ -515,6 +582,56 @@ window.CINDRA = {
         { code: 'R5.7', name: 'Sea surface salinity', notebook: 'notebooks/projections/Regional/biochemistry/c_salinity', products: [] },
       ],
     },
+    {
+      domain: 'Ocean', variable: 'Sea Level', icon: 'tide',
+      page: 'notebooks/historical/Regional/sea_level/sea_level',
+      indicators: [
+        {
+          code: 'R6.1', name: 'Sea-level trends',
+          notebook: 'notebooks/historical/Regional/sea_level/regional_indicators',
+          products: [
+            { kind: 'map', title: 'Sea-level trend', path: '{OUT}/regional_pacific/SL_regional_trend_map_pacific.png',
+              caption: 'Linear sea-level trend 1993–2025 from CMEMS altimetry (shading) and relative trends at tide gauges near Pacific EEZs (circles).' },
+            { kind: 'map', title: 'Change with all tide gauges', path: '{OUT}/regional_pacific/SL_regional_change_map_tide_gauges_pacific.png',
+              caption: 'Absolute altimetry change (cm over 1993–2025) with the relative change at every UHSLC tide gauge in the window; open circles lack sufficient data.' },
+            { kind: 'plot', title: 'Regional mean sea level', path: '{OUT}/regional_pacific/SL_regional_mean_timeseries_pacific.png',
+              caption: 'Area-weighted monthly sea-level anomaly over the Pacific window with linear trend.' },
+            { kind: 'plot', mx: false, title: 'Station trends', path: '{OUT}/regional_pacific/SL_regional_station_trends_pacific.png',
+              caption: 'Tide-gauge (relative) and nearest-cell altimetry (absolute) trends computed on the same valid months.' },
+          ],
+          tables: [
+            { title: 'Station trends', path: '{TAB}/regional_pacific/SL_regional_station_trends_pacific.csv' },
+            { title: 'Window station changes', path: '{TAB}/regional_pacific/SL_regional_window_station_changes_pacific.csv' },
+          ],
+        },
+        {
+          code: 'R6.2', name: 'Sea-level anomalies & ENSO',
+          notebook: 'notebooks/historical/Regional/sea_level/regional_indicators',
+          products: [
+            { kind: 'map', title: '5-year anomalies', path: '{OUT}/regional_pacific/SL_regional_5yr_anomalies_pacific.png',
+              caption: 'Five-year mean sea-level anomalies relative to 1993–2012 (not detrended).' },
+            { kind: 'map', title: 'Regression on ONI', path: '{OUT}/regional_pacific/SL_regional_ENSO_regression_pacific.png', enso: true,
+              caption: 'Regression of detrended, de-seasoned monthly sea level on the Oceanic Niño Index (cm per °C).' },
+          ],
+        },
+        {
+          code: 'R6.3', name: 'Minor (high-tide) flooding',
+          notebook: 'notebooks/historical/Regional/sea_level/regional_indicators',
+          products: [
+            { kind: 'plot', title: 'Station–year flood matrix', path: '{OUT}/regional_pacific/SL_regional_flood_station_year_matrix_pacific.png',
+              caption: 'Days per storm year above 30 cm over MHHW at 24 long-record tide gauges (north to south), 1983–2025, with the regional total below.' },
+            { kind: 'plot', mx: false, title: 'Flood days, all gauges', path: '{OUT}/regional_pacific/SL_regional_flood_days_pacific.png',
+              caption: 'Minor-flood days per storm year at every tide gauge passing the completeness requirement, 1993–2025.' },
+          ],
+          tables: [
+            { title: 'Station–year matrix', path: '{TAB}/regional_pacific/SL_regional_flood_station_year_matrix_pacific.csv' },
+            { title: 'Flood summary', path: '{TAB}/regional_pacific/SL_regional_flood_summary_pacific.csv' },
+          ],
+        },
+        { code: 'R6.4', name: 'Sea-level rise at tide gauges', notebook: 'notebooks/projections/Regional/sea_level/station_projections', products: [] },
+        { code: 'R6.5', name: 'Sea-level rise: grid and tide gauges', notebook: 'notebooks/projections/Regional/sea_level/regional_maps_with_stations', products: [] },
+      ],
+    },
   ],
 };
 
@@ -698,6 +815,40 @@ const GWL = 'at the year each scenario first reaches +1.5, +2.0, +2.5 and +3.0 �
       PRJ_SCENARIOS.map(sc => ['plot', `Salinity – ${sc.toUpperCase()}`, `salinity_maps_timeseries_${sc}`, `Decadal sea surface salinity at the site and maps of the region under ${sc.toUpperCase()} (Jiang et al., 2023).`]),
       [['Salinity by decade', 'salinity_ocads_decadal']]),
   };
+  // Sea level: AR6 relative sea-level projections at the national UHSLC tide gauge ({sealevel} outputs)
+  const slPrj = (nb, products, tables) => ({
+    notebook: 'notebooks/projections/National/sea_level/' + nb,
+    products: products.map(([kind, title, name, caption]) => ({ kind, title, path: `{OUT}/{sealevel}/PRJ_${name}_{sealevel}.png`, caption })),
+    tables: [
+      ...tables.map(([title, name]) => ({ title, path: `{TAB}/{sealevel}/PRJ_${name}_{sealevel}.csv` })),
+      { title: 'Warming-level years (IPCC AR6)', path: '{TAB}/global/PRJ_warming_level_crossing_years_ipcc.csv' },
+    ],
+  });
+  P['6.1'] = slPrj('a_sea_level_projections', [
+    ['plot', 'Relative sea level at the tide gauge', 'SL_station_projection_ssp',
+      'Observed annual mean sea level at the UHSLC gauge and AR6 relative sea-level projections (with vertical land motion) for the four SSPs, relative to 1995–2014: median and likely (17–83 %) range; markers show the year each scenario reaches +1.5, +2.0, +2.5 and +3.0 °C.'],
+  ], [
+    ['Change at warming levels', 'SL_station_projection_summary'],
+    ['Change at warming levels – all quantiles', 'SL_station_projection_warming_levels'],
+    ['Vertical land motion contribution', 'SL_station_vlm_contribution'],
+    ['Annual projection 2020–2150', 'SL_station_projection_annual'],
+  ]);
+  P['6.3'] = slPrj('b_sea_level_flooding', [
+    ['plot', 'Flood days at warming levels', 'SL_flood_days_warming_levels',
+      'Days per year above 30 cm over MHHW in the year each SSP reaches +1.5, +2.0, +2.5 and +3.0 °C: very likely (5–95 %) and likely (17–83 %) spread across the 19 base years at the median projected sea-level rise; year and rise above each box.'],
+    ['plot', 'Projected flood days', 'SL_projected_flood_days_ssp',
+      'Observed flood days per storm year and projected median with the likely range of sea-level rise, four SSPs.'],
+    ['plot', 'Projected flood days by scenario', 'SL_projected_flood_days_bars',
+      'Observed and projected flood days per year for each SSP (median; whiskers: likely range of sea-level rise).'],
+    ['plot', 'Flood days vs sea-level rise', 'SL_flood_days_response_curve',
+      'Flood days per year as a function of sea-level rise above 2005, from the observed hourly variability of the last 19 complete storm years.'],
+  ], [
+    ['Flood days at warming levels', 'SL_flood_days_warming_levels_summary'],
+    ['Flood days at warming levels – detail', 'SL_flood_days_warming_levels'],
+    ['Flooding milestones', 'SL_projected_flood_milestones'],
+    ['Annual projected flood days', 'SL_projected_flood_days_annual'],
+    ['Response to sea-level rise', 'SL_flood_days_response_curve'],
+  ]);
   Object.entries(P).forEach(([code, p]) => { byCode[code].projections = p; });
 })();
 
@@ -780,5 +931,55 @@ function prjRegional(nb, parts) {
     'R5.6': prjRegional('biochemistry/b_aragonite', [prjRegionalOcads('aragonite', 'Aragonite saturation state')]),
     'R5.7': prjRegional('biochemistry/c_salinity', [prjRegionalOcads('salinity', 'Sea surface salinity')]),
   };
+  // Sea level: IPCC AR6 projections (Garner et al., 2021), all four SSPs on every figure
+  const slR = (nb, products, tables) => ({
+    notebook: 'notebooks/projections/Regional/sea_level/' + nb,
+    products: products.map(([kind, title, path, caption]) => ({ kind, title, path, caption })),
+    tables: [...tables.map(([title, path]) => ({ title, path })),
+      { title: 'Warming-level years (IPCC AR6)', path: '{TAB}/global/PRJ_warming_level_crossing_years_ipcc.csv' }],
+  });
+  const noVlm = 'AR6 medium confidence, without vertical land motion (absolute sea level)';
+  R['R6.1'] = slR('regional_indicators', [
+    ['map', 'Global context – trend 2020–2100', '{OUT}/regional_pacific/PRJ_SL_trend_global_context_ar6_novlm.png',
+      `Median sea-level trend 2020–2100 worldwide with the Pacific analysis window outlined, one panel per SSP (${noVlm}).`],
+    ['map', 'Change by 2050', RFIG('SL_change_2050_ar6_novlm'),
+      `Median sea-level change by 2050 relative to 1995–2014, one panel per SSP, with the area-weighted mean and likely range (${noVlm}).`],
+    ['map', 'Change by 2100', RFIG('SL_change_2100_ar6_novlm'),
+      `Median sea-level change by 2100 relative to 1995–2014, one panel per SSP, with the area-weighted mean and likely range (${noVlm}).`],
+    ['map', 'Rates of rise 2050 and 2100', RFIG('SL_rates_ar6_novlm'),
+      `AR6 decadal rate of sea-level rise around 2050 and 2100 for each SSP (${noVlm}).`],
+    ['map', 'Trend 2020–2100', RFIG('SL_trend_2020_2100_ar6_novlm'),
+      `Least-squares trend of the decadal median change 2020–2100, one panel per SSP (${noVlm}).`],
+    ['plot', 'Regional mean change', RFIG('SL_regional_mean_change_ar6_novlm'),
+      'Area-weighted mean sea-level change over the Pacific window to 2150: median and likely (17–83 %) range per SSP.'],
+    ['plot', 'Regional mean rate', RFIG('SL_regional_mean_rate_ar6_novlm'),
+      'Area-weighted mean rate of sea-level rise over the Pacific window to 2150: median and likely range per SSP.'],
+  ], [
+    ['Regional mean change and rate', RTAB('SL_regional_mean_ar6_novlm')],
+    ['Change by EEZ / region', RTAB('SL_eez_change_ar6_novlm')],
+    ['Rate by EEZ / region', RTAB('SL_eez_rate_ar6_novlm')],
+  ]);
+  R['R6.4'] = slR('station_projections', [
+    ['map', 'Change by 2100 at tide gauges', RFIG('SL_stations_change_2100_ar6_vlm'),
+      'Median relative sea-level change by 2100 at every UHSLC tide gauge in the Pacific EEZs, one panel per SSP (AR6 with vertical land motion).'],
+    ['plot', 'Median and likely range per station', RFIG('SL_stations_ranges_2100_ar6_vlm'),
+      'Relative sea-level change by 2100 at each tide gauge, west to east: median and likely range for each SSP.'],
+    ['map', 'Vertical land motion contribution', RFIG('SL_stations_vlm_contribution_2100'),
+      'Change with minus without vertical land motion at each tide gauge by 2100 (SSP2-4.5): positive values are subsidence.'],
+  ], [
+    ['Stations – SSPs', RTAB('SL_stations_summary_ssp')],
+    ['Stations – warming levels', RTAB('SL_stations_summary_gwl')],
+    ['Stations – all values', RTAB('SL_stations_ar6_vlm')],
+  ]);
+  R['R6.5'] = slR('regional_maps_with_stations', [
+    ['map', 'Change by 2050: grid and gauges', RFIG('SL_change_2050_grid_and_stations'),
+      'Absolute change on the grid (no vertical land motion) and relative change at tide gauges (with vertical land motion) by 2050, same colour scale, one panel per SSP.'],
+    ['map', 'Change by 2100: grid and gauges', RFIG('SL_change_2100_grid_and_stations'),
+      'Absolute change on the grid (no vertical land motion) and relative change at tide gauges (with vertical land motion) by 2100, same colour scale, one panel per SSP.'],
+    ['map', 'Trend 2020–2100: grid and gauges', RFIG('SL_trend_2020_2100_grid_and_stations'),
+      'Trend 2020–2100 on the grid (absolute) and at tide gauges (relative), same colour scale, one panel per SSP.'],
+  ], [
+    ['Stations vs grid by 2100', RTAB('SL_stations_vs_grid_2100')],
+  ]);
   Object.entries(R).forEach(([code, p]) => { byCode[code].projections = p; });
 })();

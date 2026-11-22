@@ -1,0 +1,28 @@
+Metric,Value
+Total number of tracks,2694.0
+Tropical Storms per year,34.98701298701299
+Standard deviation of storms per year,7.534325789593083
+Maximum number of storms in a year 1971,55.0
+Minimum number of storms in a year 2023,19.0
+Major Hurricanes (Category 3+) per year,6.103896103896104
+Standard deviation of major hurricanes per year,2.583709650010147
+Maximum number of major hurricanes in a year 2015,14.0
+Minimum number of major hurricanes in a year 1998,1.0
+ ,
+EL NIÑO,
+Total number of storm per year,32.31818181818182
+Standard deviation of storms per year,6.018051358102582
+Major Hurricanes (Category 3+) per year,7.909090909090909
+Standard deviation of major hurricanes per year,2.4291616756158887
+ ,
+LA NIÑA,
+Total number of storm per year,35.45454545454545
+Standard deviation of storms per year,8.055078989101297
+Major Hurricanes (Category 3+) per year,4.7727272727272725
+Standard deviation of major hurricanes per year,2.2346815551421555
+ ,
+NEUTRAL,
+Total number of storm per year,36.125
+Standard deviation of storms per year,7.498958260985321
+Major Hurricanes (Category 3+) per year,5.96875
+Standard deviation of major hurricanes per year,2.2157322272354065

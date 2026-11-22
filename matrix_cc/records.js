@@ -64,6 +64,31 @@ window.CINDRA_RECORDS = {
       citation: 'NOAA CPC, Cold & Warm Episodes by Season (ONI v5).',
       copy: ['../data/tcs/oni_index.pkl'],
     },
+    uhslc: {
+      dataset: 'UHSLC Fast Delivery tide-gauge sea level (daily and hourly)', provider: 'University of Hawaii Sea Level Center (UHSLC)',
+      version: 'Fast Delivery NetCDF (level-1 QC)', url: 'https://uhslc.soest.hawaii.edu/data/netcdf/fast/',
+      citation: 'Caldwell, P.C., Merrifield, M.A., Thompson, P.R. (2015). Sea level measured by tide gauges from global oceans — the Joint Archive for Sea Level holdings. NOAA NCEI. doi:10.7289/V5V40S7W',
+      copy: ['../data/sea_level/d007.nc', '../data/sea_level/h007.nc'],
+    },
+    cmems_sl: {
+      dataset: 'Global Ocean gridded L4 sea surface heights and derived variables (DUACS)', provider: 'Copernicus Marine Service (CMEMS)',
+      version: 'SEALEVEL_GLO_PHY_L4_MY_008_047 (daily P1D national; monthly P1M-m regional)', url: 'https://doi.org/10.48670/moi-00148',
+      citation: 'E.U. Copernicus Marine Service Information (CMEMS). Global Ocean Gridded L4 Sea Surface Heights And Derived Variables Reprocessed. doi:10.48670/moi-00148',
+      copy: ['../data/sea_level/cmems_L4_SSH_0.125deg_1993_2025.nc', '../data/regional/sea_level/cmems_L4_SLA_monthly_0.25deg_pacific_1993_2025.nc'],
+    },
+    ar6_sl: {
+      dataset: 'IPCC AR6 sea-level projections (total, medium confidence): ar6-regional-confidence (with vertical land motion) and ar6-regional_novlm-confidence (without)',
+      provider: 'IPCC AR6 WGI / NASA Sea Level Change Team (Garner et al., 2021)',
+      version: 'Zenodo record 6382554, version 20210809', url: 'https://doi.org/10.5281/zenodo.6382554',
+      citation: 'Garner, G.G., et al. (2021). IPCC AR6 Sea Level Projections. Zenodo. doi:10.5281/zenodo.6382554; Fox-Kemper, B., et al. (2021). Ocean, Cryosphere and Sea Level Change. In: Climate Change 2021: The Physical Science Basis (IPCC AR6 WGI), Ch. 9.',
+      copy: ['../data/projections/regional/sl_ar6_vlm_medium_locations.nc', '../data/projections/regional/sl_ar6_novlm_medium_pacific.nc', '../data/projections/regional/sl_ar6_novlm_medium_global_median.nc'],
+    },
+    warming_levels: {
+      dataset: 'Global warming-level crossing years (IPCC AR6 SYR Figure SPM.4 multi-model mean)', provider: 'IPCC AR6 Synthesis Report',
+      version: 'SPM.4 panel (a) data', url: 'https://www.ipcc.ch/report/ar6/syr/',
+      citation: 'IPCC (2023). Climate Change 2023: Synthesis Report, Figure SPM.4.',
+      copy: ['../data/projections/warming_levels_ipcc_ar6.pkl'],
+    },
   },
 
   indicators: {},
@@ -218,6 +243,143 @@ window.CINDRA_RECORDS = {
     parameters: { ...R.indicators['3.1'].parameters, 'Severe': 'category ≥ 3' },
     products: { 'Severe TC tracks': { units: 'track maps (category)' } },
   };
+
+  // ── Sea level ──
+  const slLimits = [
+    'UHSLC Fast Delivery data have level-1 QC only; Research Quality data can differ slightly.',
+    'Tide gauges measure relative sea level, including vertical land motion; altimetry measures absolute sea level on a ~12–25 km grid.',
+    'Trend p-values ignore autocorrelation and the strong ENSO variability of the western Pacific; trends over ~30 years are descriptive.',
+    'Storm years (May–April) or months with less than 75 % coverage are left missing, never counted as zero.',
+  ];
+  const slSpatial = 'UHSLC tide gauge {sealevel} and the CMEMS altimetry grid over the {site} EEZ.';
+  const slQC = 'UHSLC level-1 QC; months need ≥ 75 % of days and storm years ≥ 75 % of hours (functions/sea_level.py).';
+  R.indicators['6.1'] = {
+    methodId: 'CIndRA-M-SL-01',
+    methods: 'Daily tide-gauge sea level (UHSLC Fast Delivery) and daily CMEMS altimetry at the nearest ocean cell are referenced to their 1993–2012 '
+      + 'mean and fitted with ordinary least-squares trends over 1993–2024; the change is the fitted difference between the first and last day. '
+      + 'Monthly altimetry gives per-cell trends and an EEZ-masked, cos(latitude)-weighted mean. The ENSO sensitivity regresses the detrended, '
+      + 'de-seasoned gauge record on daily-interpolated ONI. ' + trend,
+    limitations: slLimits, sources: ['uhslc', 'cmems_sl', 'oni'],
+    parameters: { 'Period': '1993–2024', 'Reference': '1993–2012 mean', 'Significance level': 'p < 0.05' },
+    units: 'mm/yr (rate), cm (change)', spatial: slSpatial, qc: slQC, review: pending,
+  };
+  R.indicators['6.2'] = {
+    methodId: 'CIndRA-M-SL-02',
+    methods: 'The gauge record is detrended over 1993–2024 and the mean seasonal cycle removed; storm-year (May–April) mean, minimum and maximum '
+      + 'of daily anomalies and monthly anomalies are shown with ONI-based El Niño / La Niña periods (±0.5 °C for ≥ 5 months). Altimetry is '
+      + 'detrended per cell and averaged over groups of storm years.',
+    limitations: slLimits, sources: ['uhslc', 'cmems_sl', 'oni'],
+    parameters: { 'Period': '1993–2024', 'Storm year': 'May–April, labelled by starting year' },
+    units: 'cm (anomaly)', spatial: slSpatial, qc: slQC, review: pending,
+  };
+  R.indicators['6.3'] = {
+    methodId: 'CIndRA-M-SL-03',
+    methods: 'Hourly gauge sea level is referenced to the UHSLC MHHW datum of the station tidal epoch. A minor-flood day has at least one hour '
+      + 'more than 30 cm above MHHW; flood hours count hourly exceedances. Counts are per storm year from the year before the tidal epoch to the '
+      + 'last complete storm year, coloured by the dominant ENSO phase. ' + trend,
+    limitations: [...slLimits, 'The 30 cm threshold is a regional proxy; local impact thresholds, waves and drainage are not considered.'],
+    sources: ['uhslc', 'oni'],
+    parameters: { 'Threshold': '30 cm above MHHW', 'Datum': 'UHSLC MHHW (station tidal epoch)', 'Storm year': 'May–April' },
+    units: 'days/year, hours/year', spatial: slSpatial, qc: slQC, review: pending,
+  };
+  R.indicators['6.4'] = {
+    methodId: 'CIndRA-M-SL-04',
+    methods: 'The ten highest and ten lowest hourly sea levels of the full gauge record, relative to MHHW and separated by more than three days, '
+      + 'are ranked and labelled with the ONI phase of the event month.',
+    limitations: slLimits, sources: ['uhslc', 'oni'],
+    parameters: { 'Separation': '> 3 days', 'Datum': 'MHHW' },
+    units: 'm above MHHW', spatial: slSpatial, qc: slQC, review: pending,
+  };
+  const slRegSpatial = 'Pacific window 125° E–115° W, 35° S–35° N; tide gauges within 0.5° of a Pacific EEZ (all gauges in the window for the change map; fixed list of 24 long-record gauges for the flood matrix).';
+  R.indicators['R6.1'] = {
+    methodId: 'CIndRA-M-SL-R01',
+    methods: 'Monthly CMEMS altimetry (block-averaged to 0.25°) is fitted per cell with OLS trends over 1993–2025 and averaged with cos(latitude) '
+      + 'weights. Tide-gauge monthly means (≥ 75 % of days) give relative trends for gauges with ≥ 70 % valid months; altimetry at the nearest '
+      + 'ocean cell is sampled on the same months. The change map multiplies trends by the epoch length.',
+    limitations: slLimits, sources: ['cmems_sl', 'uhslc'],
+    parameters: { 'Period': '1993–2025', 'Grid': '0.25°', 'Valid months per station': '≥ 70 %' },
+    units: 'mm/yr (trend), cm (change)', spatial: slRegSpatial, qc: slQC, review: pending,
+  };
+  R.indicators['R6.2'] = {
+    methodId: 'CIndRA-M-SL-R02',
+    methods: 'Five-year means of monthly altimetry relative to 1993–2012 (not detrended), and the regression of detrended, de-seasoned monthly sea '
+      + 'level on the ONI at every cell.',
+    limitations: slLimits, sources: ['cmems_sl', 'oni'],
+    parameters: { 'Reference': '1993–2012', 'Blocks': '1995–1999 … 2020–2024' },
+    units: 'cm, cm per °C', spatial: slRegSpatial, qc: slQC, review: pending,
+  };
+  R.indicators['R6.3'] = {
+    methodId: 'CIndRA-M-SL-R03',
+    methods: R.indicators['6.3'].methods + ' The regional total sums the stations with data in each storm year.',
+    limitations: [...R.indicators['6.3'].limitations, 'Regional totals are lowered in years when a station is missing.'],
+    sources: ['uhslc'], parameters: { ...R.indicators['6.3'].parameters, 'Matrix period': '1983–2025' },
+    units: 'days/year', spatial: slRegSpatial, qc: slQC, review: pending,
+  };
+
+  // ── Sea-level projections (IPCC AR6) ──
+  const slPrjLimits = [
+    'Medium-confidence projections exclude low-likelihood, high-impact ice-sheet processes; the upper tail could be substantially higher, especially after 2100.',
+    'Vertical land motion is extrapolated linearly from observed rates; it is uncertain where motion is episodic (e.g. post-seismic subsidence).',
+    'AR6 values are decadal; annual values are interpolated between decades and anchored at 0 cm in 2005 (centre of 1995–2014).',
+  ];
+  const slMatch = 'Each UHSLC gauge is matched to the nearest AR6 (PSMSL) tide-gauge location within 30 km, otherwise to the nearest ocean grid cell (flagged).';
+  const gwlText = 'Values are read in the year each SSP first reaches +1.5, +2.0, +2.5 and +3.0 °C (IPCC AR6 multi-model mean global surface temperature), as in the other projection notebooks.';
+  R.indicators['6.1'].projections = {
+    methodId: 'CIndRA-M-SL-P01',
+    methods: 'IPCC AR6 relative sea-level projections with vertical land motion (ar6-regional-confidence, total, medium confidence) at the national '
+      + 'tide gauge, for SSP1-2.6, SSP2-4.5, SSP3-7.0 and SSP5-8.5, relative to 1995–2014. ' + slMatch + ' ' + gwlText
+      + ' The observed annual mean (≥ 75 % of days) is referenced to its own 1995–2014 mean. The VLM contribution is the difference with the '
+      + 'no-VLM product at the same AR6 location.',
+    limitations: slPrjLimits, sources: ['ar6_sl', 'uhslc', 'warming_levels'],
+    parameters: { 'Product': 'AR6 total, medium confidence, with VLM', 'Reference': '1995–2014', 'Quantiles': '17th, 50th, 83rd (likely range)', 'Match radius': '30 km' },
+    units: 'cm', spatial: 'UHSLC tide gauge {sealevel} (nearest AR6 tide-gauge location).', qc: 'Source quantiles used as published; matching distance reported in the notebook.', review: pending,
+  };
+  R.indicators['6.3'].projections = {
+    methodId: 'CIndRA-M-SL-P03',
+    methods: 'Hourly gauge sea level above the UHSLC MHHW datum of the last 19 complete storm years (one nodal cycle) is detrended to the 2005 '
+      + 'mean sea level; for each sea-level offset the days with an hourly value more than 30 cm above MHHW are counted in every base year, '
+      + 'giving a response curve. Projected flood days apply the AR6 relative sea-level projection (with VLM) at the gauge to that curve. '
+      + gwlText + ' Simplification of Thompson et al. (2021), the method of the NASA Pacific Flooding Analysis Tool.',
+    limitations: [...slPrjLimits,
+      'Tidal nodal modulation and monthly sea-level variability are replayed from observed years rather than projected statistically.',
+      'Curve ranges reflect the likely range of sea-level rise; warming-level boxes reflect interannual variability at the median rise.',
+      'The 30 cm threshold is a regional proxy; local impact thresholds, waves and drainage are not considered.'],
+    sources: ['ar6_sl', 'uhslc', 'warming_levels'],
+    parameters: { 'Threshold': '30 cm above MHHW', 'Base years': 'last 19 complete storm years', 'Reference sea level': '2005 (centre of 1995–2014)' },
+    units: 'days/year', spatial: 'UHSLC tide gauge {sealevel}.', qc: slQC, review: pending,
+  };
+  const slPrjRegSpatial = 'Pacific window 125° E–115° W, 35° S–35° N (1° grid, land masked with Natural Earth); UHSLC gauges within 0.5° of a Pacific EEZ.';
+  R.indicators['R6.1'].projections = {
+    methodId: 'CIndRA-M-SL-PR01',
+    methods: 'IPCC AR6 sea-level projections without vertical land motion (ar6-regional_novlm-confidence, total, medium confidence) on the global '
+      + '1° grid, relative to 1995–2014, for the four SSPs: change by 2050 and 2100, AR6 decadal rates around 2050 and 2100, and the least-squares '
+      + 'trend of the decadal medians over 2020–2100. Cells whose centre is on land or Antarctic ice shelves are masked. Regional and EEZ means '
+      + 'are cos(latitude)-weighted averages of each quantile.',
+    limitations: [...slPrjLimits, 'Absolute sea level: excludes vertical land motion, so it differs from what tide gauges record.',
+      'Averaging quantiles cell by cell approximates the uncertainty of area means.'],
+    sources: ['ar6_sl'],
+    parameters: { 'Product': 'AR6 total, medium confidence, no VLM', 'Reference': '1995–2014', 'Horizons': '2050, 2100', 'Trend period': '2020–2100' },
+    units: 'cm (change), mm/yr (rate, trend)', spatial: slPrjRegSpatial, qc: 'Source quantiles used as published.', review: pending,
+  };
+  R.indicators['R6.4'] = { projections: {
+    methodId: 'CIndRA-M-SL-PR04',
+    methods: 'IPCC AR6 relative sea-level projections with vertical land motion (ar6-regional-confidence) at every UHSLC tide gauge within 0.5° '
+      + 'of a Pacific EEZ, for the four SSPs and the end-of-century warming levels. ' + slMatch + ' The VLM contribution is the difference with '
+      + 'the no-VLM product at the same location.',
+    limitations: slPrjLimits, sources: ['ar6_sl', 'uhslc'],
+    parameters: { 'Product': 'AR6 total, medium confidence, with VLM', 'Reference': '1995–2014', 'Horizons': '2050, 2100', 'Match radius': '30 km' },
+    units: 'cm', spatial: slPrjRegSpatial, qc: 'Source quantiles used as published; matching distance per station in the tables.', review: pending,
+  } };
+  R.indicators['R6.5'] = { projections: {
+    methodId: 'CIndRA-M-SL-PR05',
+    methods: 'The gridded AR6 projections without vertical land motion (R6.1) and the tide-gauge projections with vertical land motion (R6.4) drawn '
+      + 'on the same colour scale for 2050, 2100 and the 2020–2100 trend; the table gives, per station and scenario, the relative minus the '
+      + 'absolute change at the same AR6 location (the vertical land motion contribution).',
+    limitations: [...slPrjLimits, 'Grid and circles are different quantities (absolute vs relative sea level).'],
+    sources: ['ar6_sl', 'uhslc'],
+    parameters: { 'Products': 'AR6 total, medium confidence, with and without VLM', 'Reference': '1995–2014' },
+    units: 'cm (change), mm/yr (trend)', spatial: slPrjRegSpatial, qc: 'Source quantiles used as published.', review: pending,
+  } };
 
   // Issue log --------------------------------------------------------------------------------------------
   R.issues['ISS-001'] = {

@@ -30,6 +30,14 @@ parts:
               - file: notebooks/historical/National/biochemistry/b_chlorophyll
               - file: notebooks/historical/National/biochemistry/c_phytoplankton
               - file: notebooks/historical/National/biochemistry/d_dissolved_o2
+          - file: notebooks/historical/National/sea_level/sea_level
+            sections:
+              - file: notebooks/historical/National/sea_level/00_sea_level_setup
+                title: Site setup — sea level
+              - file: notebooks/historical/National/sea_level/a_sea_level_trend
+              - file: notebooks/historical/National/sea_level/b_sea_level_anomaly
+              - file: notebooks/historical/National/sea_level/c_sea_level_ff
+              - file: notebooks/historical/National/sea_level/d_sea_level_rankings
   - caption: NATIONAL PROJECTIONS
     chapters:
       - file: notebooks/projections/National/national
@@ -58,6 +66,10 @@ parts:
               - file: notebooks/projections/National/biochemistry/a_oceanic_pH
               - file: notebooks/projections/National/biochemistry/b_aragonite
               - file: notebooks/projections/National/biochemistry/c_salinity
+          - file: notebooks/projections/National/sea_level/sea_level
+            sections:
+              - file: notebooks/projections/National/sea_level/a_sea_level_projections
+              - file: notebooks/projections/National/sea_level/b_sea_level_flooding
   - caption: REGIONAL INDICATORS
     chapters:
       - file: notebooks/historical/Regional/regional
@@ -86,6 +98,9 @@ parts:
               - file: notebooks/historical/Regional/biochemistry/c_phytoplankton
               - file: notebooks/historical/Regional/biochemistry/c2_phytoplankton
               - file: notebooks/historical/Regional/biochemistry/d_dissolved_o2
+          - file: notebooks/historical/Regional/sea_level/sea_level
+            sections:
+              - file: notebooks/historical/Regional/sea_level/regional_indicators
 
   - caption: REGIONAL PROJECTIONS
     chapters:
@@ -110,6 +125,11 @@ parts:
               - file: notebooks/projections/Regional/biochemistry/a_oceanic_pH
               - file: notebooks/projections/Regional/biochemistry/b_aragonite
               - file: notebooks/projections/Regional/biochemistry/c_salinity
+          - file: notebooks/projections/Regional/sea_level/sea_level
+            sections:
+              - file: notebooks/projections/Regional/sea_level/regional_indicators
+              - file: notebooks/projections/Regional/sea_level/station_projections
+              - file: notebooks/projections/Regional/sea_level/regional_maps_with_stations
 
   - caption: CINDRA ASSISTANT
     chapters:

@@ -61,6 +61,8 @@ Search bounded local paths:
 - `functions/marineHeatWaves.py`
 - `functions/ocean.py`
 - `functions/build_regional_biochemistry_notebooks.py`
+- `functions/sea_level.py`
+- `functions/sea_level_plotting.py`
 
 Look for: `plot_bar_probs`, `plot_bar_probs_ONI`, `plot_timeseries_interactive`, `add_oni_cat`, `get_df_col`, `style_matrix`, `table_rain_21`, `table_rain_22`, `table_rain_23`, `table_temp_11`, `table_temp_12`, `table_temp_13`, `table_temp_13b` (rainfall/air-temperature).
 
@@ -154,6 +156,7 @@ Station ranking/selection in the atmosphere `00_site_setup.ipynb` is currently a
 **Standalone functions**
 - `download_oni_index(url)` → monthly ONI DataFrame; `-99.9` → NaN. Used by rainfall and air-temperature notebooks.
 - `filter_by_time_completeness(df, time_col, month_threshold, year_threshold)` → `(df_filtered, removed_months, removed_years)`.
+- `download_uhslc_data(data_dir, uhslc_id, resolution="daily"|"hourly", force_download=False)` → `xarray.Dataset` of the UHSLC Fast Delivery record; downloads and caches `d<id>.nc`/`h<id>.nc` when missing.
 
 ---
 
@@ -199,6 +202,16 @@ Use `assistant/skills/sea-surface-temperature/SKILL.md` for workflow and period 
 - Regional loading: `PacificSST`, `load_pacific_sst` (0–360 longitudes, Pacific subset, all EEZ boundaries).
 - Regional calculations: `compute_sst_trend` (annual means → °C/decade), `compute_djf_period_anomalies` (equal half-open DJF blocks). `compute_djf_decadal_anomalies` remains available for the earlier decade-based form.
 - Regional plots: `plot_pacific_sst_field`, `plot_pacific_sst_panels`; both overlay all Pacific EEZ boundaries.
+
+## `functions/sea_level.py` and `functions/sea_level_plotting.py` — National and Regional sea level
+
+Use `assistant/skills/sea-level/SKILL.md` for workflow, units and storm-year conventions.
+
+- Config/EEZ: `find_repo_root`, `sea_level_config_path`, `load_site_config`, `resolve_eez`, `eez_bounds_360`, `eez_mask`, `prepare_site_data`, `select_uhslc_station`.
+- Data: `get_CMEMS_data` (daily box), `get_cmems_monthly_pacific`, `get_uhslc_metadata`, `get_uhslc_datum`, `station_series`, `station_attr`.
+- Statistics: `process_trend_with_nan` (NaN-aware OLS returning magnitude, line, rate, p, SE), `storm_year`, `monthly_mean_with_completeness`, `annual_completeness`, `detect_enso_events`, `enso_by_storm_year`, `flood_counts_per_storm_year`, `monthly_flood_day_matrix`, `get_top_10_table`.
+- Regional: `pacific_uhslc_stations`, `regional_station_trends`, `regional_flood_days`.
+- Plots: `plot_sl_change_map`, `plot_combined_trends`, `plot_series_with_trend`, `plot_enso_scatter`, `plot_station_anomaly_series`, `plot_sl_anomaly_period_maps`, `plot_flood_counts_with_trend`, `plot_flood_counts_with_oni`, `plot_flood_matrix_summary`, `make_rankings_static_figure`, `make_plotly_figure_rankings`, `plot_pacific_sl_field`, `plot_station_trend_comparison`, `plot_regional_flood_overview`.
 
 ## Marine heatwaves and marine biochemistry
 

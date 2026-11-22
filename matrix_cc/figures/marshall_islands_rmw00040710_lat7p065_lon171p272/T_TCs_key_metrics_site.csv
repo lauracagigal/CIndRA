@@ -1,0 +1,28 @@
+Metric,Value
+Total number of tracks,100.0
+Tropical Storms per year,2.5
+Standard deviation of storms per year,2.29128784747792
+Maximum number of storms in a year 1997,13.0
+Minimum number of storms in a year 1950,1.0
+Major Hurricanes (Category 3+) per year,0.0
+Standard deviation of major hurricanes per year,0.0
+Maximum number of major hurricanes in a year,0.0
+Minimum number of major hurricanes in a year,0.0
+ ,
+EL NIÑO,
+Total number of storm per year,2.5454545454545454
+Standard deviation of storms per year,2.580697580112788
+Major Hurricanes (Category 3+) per year,0.0
+Standard deviation of severe storms per year,0.0
+ ,
+LA NIÑA,
+Total number of storm per year,0.36363636363636365
+Standard deviation of storms per year,0.8
+Major Hurricanes (Category 3+) per year,0.0
+Standard deviation of severe storms per year,0.0
+ ,
+NEUTRAL,
+Total number of storm per year,1.09375
+Standard deviation of storms per year,2.1630005613895316
+Major Hurricanes (Category 3+) per year,0.0
+Standard deviation of severe storms per year,0.0

@@ -5,6 +5,8 @@ The notebooks document indicator-specific references alongside their calculation
 - NOAA Global Historical Climatology Network Daily (GHCN-Daily) for rainfall and surface-air temperature.
 - NOAA International Best Track Archive for Climate Stewardship (IBTrACS) for tropical cyclones.
 - NOAA Oceanic Niño Index (ONI) for ENSO context.
+- University of Hawaii Sea Level Center (UHSLC) Fast Delivery tide-gauge records.
+- Copernicus Marine Service (CMEMS) L4 satellite-altimetry sea-level anomalies (SEALEVEL_GLO_PHY_L4_MY_008_047).
 - ERA5 monthly fields for supported Regional rainfall and temperature backgrounds.
 
 See `assistant/skills/data-sources/SKILL.md` in the repository for URLs, units, cache conventions and attribution guidance.
@@ -24,8 +26,9 @@ Completeness is evaluated separately from observational quality control. Missing
 
 ## Other methodological conventions
 
-- **Reference periods:** rainfall and air-temperature anomalies normally use 1961–1990.
+- **Reference periods:** rainfall and air-temperature anomalies normally use 1961–1990. Sea-level series are expressed relative to the 1993–2012 altimetry reference period; trends do not depend on this choice.
 - **Rainfall thresholds:** a dry day has rainfall below 1 mm, a wet day has rainfall of at least 1 mm, and station-level heavy rainfall is above the 95th percentile of the available `PRCP` record.
+- **Sea-level flooding:** a minor-flood day has at least one hourly sea level more than 30 cm above the station's mean higher high water (MHHW). Storm years run from May to April and are labelled by their starting year; years with less than 75% hourly coverage are excluded.
 - **Temperature extremes:** hot days (TX90p) and cold nights (TN10p) use calendar-day 90th- and 10th-percentile thresholds derived from the 1961–1990 base period.
 - **Tropical cyclones:** named-storm, cyclone-strength and major/severe thresholds are at least 34, 64 and 96 kt, respectively. Analyses should state how missing wind observations and an incomplete final season are handled.
 - **Trend reporting:** report the data source, station or site, analysis window, units, trend rate, p-value when available, reference period and whether the input was raw or completeness-filtered. Statistical significance does not by itself establish physical attribution.

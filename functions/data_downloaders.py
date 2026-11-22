@@ -7,12 +7,15 @@ This module provides access to:
 - **NOAA ONI** (Oceanic Niño Index) for ENSO analysis, used by rainfall,
   air-temperature, and sea-level notebooks alike.
 - **Time-completeness filtering** applied during ``00_site_setup.ipynb``.
-- **UHSLC tide-gauge NetCDF lookup**, used by the sea-level notebooks.
+- **UHSLC Fast Delivery tide-gauge downloads**, used by the sea-level notebooks.
+- **IPCC AR6 sea-level projections** (Zenodo 6382554), extracted member by member
+  from the remote archive, used by the regional sea-level projection notebook.
 
 Rainfall notebooks use the ``PRCP`` variable (daily precipitation in mm after
 the GHCN tenths scaling factor is applied).
 """
 
+import io
 from io import BytesIO, StringIO
 from pathlib import Path
 
@@ -318,57 +321,56 @@ def download_ERDDAP_data(base_url, dataset_id, date_ini, date_end, lon_range, la
     return data
 
 
-def download_uhslc_data(data_dir, uhslc_id, resolution="daily"):
-    """Return the cached UHSLC Research Quality NetCDF file for one station.
+UHSLC_FAST_URL = "https://uhslc.soest.hawaii.edu/data/netcdf/fast/{resolution}/{prefix}{uhslc_id:03d}.nc"
 
-    Looks up an already-downloaded file named ``d<uhslc_id>.nc`` (daily) or
-    ``h<uhslc_id>.nc`` (hourly), zero-padded to 3 digits, inside ``data_dir``
-    (e.g. ``d007.nc`` for UHSLC station 007 / Malakal, Palau).
+
+def download_uhslc_data(data_dir, uhslc_id, resolution="daily", force_download=False, timeout=120):
+    """Download (or reuse) one UHSLC Fast Delivery tide-gauge NetCDF file.
+
+    Files are cached as ``d<id>.nc`` (daily) or ``h<id>.nc`` (hourly),
+    zero-padded to three digits, inside ``data_dir`` (for example
+    ``data/sea_level/d007.nc`` for Malakal, Palau). Fast Delivery data are
+    released within 1-2 months of collection and receive level-1 quality
+    control only.
 
     Parameters
     ----------
     data_dir : str or pathlib.Path
-        Directory holding cached UHSLC NetCDF files (``data/sea_level/``).
+        Cache directory, normally ``data/sea_level``.
     uhslc_id : int
-        UHSLC station/record ID.
+        UHSLC station identifier (not the NetCDF ``record_id``).
     resolution : {"daily", "hourly"}, optional
-        Which product to look up. Defaults to ``"daily"``.
+        Product to retrieve. Defaults to ``"daily"``.
+    force_download : bool, optional
+        Re-download even when a cached copy exists.
+    timeout : int, optional
+        HTTP timeout in seconds.
 
     Returns
     -------
-    pathlib.Path
-        Path to the cached NetCDF file.
-
-    Raises
-    ------
-    ValueError
-        If ``resolution`` is not ``"daily"`` or ``"hourly"``.
-    FileNotFoundError
-        If the file is not already cached in ``data_dir``. Automatic
-        download from UHSLC was lost when this module was merged from the
-        separate PICCM_Atmosphere and PICCM_SeaLevel repositories (the
-        atmosphere-only ``data_downloaders.py`` silently overwrote the
-        sea-level one) and has not been restored -- download the file
-        manually from the UHSLC Research Quality Data Set
-        (https://uhslc.soest.hawaii.edu/data/?rq) and save it at the path
-        given in the error message.
+    xarray.Dataset
+        Station dataset with ``sea_level`` in mm relative to the station
+        datum and dimensions ``(record_id, time)``. The single ``record_id``
+        encodes station and version and differs from ``uhslc_id``.
     """
     if resolution not in ("daily", "hourly"):
         raise ValueError('resolution must be "daily" or "hourly"')
 
     prefix = "d" if resolution == "daily" else "h"
-    filename = f"{prefix}{int(uhslc_id):03d}.nc"
-    output_path = Path(data_dir) / filename
+    data_dir = Path(data_dir)
+    data_dir.mkdir(parents=True, exist_ok=True)
+    output_path = data_dir / f"{prefix}{int(uhslc_id):03d}.nc"
 
-    if not output_path.exists():
-        raise FileNotFoundError(
-            f"UHSLC {resolution} file not cached: {output_path}. Automatic "
-            "download is not implemented (lost during the PICCM_Atmosphere / "
-            "PICCM_SeaLevel merge) -- download it manually from "
-            "https://uhslc.soest.hawaii.edu/data/?rq and save it at this path."
-        )
+    if force_download or not output_path.exists():
+        url = UHSLC_FAST_URL.format(resolution=resolution, prefix=prefix, uhslc_id=int(uhslc_id))
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
+        temporary_path = output_path.with_suffix(".nc.part")
+        temporary_path.write_bytes(response.content)
+        temporary_path.replace(output_path)
 
-    return output_path
+    with xr.open_dataset(output_path) as dataset:
+        return dataset.load()
 
 
 def filter_by_time_completeness(
@@ -436,3 +438,116 @@ def filter_by_time_completeness(
     df_filtered = df_filtered.drop(columns=["year", "month", "day"])
 
     return df_filtered, removed_months, removed_years
+
+
+# ---------------------------------------------------------------------------
+# IPCC AR6 sea-level projections (Garner et al., 2021; Zenodo 6382554)
+# ---------------------------------------------------------------------------
+
+AR6_SL_ZENODO_URL = "https://zenodo.org/records/6382554/files/{archive}.zip"
+AR6_SL_ARCHIVES = {False: "ar6-regional_novlm-confidence", True: "ar6-regional-confidence"}
+
+
+class _HttpRangeFile(io.RawIOBase):
+    """Read-only, seekable view of a remote file through HTTP range requests.
+
+    Lets :class:`zipfile.ZipFile` read the central directory and single members
+    of a multi-GB archive without downloading the whole file.
+    """
+
+    def __init__(self, url, timeout=120):
+        self.url, self.timeout = url, timeout
+        self.session = requests.Session()
+        probe = self.session.get(url, headers={"Range": "bytes=0-0"}, timeout=timeout)
+        probe.raise_for_status()
+        if probe.status_code != 206 or "Content-Range" not in probe.headers:
+            raise OSError(f"Server does not support range requests: {url}")
+        self.size = int(probe.headers["Content-Range"].rsplit("/", 1)[1])
+        self.pos = 0
+
+    def readable(self):
+        return True
+
+    def seekable(self):
+        return True
+
+    def tell(self):
+        return self.pos
+
+    def seek(self, offset, whence=io.SEEK_SET):
+        base = {io.SEEK_SET: 0, io.SEEK_CUR: self.pos, io.SEEK_END: self.size}[whence]
+        self.pos = base + offset
+        return self.pos
+
+    def readinto(self, buffer):
+        n = min(len(buffer), self.size - self.pos)
+        if n <= 0:
+            return 0
+        headers = {"Range": f"bytes={self.pos}-{self.pos + n - 1}"}
+        r = self.session.get(self.url, headers=headers, timeout=self.timeout)
+        r.raise_for_status()
+        if r.status_code != 206:
+            raise OSError("Expected a partial (206) response to a range request.")
+        data = r.content
+        buffer[: len(data)] = data
+        self.pos += len(data)
+        return len(data)
+
+
+def ar6_sea_level_file(out_dir, scenario, kind="values", confidence="medium", vlm=False):
+    """Local path of one AR6 ``total`` sea-level projection file."""
+    sub = "with_vlm" if vlm else "novlm"
+    return Path(out_dir) / sub / f"total_{scenario}_{confidence}_confidence_{kind}.nc"
+
+
+def download_ar6_sea_level_projections(
+    out_dir,
+    scenarios=("ssp126", "ssp245", "ssp370", "ssp585"),
+    kinds=("values", "rates"),
+    confidence="medium",
+    vlm=False,
+    force_download=False,
+    timeout=120,
+):
+    """Download IPCC AR6 regional sea-level projections from Zenodo record 6382554.
+
+    Only the ``total_<scenario>_<confidence>_confidence_<kind>.nc`` members are
+    extracted from the ``ar6-regional_novlm-confidence.zip`` archive (or
+    ``ar6-regional-confidence.zip`` when ``vlm=True``) through HTTP range
+    requests, so each scenario costs ~75 MB (values) + ~35 MB (rates) instead
+    of the 8.7 GB archive. Files that already exist are reused unless
+    ``force_download`` is True.
+
+    Each file holds ``sea_level_change`` (mm, relative to 1995–2014) or
+    ``sea_level_change_rate`` (mm/yr) on (quantiles, years, locations), where
+    the locations are a global 1° grid plus the PSMSL tide gauges.
+
+    Returns a dict ``{(scenario, kind): Path}``.
+    """
+    import shutil
+    import zipfile
+
+    paths = {(s, k): ar6_sea_level_file(out_dir, s, k, confidence, vlm) for s in scenarios for k in kinds}
+    missing = {key: path for key, path in paths.items() if force_download or not path.is_file()}
+    if not missing:
+        return paths
+
+    archive = AR6_SL_ARCHIVES[bool(vlm)]
+    url = AR6_SL_ZENODO_URL.format(archive=archive)
+    print(f"Opening {archive}.zip on Zenodo (range requests, only the needed members are transferred)")
+    remote = io.BufferedReader(_HttpRangeFile(url, timeout=timeout), buffer_size=1 << 22)
+    with zipfile.ZipFile(remote) as zf:
+        members = {Path(name).name: name for name in zf.namelist()}
+        for (scenario, kind), path in missing.items():
+            member = members.get(path.name)
+            if member is None:
+                available = sorted(n for n in members if n.startswith("total_") and f"_{confidence}_" in n)
+                raise FileNotFoundError(f"{path.name} is not in {archive}.zip. Available: {available}")
+            path.parent.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".part")
+            size_mb = zf.getinfo(member).file_size / 1e6
+            print(f"  downloading {path.name} ({size_mb:.0f} MB)")
+            with zf.open(member) as src, open(tmp, "wb") as dst:  # zipfile verifies the CRC
+                shutil.copyfileobj(src, dst, 1 << 24)
+            tmp.replace(path)
+    return paths

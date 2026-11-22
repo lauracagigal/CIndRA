@@ -99,6 +99,7 @@ If a p-value or additional regression statistics are needed and not returned by 
 - `notebooks/historical/National/sea_surface_temperature/b_DHW.ipynb` — Degree Heating Weeks and bleaching-alert summaries.
 - `notebooks/historical/National/sea_surface_temperature/c_MHW.ipynb` — EEZ-first marine-heatwave analysis followed by a user-selected point analysis. See `assistant/skills/marine-heatwaves/SKILL.md`.
 - `notebooks/historical/National/biochemistry/` — National EEZ pH, chlorophyll-a, phytoplankton-size and dissolved-oxygen analyses. See `assistant/skills/marine-biochemistry/SKILL.md`.
+- `notebooks/historical/National/sea_level/` — own setup (`00_sea_level_setup.ipynb`, UHSLC station + EEZ + CMEMS, writes `data/sites/sea_level/<site_key>.json`) followed by absolute/relative trends, anomalies, minor flooding above MHHW and extreme-level rankings. See `assistant/skills/sea-level/SKILL.md`.
 - `notebooks/historical/Regional/00_regional_setup.ipynb` — multi-station counterpart of `00_site_setup.ipynb`: scans every GHCN station inside the Pacific EEZ area, filters by quality, and saves `data/regional/<region_key>_stations.pkl`. See [Regional Workflows](#cindra-regional-workflows).
 - `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` — regional rainfall indicators and Pacific EEZ maps, computed station-by-station from `00_regional_setup.ipynb`'s output.
 - `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb` — regional air-temperature indicators and Pacific EEZ maps, same pattern.
@@ -188,6 +189,10 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 - Copernicus workflows share `data/regional/biochemistry/copernicus_bgc_pacific_surface_monthly.nc`; MD50 uses `MD50_pacific_monthly.nc`. They map the Pacific field with EEZ outlines and never substitute a National/Palau subset.
 - ENSO maps retain La Niña, Neutral and El Niño panels, each expressed relative to the complete-period grid-cell mean. See `assistant/skills/marine-biochemistry/SKILL.md`.
 
+### Regional sea level — built
+- `Regional/sea_level/regional_indicators.ipynb` downloads monthly CMEMS L4 altimetry for the Pacific window (cached under `data/regional/sea_level/`) and UHSLC Fast Delivery records for every tide gauge inside a Pacific EEZ; it is independent of `Regional/00_regional_setup.ipynb`.
+- It maps 1993–2024 altimetry trends with tide-gauge trends, compares absolute and relative station trends on the same valid months, and adds the regional-mean series, five-year anomalies, the ENSO regression and minor-flood days per storm year. See `assistant/skills/sea-level/SKILL.md`.
+
 ### Shared conventions (rainfall/air-temperature)
 - `region_key` (default `"pacific"`) names every regional output file/folder.
 - `min_years` (the setup notebook calls it `min_years_after_filter`; the indicator notebooks call the map-config field `min_years`) guards against an unstable trend fit from very few valid years dominating a map's colour scale — set to 20 in both existing domains.
@@ -229,6 +234,8 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 - **IBTrACS tropical cyclones**: NOAA NCEI v04r01 NetCDF via `download_ibtracs`; `wmo_wind` is in knots and `wmo_pres` in hPa. Cache under `data/tcs/`; see `assistant/skills/tropical-cyclones/SKILL.md`.
 - **Marine heatwaves**: daily NOAA OISST analysed with `functions/marineHeatWaves.py`, based on the Hobday et al. marine-heatwave definition. Use the climatology, percentile, minimum-duration and gap parameters already declared in the National/Regional MHW notebooks; do not silently change them.
 - **Copernicus Marine biogeochemistry**: `cmems_mod_glo_bgc_my_0.25deg_P1M-m`, surface variables `ph`, `chl`, `phyc` and `o2`, downloaded with `copernicusmarine` and cached under `data/regional/biochemistry/`. Credentials must be configured outside the notebook.
+- **UHSLC tide gauges**: Fast Delivery daily/hourly NetCDF (`https://uhslc.soest.hawaii.edu/data/netcdf/fast/`) via `download_uhslc_data`, cached as `data/sea_level/d<id>.nc`/`h<id>.nc`; `sea_level` in mm relative to station datum; datums (MHHW, MSL) from the UHSLC datum tables via `get_uhslc_datum`.
+- **CMEMS altimetry**: `SEALEVEL_GLO_PHY_L4_MY_008_047` (daily `..._P1D` for National, monthly `..._P1M-m` for Regional); `sla` in m relative to 1993–2012. See `assistant/skills/sea-level/SKILL.md`.
 - **NOAA PIFSC MD50**: experimental median phytoplankton-size product `md50_exp_2025`, used by the National and Regional phytoplankton-size workflows. Disclose its experimental status.
 - **Reference period**: WMO **1961–1990** unless the user overrides, for rainfall/air-temperature anomalies. Slice with `.loc[ref_start:ref_end]` — never `.loc["1961:1990"]` as a single label on a `DatetimeIndex`.
 - **Wet/dry threshold** (rainfall): 1 mm unless explicitly changed by the user.

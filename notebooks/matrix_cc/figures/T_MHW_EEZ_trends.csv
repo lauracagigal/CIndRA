@@ -1,0 +1,6 @@
+indicator,mean,trend_per_decade,ci95_per_decade
+Event count,2.2381,1.0874,0.3698
+MHW days,64.2857,53.1383,15.3583
+Mean duration,19.9599,13.4726,7.5441
+Mean maximum intensity,1.0742,0.0033,0.0519
+Cumulative intensity,18.7435,12.9047,8.2654

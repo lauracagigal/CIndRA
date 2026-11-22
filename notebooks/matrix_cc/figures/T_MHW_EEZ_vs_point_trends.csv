@@ -1,0 +1,6 @@
+indicator,mean_EEZ,trend_per_decade_EEZ,ci95_per_decade_EEZ,mean_point,trend_per_decade_point,ci95_per_decade_point
+Event count,2.2381,1.0874,0.3698,3.119,1.4885,0.6479
+MHW days,64.2857,53.1383,15.3583,44.119,32.0647,10.4964
+Mean duration,19.9599,13.4726,7.5441,10.7887,3.6567,1.878
+Mean maximum intensity,1.0742,0.0033,0.0519,1.3829,-0.0331,0.0546
+Cumulative intensity,18.7435,12.9047,8.2654,12.5506,3.739,2.5804

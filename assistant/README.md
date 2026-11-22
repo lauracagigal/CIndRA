@@ -23,6 +23,7 @@ unavailable.
 | `sea-surface-temperature` | National selected-EEZ and Regional Pacific SST means, trends, anomalies, NOAA OISST download and `functions/sst.py` |
 | `marine-heatwaves` | National EEZ-first/point and Regional Pacific NOAA OISST MHW detection, trends, decadal/ENSO maps and EEZ summaries |
 | `marine-biochemistry` | National and Regional pH, chlorophyll-a, phytoplankton size/biomass and dissolved-oxygen workflows |
+| `sea-level` | National tide-gauge/EEZ and Regional Pacific sea-level trends, anomalies, minor flooding, rankings; `functions/sea_level.py` |
 | `regional-setup` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
 | `regional-atmosphere` | Regional rainfall and air-temperature indicators, station maps, anomaly series and supported ERA5 backgrounds |
 | `tropical-cyclones` | National site-radius and Regional Pacific-subregion IBTrACS/ONI workflows; `functions/tcs.py` |

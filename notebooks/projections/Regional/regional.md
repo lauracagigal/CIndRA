@@ -42,6 +42,11 @@ Projections are averaged over two kinds of spatial units:
   <p>Surface pH, aragonite saturation state and salinity.</p>
 </a>
 
+<a href="sea_level/sea_level.html" class="dashboard-card ocean">
+  <h3>Sea level</h3>
+  <p>IPCC AR6 projected sea-level change and rates of rise (no vertical land motion).</p>
+</a>
+
 </div>
 
 Outputs: figures in `outputs/figures/regional_pacific/PRJ_*.png`, tables in `outputs/tables/regional_pacific/PRJ_*.csv`; regional means are cached in `data/projections/regional/`.

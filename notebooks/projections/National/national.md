@@ -44,6 +44,11 @@ The notebooks use the same site configuration as the historical analysis (`data/
   <p>Surface pH, aragonite saturation state and salinity.</p>
 </a>
 
+<a href="sea_level/sea_level.html" class="dashboard-card ocean">
+  <h3>Sea level</h3>
+  <p>AR6 relative sea-level rise at the tide gauge and projected minor-flood days.</p>
+</a>
+
 </div>
 
 ## Data
@@ -55,6 +60,7 @@ The notebooks use the same site configuration as the historical analysis (`data/
 | IPCC-WGI AR6 Interactive Atlas | Surface pH (CMIP6 members) | `CINDRA_EXTRA_PROJECTIONS_DIR/data_copernicus` |
 | Jiang et al. (2023), NCEI OCADS 0259391 | pH, aragonite, salinity | `CINDRA_EXTRA_PROJECTIONS_DIR/bio/nc` |
 | Holbrook et al., Pacific MHW statistics | Marine heatwave days by category | `CINDRA_EXTRA_PROJECTIONS_DIR/marine_heatwaves` |
+| IPCC AR6 sea-level projections (Garner et al., 2021; Zenodo 6382554) | Relative sea-level change at tide gauges (with VLM) | `data/projections/sea_level/` (downloaded on demand) |
 
 Default locations are defined in `functions/projections.py`; series extracted for each site are cached in `data/projections/<site_tag>/` and figures are written to `outputs/figures/<site_tag>/PRJ_*.png`.
 

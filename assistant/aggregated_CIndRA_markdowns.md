@@ -1,6 +1,6 @@
 # CIndRA — Aggregated Training Material
 
-Single-file concatenation of all CIndRA assistant markdowns. Generated on 2026-09-29. Source files live in `assistant/` and `assistant/skills/`; regenerate with `python assistant/build_aggregated_CIndRA.py`.
+Single-file concatenation of all CIndRA assistant markdowns. Generated on 2026-11-06. Source files live in `assistant/` and `assistant/skills/`; regenerate with `python assistant/build_aggregated_CIndRA.py`.
 
 ---
 
@@ -107,6 +107,7 @@ If a p-value or additional regression statistics are needed and not returned by 
 - `notebooks/historical/National/sea_surface_temperature/b_DHW.ipynb` — Degree Heating Weeks and bleaching-alert summaries.
 - `notebooks/historical/National/sea_surface_temperature/c_MHW.ipynb` — EEZ-first marine-heatwave analysis followed by a user-selected point analysis. See `assistant/skills/marine-heatwaves/SKILL.md`.
 - `notebooks/historical/National/biochemistry/` — National EEZ pH, chlorophyll-a, phytoplankton-size and dissolved-oxygen analyses. See `assistant/skills/marine-biochemistry/SKILL.md`.
+- `notebooks/historical/National/sea_level/` — own setup (`00_sea_level_setup.ipynb`, UHSLC station + EEZ + CMEMS, writes `data/sites/sea_level/<site_key>.json`) followed by absolute/relative trends, anomalies, minor flooding above MHHW and extreme-level rankings. See `assistant/skills/sea-level/SKILL.md`.
 - `notebooks/historical/Regional/00_regional_setup.ipynb` — multi-station counterpart of `00_site_setup.ipynb`: scans every GHCN station inside the Pacific EEZ area, filters by quality, and saves `data/regional/<region_key>_stations.pkl`. See [Regional Workflows](#cindra-regional-workflows).
 - `notebooks/historical/Regional/rainfall/regional_indicators.ipynb` — regional rainfall indicators and Pacific EEZ maps, computed station-by-station from `00_regional_setup.ipynb`'s output.
 - `notebooks/historical/Regional/air_temperature/regional_indicators.ipynb` — regional air-temperature indicators and Pacific EEZ maps, same pattern.
@@ -196,6 +197,10 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 - Copernicus workflows share `data/regional/biochemistry/copernicus_bgc_pacific_surface_monthly.nc`; MD50 uses `MD50_pacific_monthly.nc`. They map the Pacific field with EEZ outlines and never substitute a National/Palau subset.
 - ENSO maps retain La Niña, Neutral and El Niño panels, each expressed relative to the complete-period grid-cell mean. See `assistant/skills/marine-biochemistry/SKILL.md`.
 
+### Regional sea level — built
+- `Regional/sea_level/regional_indicators.ipynb` downloads monthly CMEMS L4 altimetry for the Pacific window (cached under `data/regional/sea_level/`) and UHSLC Fast Delivery records for every tide gauge inside a Pacific EEZ; it is independent of `Regional/00_regional_setup.ipynb`.
+- It maps 1993–2024 altimetry trends with tide-gauge trends, compares absolute and relative station trends on the same valid months, and adds the regional-mean series, five-year anomalies, the ENSO regression and minor-flood days per storm year. See `assistant/skills/sea-level/SKILL.md`.
+
 ### Shared conventions (rainfall/air-temperature)
 - `region_key` (default `"pacific"`) names every regional output file/folder.
 - `min_years` (the setup notebook calls it `min_years_after_filter`; the indicator notebooks call the map-config field `min_years`) guards against an unstable trend fit from very few valid years dominating a map's colour scale — set to 20 in both existing domains.
@@ -237,6 +242,8 @@ The Regional workflow scans **many** stations across the Pacific EEZ area at onc
 - **IBTrACS tropical cyclones**: NOAA NCEI v04r01 NetCDF via `download_ibtracs`; `wmo_wind` is in knots and `wmo_pres` in hPa. Cache under `data/tcs/`; see `assistant/skills/tropical-cyclones/SKILL.md`.
 - **Marine heatwaves**: daily NOAA OISST analysed with `functions/marineHeatWaves.py`, based on the Hobday et al. marine-heatwave definition. Use the climatology, percentile, minimum-duration and gap parameters already declared in the National/Regional MHW notebooks; do not silently change them.
 - **Copernicus Marine biogeochemistry**: `cmems_mod_glo_bgc_my_0.25deg_P1M-m`, surface variables `ph`, `chl`, `phyc` and `o2`, downloaded with `copernicusmarine` and cached under `data/regional/biochemistry/`. Credentials must be configured outside the notebook.
+- **UHSLC tide gauges**: Fast Delivery daily/hourly NetCDF (`https://uhslc.soest.hawaii.edu/data/netcdf/fast/`) via `download_uhslc_data`, cached as `data/sea_level/d<id>.nc`/`h<id>.nc`; `sea_level` in mm relative to station datum; datums (MHHW, MSL) from the UHSLC datum tables via `get_uhslc_datum`.
+- **CMEMS altimetry**: `SEALEVEL_GLO_PHY_L4_MY_008_047` (daily `..._P1D` for National, monthly `..._P1M-m` for Regional); `sla` in m relative to 1993–2012. See `assistant/skills/sea-level/SKILL.md`.
 - **NOAA PIFSC MD50**: experimental median phytoplankton-size product `md50_exp_2025`, used by the National and Regional phytoplankton-size workflows. Disclose its experimental status.
 - **Reference period**: WMO **1961–1990** unless the user overrides, for rainfall/air-temperature anomalies. Slice with `.loc[ref_start:ref_end]` — never `.loc["1961:1990"]` as a single label on a `DatetimeIndex`.
 - **Wet/dry threshold** (rainfall): 1 mm unless explicitly changed by the user.
@@ -817,6 +824,51 @@ notebooks, say it is not currently supported by CIndRA.
 
 ---
 
+<!-- SOURCE: assistant/skills/sea-level/SKILL.md -->
+
+---
+name: sea-level
+description: Build and maintain the National (tide gauge + EEZ) and Regional (Pacific) historical sea-level analyses — UHSLC Fast Delivery downloads, CMEMS L4 altimetry, absolute vs relative trends, detrended anomalies, minor-flood days above MHHW, extreme-level rankings, the ENSO response and Pacific tide-gauge comparisons. Use for notebooks under National/sea_level or Regional/sea_level and for functions/sea_level.py and functions/sea_level_plotting.py.
+---
+
+# Sea level
+
+Ported from SLIndRA (github.com/asgenz23/SLIndRA) / PICCM_SeaLevel. Calculations live in `functions/sea_level.py`, figures in `functions/sea_level_plotting.py`; keep function definitions out of the notebooks.
+
+## National workflow (`notebooks/historical/National/sea_level/`)
+
+Run in order:
+
+1. `00_sea_level_setup.ipynb` — selects the UHSLC station (`selected_uhslc_id`, `selected_station_name` or nearest to `site_lon/site_lat` within `station_country_filter`), resolves the EEZ from `data/regional/Pacific_EEZs/Pacific_EEZs.shp` by `country`, downloads `data/sea_level/d<id>.nc` and `h<id>.nc`, and reuses `cmems_file` when it covers the EEZ plus `cmems_padding_degrees` (otherwise downloads daily CMEMS with `get_CMEMS_data`). Writes `data/sites/sea_level/<site_key>.json` with repo-relative paths and `site_name = <country>_uhslc<id>`.
+2. `a_sea_level_trend.ipynb` — absolute (nearest ocean altimetry cell) vs relative (tide gauge) daily trends, EEZ-masked area-weighted monthly altimetry trend, change map, ENSO scatter (detrended, de-seasoned gauge vs ONI).
+3. `b_sea_level_anomaly.ipynb` — detrended, de-seasoned anomalies; storm-year mean/min/max; period-mean detrended altimetry maps over the EEZ with the gauge anomaly on the same scale.
+4. `c_sea_level_ff.ipynb` — hourly sea level minus the UHSLC MHHW datum; flood days/hours above `flood_threshold_cm` (default 30 cm) per storm year from the year before the tidal epoch to the last complete storm year; ENSO colouring, monthly matrix, decadal means.
+5. `d_sea_level_rankings.ipynb` — top-10 highest/lowest hourly levels (m above MHHW), > 3 days apart, with the ONI phase of the event month.
+
+## Regional workflow (`notebooks/historical/Regional/sea_level/regional_indicators.ipynb`)
+
+- Monthly CMEMS `cmems_obs-sl_glo_phy-ssh_my_allsat-l4-duacs-0.125deg_P1M-m`, window `(125, 245, -35, 35)`, 1993–2025, block-averaged to 0.25° and cached as `data/regional/sea_level/cmems_L4_SLA_monthly_0.25deg_pacific_1993_2025.nc` by `get_cmems_monthly_pacific`.
+- Tide gauges: `pacific_uhslc_stations` then `sjoin_nearest` against the Pacific EEZs with a 0.5° tolerance (coastal gauges fall just landward of the EEZ baseline; a strict `within` test drops Kwajalein, Pago Pago, Honolulu, Yap, Noumea, …). `regional_station_trends` keeps months with ≥ 75% of days and flags `qc_pass` when ≥ 70% of months are valid; altimetry is sampled at the nearest ocean cell on the same months.
+- Outputs: trend map with gauge circles, PICCM-style change map (cm/epoch) with every gauge in the window (`plot_regional_change_map_filled_tide_gauges`), station trend comparison, regional-mean series, five-year anomaly panels (not detrended, relative to 1993–2012), ENSO regression map (cm/°C), minor-flood heatmap (`regional_flood_days`, storm years 1993–2025), and the PICCM station–year flood matrix for 24 long-record gauges ordered north to south, 1983–2025, with aligned regional-total bars (`plot_regional_flood_matrix`; list in `matrix_station_ids`, includes Santa Cruz and Easter outside the map window).
+- Does not use `Regional/00_regional_setup.ipynb`.
+
+## Invariants
+
+- Units: UHSLC `sea_level` is mm relative to station datum; CMEMS `sla` is m relative to the 1993–2012 mean. Report trends in mm/yr, changes and anomalies in cm.
+- UHSLC NetCDF `record_id` ≠ UHSLC station ID; always use `station_series(rsl)` / `station_attr(rsl, ...)` (selects by position).
+- Storm year = May–April labelled by its **starting** year (`storm_year`), the same convention as `detect_enso_events`. Bars are centred on that label.
+- Incomplete years/months (< 75% coverage) stay NaN; never count missing data as zero flood days.
+- Trend lines: solid when p < 0.05, dashed otherwise. p-values ignore autocorrelation and are descriptive.
+- Altimetry minus tide-gauge rate approximates vertical land motion plus representativeness error — do not present it as a geodetic measurement.
+- CMEMS needs `copernicusmarine login` outside the notebooks; never store credentials.
+
+## Outputs
+
+- National: `outputs/figures/<site_tag>/` and `outputs/tables/<site_tag>/` with `site_tag = build_site_tag(site_name, station_lon, station_lat)` (e.g. `palau_uhslc007_lat7p329_lon134p450`); matrix figures `F10_SeaLevel_map_*`, `F10_SeaLevel_trends_*`, `F11_Minor_flood_matrix_*` in `matrix_cc/figures/`.
+- Regional: `outputs/figures/regional_pacific/SL_regional_*_pacific.png`, `outputs/tables/regional_pacific/SL_regional_*_pacific.csv|json`, and `matrix_cc/figures/F10_SeaLevel_*_regional_pacific.png`, `F11_Minor_flood_regional_pacific.png`.
+
+---
+
 <!-- SOURCE: assistant/skills/regional-setup/SKILL.md -->
 
 ---
@@ -1308,6 +1360,8 @@ Search bounded local paths:
 - `functions/marineHeatWaves.py`
 - `functions/ocean.py`
 - `functions/build_regional_biochemistry_notebooks.py`
+- `functions/sea_level.py`
+- `functions/sea_level_plotting.py`
 
 Look for: `plot_bar_probs`, `plot_bar_probs_ONI`, `plot_timeseries_interactive`, `add_oni_cat`, `get_df_col`, `style_matrix`, `table_rain_21`, `table_rain_22`, `table_rain_23`, `table_temp_11`, `table_temp_12`, `table_temp_13`, `table_temp_13b` (rainfall/air-temperature).
 
@@ -1401,6 +1455,7 @@ Station ranking/selection in the atmosphere `00_site_setup.ipynb` is currently a
 **Standalone functions**
 - `download_oni_index(url)` → monthly ONI DataFrame; `-99.9` → NaN. Used by rainfall and air-temperature notebooks.
 - `filter_by_time_completeness(df, time_col, month_threshold, year_threshold)` → `(df_filtered, removed_months, removed_years)`.
+- `download_uhslc_data(data_dir, uhslc_id, resolution="daily"|"hourly", force_download=False)` → `xarray.Dataset` of the UHSLC Fast Delivery record; downloads and caches `d<id>.nc`/`h<id>.nc` when missing.
 
 ---
 
@@ -1446,6 +1501,16 @@ Use `assistant/skills/sea-surface-temperature/SKILL.md` for workflow and period 
 - Regional loading: `PacificSST`, `load_pacific_sst` (0–360 longitudes, Pacific subset, all EEZ boundaries).
 - Regional calculations: `compute_sst_trend` (annual means → °C/decade), `compute_djf_period_anomalies` (equal half-open DJF blocks). `compute_djf_decadal_anomalies` remains available for the earlier decade-based form.
 - Regional plots: `plot_pacific_sst_field`, `plot_pacific_sst_panels`; both overlay all Pacific EEZ boundaries.
+
+## `functions/sea_level.py` and `functions/sea_level_plotting.py` — National and Regional sea level
+
+Use `assistant/skills/sea-level/SKILL.md` for workflow, units and storm-year conventions.
+
+- Config/EEZ: `find_repo_root`, `sea_level_config_path`, `load_site_config`, `resolve_eez`, `eez_bounds_360`, `eez_mask`, `prepare_site_data`, `select_uhslc_station`.
+- Data: `get_CMEMS_data` (daily box), `get_cmems_monthly_pacific`, `get_uhslc_metadata`, `get_uhslc_datum`, `station_series`, `station_attr`.
+- Statistics: `process_trend_with_nan` (NaN-aware OLS returning magnitude, line, rate, p, SE), `storm_year`, `monthly_mean_with_completeness`, `annual_completeness`, `detect_enso_events`, `enso_by_storm_year`, `flood_counts_per_storm_year`, `monthly_flood_day_matrix`, `get_top_10_table`.
+- Regional: `pacific_uhslc_stations`, `regional_station_trends`, `regional_flood_days`.
+- Plots: `plot_sl_change_map`, `plot_combined_trends`, `plot_series_with_trend`, `plot_enso_scatter`, `plot_station_anomaly_series`, `plot_sl_anomaly_period_maps`, `plot_flood_counts_with_trend`, `plot_flood_counts_with_oni`, `plot_flood_matrix_summary`, `make_rankings_static_figure`, `make_plotly_figure_rankings`, `plot_pacific_sl_field`, `plot_station_trend_comparison`, `plot_regional_flood_overview`.
 
 ## Marine heatwaves and marine biochemistry
 
@@ -1771,6 +1836,7 @@ unavailable.
 | `sea-surface-temperature` | National selected-EEZ and Regional Pacific SST means, trends, anomalies, NOAA OISST download and `functions/sst.py` |
 | `marine-heatwaves` | National EEZ-first/point and Regional Pacific NOAA OISST MHW detection, trends, decadal/ENSO maps and EEZ summaries |
 | `marine-biochemistry` | National and Regional pH, chlorophyll-a, phytoplankton size/biomass and dissolved-oxygen workflows |
+| `sea-level` | National tide-gauge/EEZ and Regional Pacific sea-level trends, anomalies, minor flooding, rankings; `functions/sea_level.py` |
 | `regional-setup` | `Regional/00_regional_setup.ipynb` — shared entry point for regional rainfall + air temperature |
 | `regional-atmosphere` | Regional rainfall and air-temperature indicators, station maps, anomaly series and supported ERA5 backgrounds |
 | `tropical-cyclones` | National site-radius and Regional Pacific-subregion IBTrACS/ONI workflows; `functions/tcs.py` |
