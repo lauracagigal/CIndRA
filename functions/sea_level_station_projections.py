@@ -618,3 +618,56 @@ def plot_flood_days_bars_grid(days, scenarios, observed_table=None, title="", en
     fig.suptitle(title, fontsize=15, fontweight="bold")
     fig.tight_layout()
     return fig, axes
+
+
+# ---------------------------------------------------------------------------
+# Warming-level box plots (same figure as the other CIndRA projection notebooks)
+# ---------------------------------------------------------------------------
+
+def _ind_setup():
+    """Import ``ind_setup.plotting_projections`` from the sibling indicators_setup repository."""
+    import sys
+
+    candidate = Path(__file__).resolve().parents[3] / "indicators_setup"
+    if candidate.is_dir() and str(candidate) not in sys.path:
+        sys.path.append(str(candidate))
+    import ind_setup.plotting_projections as pp
+
+    return pp
+
+
+def gwl_box_data(change_annual, scenario_info, levels, scenarios, quantiles=(0.05, 0.17, 0.5, 0.83, 0.95)):
+    """Box-plot inputs at the global warming levels from AR6 quantiles.
+
+    Each box receives the five AR6 quantiles (5, 17, 50, 83, 95 %) of the value in the year the scenario first
+    reaches the level, so the box spans the likely range (17–83 %), the line is the median and the whiskers and
+    min/max labels are the very likely range (5–95 %). ``change_annual`` has (scenario, quantile, year).
+    Returns (box_data, box_scenarios, positions, table) with the layout of ``ind_setup.get_box_data``.
+    """
+    pp = _ind_setup()
+    box_data, box_scenarios, positions, rows = [], [], [], []
+    pos = 1.0
+    for level in levels:
+        for i, scenario in enumerate(scenarios):
+            year = scenario_info.get(scenario, {}).get(level, {}).get("year")
+            if not (isinstance(year, np.datetime64) and not np.isnat(year)):
+                continue
+            y = int(str(year)[:4])
+            values = change_annual.sel(scenario=scenario, year=y, quantile=list(quantiles)).values.astype(float)
+            box_data.append(values)
+            box_scenarios.append(scenario)
+            positions.append(pos + i * pp.BOX_INTRA_OFFSET)
+            rows.append({"scenario": scenario, "level": level, "year": y,
+                         **{f"q{q:g}": round(float(v), 2) for q, v in zip(quantiles, values)}})
+        pos += len(scenarios) * pp.BOX_INTRA_OFFSET + pp.BOX_GROUP_GAP
+    return box_data, box_scenarios, positions, pd.DataFrame(rows)
+
+
+def plot_gwl_boxplot(change_annual, scenario_info, levels, scenarios, site_label, ylabel="Δ Sea level [cm]", n_f=0):
+    """``ind_setup.plot_global_warming_boxplot`` for an AR6 sea-level quantity (see :func:`gwl_box_data`)."""
+    pp = _ind_setup()
+    box_data, box_scenarios, positions, table = gwl_box_data(change_annual, scenario_info, levels, scenarios)
+    info = {s: scenario_info[s] for s in scenarios if s in scenario_info}
+    fig, ax = pp.plot_global_warming_boxplot(box_data, None, positions, box_scenarios, info, list(levels), "sea_level",
+                                             plot_ref=False, n_f=n_f, site_label=site_label, ylabel=ylabel)
+    return fig, ax, table

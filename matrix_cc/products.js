@@ -825,6 +825,8 @@ const GWL = 'at the year each scenario first reaches +1.5, +2.0, +2.5 and +3.0 �
     ],
   });
   P['6.1'] = slPrj('a_sea_level_projections', [
+    ['plot', 'Sea level at warming levels', 'SL_station_gwl_boxplot',
+      'Relative sea-level change at the tide gauge (AR6 with vertical land motion, vs 1995–2014) in the year each SSP first reaches +1.5, +2.0, +2.5 and +3.0 °C; boxes: likely range (17–83 %), bold: median, whiskers: very likely range (5–95 %).'],
     ['plot', 'Relative sea level at the tide gauge', 'SL_station_projection_ssp',
       'Observed annual mean sea level at the UHSLC gauge and AR6 relative sea-level projections (with vertical land motion) for the four SSPs, relative to 1995–2014: median and likely (17–83 %) range; markers show the year each scenario reaches +1.5, +2.0, +2.5 and +3.0 °C.'],
   ], [
@@ -950,12 +952,17 @@ function prjRegional(nb, parts) {
       `AR6 decadal rate of sea-level rise around 2050 and 2100 for each SSP (${noVlm}).`],
     ['map', 'Trend 2020–2100', RFIG('SL_trend_2020_2100_ar6_novlm'),
       `Least-squares trend of the decadal median change 2020–2100, one panel per SSP (${noVlm}).`],
+    ['plot', 'Pacific window at warming levels', RFIG('SL_gwl_pacific_window_ar6_novlm'),
+      `Area-weighted sea-level change over the Pacific window in the year each SSP first reaches +1.5, +2.0, +2.5 and +3.0 °C; boxes: likely range, bold: median, whiskers: very likely range (${noVlm}).`],
+    ...PRJ_REGIONS.map(([region, slug]) => ['plot', `${region} at warming levels`, RFIG(`SL_gwl_${slug}_ar6_novlm`),
+      `Sea-level change averaged over the ${region} in the year each SSP first reaches each warming level; boxes: likely range, bold: median, whiskers: very likely range (${noVlm}).`]),
     ['plot', 'Regional mean change', RFIG('SL_regional_mean_change_ar6_novlm'),
       'Area-weighted mean sea-level change over the Pacific window to 2150: median and likely (17–83 %) range per SSP.'],
     ['plot', 'Regional mean rate', RFIG('SL_regional_mean_rate_ar6_novlm'),
       'Area-weighted mean rate of sea-level rise over the Pacific window to 2150: median and likely range per SSP.'],
   ], [
     ['Regional mean change and rate', RTAB('SL_regional_mean_ar6_novlm')],
+    ['Change at warming levels – window and ocean regions', RTAB('SL_gwl_regions_ar6_novlm')],
     ['Change by EEZ / region', RTAB('SL_eez_change_ar6_novlm')],
     ['Rate by EEZ / region', RTAB('SL_eez_rate_ar6_novlm')],
   ]);

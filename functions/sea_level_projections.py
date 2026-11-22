@@ -502,3 +502,19 @@ def plot_global_context_grid(fields, extent, title, label, cmap="afmhot_r", vmin
     if filename:
         fig.savefig(filename, dpi=150, bbox_inches="tight")
     return fig
+
+
+def region_change(ds, eez, var="change"):
+    """Cos(latitude)-weighted mean of ``var`` over every Pacific EEZ and ocean region, for every scenario,
+    quantile and year: DataArray (region, scenario, quantile, year). Quantiles are averaged cell by cell."""
+    import projections_regional as reg
+
+    weights = reg.region_weights(ds.lon.values, ds.lat.values, eez)
+    names = reg.region_names(eez)
+    da = ds[var]
+    values = da.transpose("scenario", "quantile", "year", "lat", "lon").values
+    flat = values.reshape(-1, values.shape[-2] * values.shape[-1])
+    means = reg._weighted_means(flat, weights).reshape(values.shape[:3] + (len(names),))
+    return xr.DataArray(np.moveaxis(means, -1, 0), dims=("region", "scenario", "quantile", "year"),
+                        coords={"region": names, "scenario": da.scenario.values, "quantile": da["quantile"].values,
+                                "year": da.year.values})
