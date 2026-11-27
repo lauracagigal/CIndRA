@@ -1,6 +1,6 @@
 # Sea-surface temperature
 
-Projected sea surface temperature (CSIRO CMIP6 ensemble) and marine heatwave days (Holbrook et al.) across the Pacific EEZs and ocean regions.
+Projected sea surface temperature (CSIRO CMIP6 ensemble) and marine heatwave days (Holbrook et al.) in each Pacific EEZ and over all the EEZs together.
 
 <div class="dashboard-grid">
 
@@ -11,7 +11,7 @@ Projected sea surface temperature (CSIRO CMIP6 ensemble) and marine heatwave day
 
 <a href="mhw_regional.html" class="dashboard-card ocean">
   <h3>Marine heatwaves</h3>
-  <p>MHW days per year in each EEZ and ocean region under SSP1-2.6 and SSP5-8.5.</p>
+  <p>MHW days per year in each EEZ and over all the EEZs under SSP1-2.6 and SSP5-8.5.</p>
 </a>
 
 </div>

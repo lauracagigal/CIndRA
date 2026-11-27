@@ -396,6 +396,27 @@ def plot_global_context_map(
     return fig, ax
 
 
+# Colour scales of the historical regional sea-level maps (notebooks/historical/Regional/sea_level), reused by the
+# projection maps so historical and projected maps read the same way: trends and rates on RdYlBu_r from 0 (0–8 mm/yr in
+# the historical map), absolute changes on RdBu_r centred on 0 (±25 cm in the historical map). The projection scales
+# keep these limits and widen only when the projected values exceed them.
+TREND_CMAP, TREND_HIST_MAX = "RdYlBu_r", 8      # mm/yr
+CHANGE_CMAP, CHANGE_HIST_MAX = "RdBu_r", 25     # cm
+
+
+def trend_scale(*values, step=1):
+    """(vmin, vmax) for trend/rate maps: 0 to the larger of the historical 8 mm/yr and the data maximum (rounded up)."""
+    hi = max(float(np.nanmax(np.asarray(v, dtype=float))) for v in values)
+    return 0, max(TREND_HIST_MAX, float(np.ceil(hi / step) * step))
+
+
+def change_scale(*values, step=5):
+    """(vmin, vmax) for absolute-change maps: symmetric around 0, at least the historical ±25 cm (rounded up)."""
+    hi = max(float(np.nanmax(np.abs(np.asarray(v, dtype=float)))) for v in values)
+    lim = max(CHANGE_HIST_MAX, float(np.ceil(hi / step) * step))
+    return -lim, lim
+
+
 def colour_limits(da, step):
     """Colour range from the data minimum to its maximum, rounded outwards to ``step``, and contour levels inside it."""
     lo = np.floor(float(da.min()) / step) * step

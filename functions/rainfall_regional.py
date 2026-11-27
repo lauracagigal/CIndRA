@@ -1426,6 +1426,110 @@ def plot_era5_eez_temperature_anomaly(
     return fig, ax, anomaly_df, smooth
 
 
+def load_or_compute_era5_eez_annual_rainfall(
+    era5_ds,
+    data_dir: str | Path,
+    cache_path: str | Path,
+    period_start: int = 1980,
+    period_end: int = 2024,
+    precip_var: str = "tp",
+    time_dim: str = "valid_time",
+    force_recompute: bool = False,
+) -> pd.Series:
+    """Annual total rainfall (mm) averaged over all the Pacific EEZ grid cells of ERA5, cached as CSV.
+
+    Monthly ``tp`` (already in mm per month, as prepared in the notebook) is summed to annual totals
+    for complete years, then averaged with cosine-of-latitude weights over the grid-cell centres inside
+    the Pacific EEZs. Only the latitude/longitude window around the EEZs is read. Pass ``era5_ds=None``
+    when the cache exists.
+    """
+    cache_path = Path(cache_path)
+    if cache_path.exists() and not force_recompute:
+        return pd.read_csv(cache_path, index_col="year")["total_annual_mm"]
+    if era5_ds is None:
+        raise ValueError(f"{cache_path} not found: open the ERA5 dataset to compute the EEZ-mean series.")
+
+    import xarray as xr
+
+    eez_gdf = load_pacific_eez(data_dir)
+    precip = era5_ds[precip_var].sel({time_dim: slice(str(period_start), str(period_end))})
+
+    # Read only the window around the EEZs (ERA5 longitudes are 0–360 °E).
+    minx, miny, maxx, maxy = eez_gdf.to_crs(4326).total_bounds
+    lats, lons = precip["latitude"].values, precip["longitude"].values
+    lon360 = lons % 360
+    lat_ok = (lats >= miny - 1) & (lats <= maxy + 1)
+    lon_ok = (lon360 >= 100) & (lon360 <= 260)
+    precip = precip.isel(latitude=np.where(lat_ok)[0], longitude=np.where(lon_ok)[0])
+
+    inside = _eez_inside_mask(precip["longitude"].values, precip["latitude"].values, eez_gdf)
+    weights = np.cos(np.deg2rad(precip["latitude"].values))[:, None] * inside
+
+    months = precip[time_dim].dt.year.to_series().value_counts()
+    complete = sorted(int(y) for y, n in months.items() if n == 12)
+    annual = _annual_rainfall_mm_from_precip(precip, time_dim=time_dim)
+    year_coord = "year" if "year" in annual.coords else f"{time_dim}.year"
+    annual = annual.sel({year_coord: complete}).load()
+
+    values = annual.transpose(year_coord, "latitude", "longitude").values
+    valid = np.isfinite(values)
+    mean = (np.where(valid, values, 0) * weights).sum(axis=(1, 2)) / (valid * weights).sum(axis=(1, 2))
+    series = pd.Series(mean, index=pd.Index(complete, name="year"), name="total_annual_mm")
+
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    series.to_csv(cache_path)
+    return series
+
+
+def plot_era5_eez_rainfall_series(
+    series: pd.Series,
+    data_dir: str | Path | None = None,
+    smooth_years: int = 5,
+    figsize: tuple[float, float] = (10, 5),
+    show_eez_map: bool = False,
+    ax=None,
+):
+    """Annual EEZ-mean total rainfall from ERA5 with its linear trend.
+
+    Solid line with markers: annual total; dashed line: centred ``smooth_years`` running mean; red line:
+    least-squares trend, with its rate (mm/decade) and p-value in the legend. Returns the figure, the axes
+    and a one-row DataFrame with the trend statistics.
+    """
+    years = series.index.values.astype(float)
+    values = series.values.astype(float)
+    ok = np.isfinite(values)
+    fit = stats.linregress(years[ok], values[ok])
+    smooth = series.rolling(window=smooth_years, center=True, min_periods=1).mean()
+
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
+    ax.plot(series.index, values, color="black", marker="o", markersize=4, linewidth=1, label="Annual total")
+    ax.plot(smooth.index, smooth.values, color="black", linestyle="--", linewidth=1, label=f"{smooth_years}-year running mean")
+    ax.plot(years, fit.intercept + fit.slope * years, color="crimson", linewidth=2,
+            linestyle="-" if fit.pvalue < 0.05 else ":",
+            label=f"Trend {fit.slope * 10:+.0f} mm/decade (p = {fit.pvalue:.2f})")
+    ax.set_xlim(years.min() - 0.5, years.max() + 0.5)
+    ax.set_xlabel("Year")
+    ax.set_ylabel("Total annual rainfall (mm)")
+    ax.set_title(f"ERA5 total annual rainfall averaged over the Pacific EEZs, {int(years.min())}–{int(years.max())}")
+    ax.grid(alpha=0.3)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.14), ncol=3, fontsize=10, frameon=False)
+    if show_eez_map and data_dir is not None:
+        _add_pacific_eez_inset(ax, load_pacific_eez(data_dir))
+
+    trend = pd.DataFrame([{
+        "Period": f"{int(years.min())}–{int(years.max())}",
+        "Mean (mm/year)": round(float(np.nanmean(values)), 0),
+        "Trend (mm/decade)": round(fit.slope * 10, 1),
+        "Trend (%/decade)": round(fit.slope * 10 / np.nanmean(values) * 100, 2),
+        "p-value": round(fit.pvalue, 3),
+        "Significant (95%)": bool(fit.pvalue < 0.05),
+    }])
+    return fig, ax, trend
+
+
 def load_or_compute_era5_annual_rainfall(
     era5_ds,
     cache_path: str | Path,

@@ -2,10 +2,11 @@
 
 The regional projection workflows summarise how the climate of the whole Pacific Islands region is expected to change under the CMIP6 scenarios, using the same data and global warming levels (+1.5, +2.0, +2.5 and +3.0 °C above 1850–1900) as the [national projections](../National/national.md).
 
-Projections are averaged over two kinds of spatial units:
+Projections are averaged over these spatial units:
 
 * every **Pacific EEZ** (one mean per country), shown as maps of the trend over 2015–2100 and of the change at each warming level;
-* four **ocean regions** — North Pacific Subtropical Gyre, Equatorial Upwelling, Western Equatorial Pacific and South Pacific Subtropical Gyre — shown as box plots across models at each warming level.
+* **all the EEZs together**, shown as box plots across models at each warming level for air temperature, rainfall, sea surface temperature and marine heatwaves (sea level uses the mean over the whole Pacific window);
+* four **ocean regions**, used **only for the biochemical indicators** (pH, aragonite, salinity): North Pacific Subtropical Gyre, Equatorial Upwelling, Western Equatorial Pacific and South Pacific Subtropical Gyre. For these indicators the maps show the gridded field over the whole Pacific window instead of EEZ means, and trends, tables and box plots are computed in the four regions.
 
 ## Prepare the regional analysis
 
@@ -30,6 +31,11 @@ Projections are averaged over two kinds of spatial units:
 <a href="rainfall/rainfall.html" class="dashboard-card rainfall">
   <h3>Rainfall</h3>
   <p>Annual totals, dry days, heavy-rainfall days and annual maximum daily rainfall.</p>
+</a>
+
+<a href="tropical_cyclones/tropical_cyclones.html" class="dashboard-card cyclone">
+  <h3>Tropical cyclones</h3>
+  <p>Change in the number of tropical cyclones and in their genesis latitude in four Pacific subregions (CMIP6-HighResMIP).</p>
 </a>
 
 <a href="sea_surface_temperature/sea_surface_temperature.html" class="dashboard-card ocean">

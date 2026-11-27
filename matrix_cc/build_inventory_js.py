@@ -7,7 +7,7 @@ period covered (first/last year found in a year/date column). It also records th
 repository (git commit, branch, uncommitted changes) and the local-copy date of the source data files, so
 index.html can assemble the provenance and validation sections of each product record.
 
-The hand-written part of each record (methods, limitations, sources, review status) lives in records.js.
+The hand-written part of each record (methods, limitations, sources) lives in records.js.
 
 Usage:  python3 build_inventory_js.py <index_dir> <product_dir> [<product_dir> ...] [--data <data_dir>]
 

@@ -1,6 +1,6 @@
 # Rainfall
 
-Projected change in annual rainfall, dry days, heavy-rainfall days and annual maximum daily rainfall across the Pacific EEZs and ocean regions (CSIRO CMIP6 ensemble).
+Projected change in annual rainfall, dry days, heavy-rainfall days and annual maximum daily rainfall in each Pacific EEZ and over all the EEZs together (CSIRO CMIP6 ensemble).
 
 <div class="dashboard-grid">
 

@@ -1,6 +1,6 @@
 # Air temperature
 
-Projected change in mean, minimum and maximum temperature, warm days and cold nights across the Pacific EEZs and ocean regions (CSIRO CMIP6 ensemble).
+Projected change in mean, minimum and maximum temperature, warm days and cold nights in each Pacific EEZ and over all the EEZs together (CSIRO CMIP6 ensemble).
 
 <div class="dashboard-grid">
 

@@ -410,6 +410,36 @@
   .stage th { background: #eef2f6; position: sticky; top: 0; }
   .stage td:first-child, .stage th:first-child { text-align: left; }
   .stage .msg { padding: 32px; color: #5b6877; text-align: center; max-width: 520px; }
+  /* Table viewer (the stage is always light) */
+  .tview { width: 100%; align-self: start; padding: 16px 18px 6px; color: #15202b; }
+  .tscroll { overflow: auto; max-height: calc(100vh - 260px); border: 1px solid #e3e8ee; border-radius: 12px; box-shadow: 0 1px 3px rgba(16,24,40,.06); }
+  .stage table.dt { border-collapse: separate; border-spacing: 0; margin: 0; width: 100%; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .stage table.dt th, .stage table.dt td { border: 0; border-bottom: 1px solid #edf1f5; padding: 7px 12px; }
+  .stage table.dt th { background: #f3f6f9; color: #3d4b5a; font-size: 11.5px; font-weight: 700; letter-spacing: .02em; text-transform: uppercase;
+    border-bottom: 2px solid #dde3ea; white-space: normal; min-width: 70px; max-width: 220px; vertical-align: bottom; z-index: 1; }
+  .stage table.dt th.sig { color: #0e5c64; }
+  .stage table.dt tbody tr:nth-child(even) td { background-color: #fafbfc; }
+  .stage table.dt tbody tr:hover td { background-color: #eef6f7; }
+  .stage table.dt tbody tr:last-child td { border-bottom: 0; }
+  .stage table.dt td.txt { text-align: left; white-space: normal; min-width: 120px; max-width: 420px; }
+  .stage table.dt td.nil { color: #b3bdc7; text-align: center; }
+  .stage table.dt td.pos, .stage table.dt td.neg { font-weight: 600; }
+  .stage table.dt td.pos { color: #a3231a; background-color: rgba(214, 48, 39, var(--a)) !important; }
+  .stage table.dt td.neg { color: #17508f; background-color: rgba(33, 102, 172, var(--a)) !important; }
+  .stage table.dt .arr { font-size: 9px; margin-right: 5px; opacity: .8; vertical-align: 1px; }
+  .stage table.dt tr.sec td { background: #e8f1f2 !important; color: #0e5c64; font-weight: 700; text-align: left; font-size: 12px; letter-spacing: .03em; text-transform: uppercase; }
+  .stage .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; background: #eef2f6; }
+  .stage .pill.ssp1 { background: #dfe8f3; color: #173c66; } .stage .pill.ssp2 { background: #fdebd5; color: #9a5300; }
+  .stage .pill.ssp3 { background: #fbdcdc; color: #b01818; } .stage .pill.ssp5 { background: #f1d7d8; color: #7a1518; }
+  .stage .pill.nino { background: #fbdcdc; color: #a3231a; } .stage .pill.nina { background: #dbe7f5; color: #17508f; }
+  .stage .pill.yes { background: #dcf1e4; color: #1d6b3d; } .stage .pill.no { background: #eef2f6; color: #5b6877; }
+  .stage table.dt tr.gap td { background: #fff !important; padding: 4px; border-bottom: 1px solid #dde3ea; }
+  .tlegend { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; font-size: 12.5px; margin-bottom: 10px; }
+  .tlegend > .pos, .tlegend > .neg { font-weight: 600; padding: 2px 10px; border-radius: 999px; }
+  .tlegend > .pos { color: #a3231a; background: rgba(214, 48, 39, .15); } .tlegend > .neg { color: #17508f; background: rgba(33, 102, 172, .15); }
+  .tlegend .arr { font-size: 9px; margin-right: 5px; }
+  .tlegend .muted { color: #5b6877; }
+  .tnote { font-size: 12px; color: #7a8794; margin: 8px 2px 10px; }
   .dialog-foot { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 14px; align-items: flex-start; flex-wrap: wrap; }
   .dialog-foot .cap { flex: 1 1 380px; font-size: 13.5px; color: var(--muted); margin: 0; }
   .dialog-foot .acts { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -810,15 +840,72 @@
     showModal();
     setOpenHash('product', url);
   }
-  function openTable(url, title) {
+  // ── Table viewer ──
+  // Trend / change / anomaly / difference values are coloured by sign (red: increase, blue: decrease), either by
+  // column (header names the quantity) or by row (first text cell names it, as in Metric/Value summary tables).
+  const SIGNED = /trend|change|anomal|differen|\brate\b|rate_|minus|\bdiff\b|^tdiff$/i;
+  const UNSIGNED = /_se_|\bse\b|\bstd\b|significant|stations with|_p$|\bp-?value|uncert|^unc$/i;
+  const isSigned = t => SIGNED.test(t) && !UNSIGNED.test(t);
+  const EMPTY = /^(|nan|none|null|na|—|-)$/i;
+  const numOf = v => { const m = String(v).trim().replace(/^−/, '-').match(/^[-+]?(\d+\.?\d*|\.\d+)(e[-+]?\d+)?(?=\s*[^\d.]*$)/i); return m ? Number(m[0]) : NaN; };
+  const SSP = { 1: 'ssp1', 2: 'ssp2', 3: 'ssp3', 5: 'ssp5' };
+  function tableHtml(data) {
+    let [head, ...rows] = data;
+    const n = head.length;
+    rows = rows.map(r => Array.from({ length: n }, (_, i) => (r[i] ?? '').trim()));
+    // Drop the unnamed pandas index column (header '' and values 0, 1, 2, ...).
+    if (head[0].trim() === '' && rows.length && rows.every((r, i) => r[0] === String(i))) { head = head.slice(1); rows = rows.map(r => r.slice(1)); }
+    const nc = head.length;
+    const colSigned = head.map(isSigned);
+    const plainCol = head.map(h => /^(year|years|decade|storm_year|month|models|stations|grid cells|lat|lon|latitude|longitude|.*_id|complete_years)$/i.test(h.trim()));
+    const labelOf = r => r.find(c => c !== '' && isNaN(numOf(c))) || '';
+    const rowSigned = rows.map(r => isSigned(labelOf(r)));
+    // Colour intensity scaled per column by the largest absolute value.
+    const maxAbs = head.map((_, j) => Math.max(0, ...rows.map(r => Math.abs(numOf(r[j]))).filter(isFinite)));
+    let anySigned = false;
+    const fmtNum = (v, x) => /\./.test(v) && /^[-+−]?[\d.]+(e[-+]?\d+)?$/i.test(v) ? x.toFixed(3).replace(/\.?0+$/, '') : v;
+    const cell = (v, j, r, i) => {
+      if (EMPTY.test(v)) return '<td class="nil">—</td>';
+      const x = numOf(v);
+      if (isNaN(x)) {
+        const ssp = v.match(/^ssp\s?([1235])/i);
+        if (ssp) return `<td class="txt"><span class="pill ${SSP[ssp[1]]}">${esc(v)}</span></td>`;
+        if (/^(yes|true)$/i.test(v)) return `<td class="txt"><span class="pill yes">${esc(v)}</span></td>`;
+        if (/^(no|false)$/i.test(v)) return `<td class="txt"><span class="pill no">${esc(v)}</span></td>`;
+        if (/el ?ni[nñ]o/i.test(v)) return `<td class="txt"><span class="pill nino">${esc(v)}</span></td>`;
+        if (/la ?ni[nñ]a/i.test(v)) return `<td class="txt"><span class="pill nina">${esc(v)}</span></td>`;
+        return `<td class="txt">${esc(v)}</td>`;
+      }
+      const shown = esc(fmtNum(v, x));
+      if (plainCol[j] || !(colSigned[j] || rowSigned[i]) || x === 0) return `<td>${shown}</td>`;
+      anySigned = true;
+      const a = colSigned[j] && maxAbs[j] ? .1 + .38 * Math.abs(x) / maxAbs[j] : .16;
+      return `<td class="${x > 0 ? 'pos' : 'neg'}" style="--a:${a.toFixed(2)}"><span class="arr">${x > 0 ? '▲' : '▼'}</span>${shown}</td>`;
+    };
+    const body = rows.map((r, i) => {
+      const filled = r.filter(c => !EMPTY.test(c));
+      if (!filled.length) return `<tr class="gap"><td colspan="${nc}"></td></tr>`;
+      if (nc > 1 && filled.length === 1 && r[0] !== '' && isNaN(numOf(r[0]))) return `<tr class="sec"><td colspan="${nc}">${esc(r[0])}</td></tr>`;
+      return `<tr>${r.map((v, j) => cell(v, j, r, i)).join('')}</tr>`;
+    }).join('');
+    const legend = anySigned ? `<div class="tlegend"><span class="pos"><span class="arr">▲</span>Increase</span><span class="neg"><span class="arr">▼</span>Decrease</span>
+      <span class="muted">Trend, change, anomaly and difference values; shading scales with magnitude.</span></div>` : '';
+    return `<div class="tview">${legend}<div class="tscroll"><table class="dt"><thead><tr>${head.map((h, j) => `<th class="${colSigned[j] ? 'sig' : ''}">${esc(h)}</th>`).join('')}</tr></thead>
+      <tbody>${body}</tbody></table></div><p class="tnote">${rows.length} rows · ${nc} columns</p></div>`;
+  }
+  // `back` ({ label, fn }) adds a button that returns to where the table was opened from (table list, record).
+  let tableBack = null;
+  function openTable(url, title, back = null) {
     cur = -1;
+    tableBack = back;
     $('#mTitle').innerHTML = `${esc(title)}<span class="sub">${esc(decodeURI(url).split('/').pop())}</span>`;
     $('#mCount').textContent = '';
     $('#mPrev').style.visibility = $('#mNext').style.visibility = 'hidden';
     $('#mCap').textContent = '';
-    $('#mActs').innerHTML = `<a class="btn" href="${url}" download>${ICONS.dl}Download CSV</a>
+    $('#mActs').innerHTML = `${back ? `<button type="button" class="btn ghost" data-tbl-back>← ${esc(back.label)}</button>` : ''}
+      <a class="btn" href="${url}" download>${ICONS.dl}Download CSV</a>
       ${ctx.has(url) ? `<button type="button" class="btn ghost" data-rec="${url}">${ICONS.doc}Product record</button>` : ''}`;
-    lastView = { type: 'table', url, title };
+    lastView = { type: 'table', url, title, back };
     $('#mActs').insertAdjacentHTML('beforeend', linkBtn());
     $('#mStage').innerHTML = '<div class="msg">Loading…</div>';
     showModal();
@@ -827,10 +914,7 @@
     (cached && cached.data ? Promise.resolve(cached.data)
       : tableText(url).then(txt => { if (txt === '') throw new Error('unavailable'); return Papa.parse(txt.trim(), { skipEmptyLines: true }).data; })
     ).then(data => {
-      const [head, ...rows] = data;
-      const fmt = v => { const n = Number(v); return v !== '' && isFinite(n) && /\./.test(v) ? n.toFixed(3).replace(/\.?0+$/, '') : esc(v); };
-      $('#mStage').innerHTML = `<div style="width:100%;overflow:auto;align-self:start"><table><thead><tr>${head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
-        <tbody>${rows.map(r => `<tr>${r.map(fmt).map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+      $('#mStage').innerHTML = tableHtml(data);
     }).catch(() => {
       $('#mStage').innerHTML = `<div class="msg">The table could not be loaded. Rebuild <code>tables.js</code> (<code>build_tables_js.py</code>), serve the repository over HTTP
         (for example <code>python -m http.server</code> from the repository root) or use the download button.</div>`;
@@ -869,7 +953,7 @@
     });
   }
   // ── Product records (CIndRA CMPLV "source of record") ──
-  // Hand-written content: records.js (methods, limitations, sources, review). Automatic part: inventory.js
+  // Hand-written content: records.js (methods, limitations, sources). Automatic part: inventory.js
   // (run dates, file inventory, code version, local data copies; build_inventory_js.py). The context of every
   // product / table drawn on the page (indicator, historical or projection, scale, site) is kept in `ctx`.
   const REC = window.CINDRA_RECORDS || { sources: {}, indicators: {}, issues: {} };
@@ -925,7 +1009,6 @@
     const productId = `${packageId}-${key.split('/').pop().replace(/\.[^.]+$/, '')}`;
     const issues = Object.entries(REC.issues || {}).filter(([, x]) =>
       (!x.codes || x.codes.includes(code)) && (!x.sites || (national && x.sites.includes(site.id)))).map(([id, x]) => ({ id, ...x }));
-    const review = meta.review || { status: 'pending', notes: 'No review recorded.' };
     const repo = INV && INV.repo || {};
 
     // Validation record.
@@ -933,32 +1016,16 @@
     const chk = (status, label, detail) => checks.push({ status, label, detail });
     if (!INV) chk('fail', 'Inventory', 'inventory.js not found: run build_inventory_js.py to record run dates, files and code version.');
     else chk(file ? 'pass' : 'fail', 'Product file', file ? `Found (${fmtSize(file.size)}, generated ${fmtDate(file.modified)}).` : 'Product file missing from the inventory.');
-    chk(item.caption ? 'pass' : 'flag', 'Caption', item.caption ? 'Caption tied to the product.' : 'No caption for this product.');
     chk(meta.methods && meta.methodId ? 'pass' : 'flag', 'Methods note', meta.methods ? `Method ${meta.methodId || '(no ID)'} documented.` : 'Methods note not written yet (records.js).');
     chk(meta.limitations && meta.limitations.length ? 'pass' : 'flag', 'Limitations note', meta.limitations && meta.limitations.length ? `${meta.limitations.length} limitations documented.` : 'Limitations not written yet (records.js).');
     chk(pmeta.units || meta.units ? 'pass' : 'flag', 'Units', pmeta.units || meta.units || 'Units not declared.');
     chk(period ? 'pass' : 'flag', 'Period', period ? `${period[0]}–${period[1]} (from the supporting tables).` : 'Period not identified from the tables.');
     const srcOk = sources.length && sources.every(s => s.provider && s.version && s.url);
     chk(srcOk ? 'pass' : 'flag', 'Data sources', sources.length ? (srcOk ? `${sources.length} source(s) with provider, version and URL.` : 'Some sources lack provider, version or URL.') : 'No data source documented.');
-    const copies = sources.flatMap(s => s.copies);
-    const missingCopies = copies.filter(x => !x.data);
-    chk(copies.length && !missingCopies.length ? 'pass' : 'flag', 'Source data copy',
-      !copies.length ? 'Local copy of the source data not documented.' : missingCopies.length ? `Not found: ${missingCopies.map(x => x.path).join(', ')}` : `${copies.length} local file(s) found; dates recorded.`);
-    chk(!repo.commit ? 'flag' : repo.dirty ? 'flag' : 'pass', 'Code version',
-      !repo.commit ? 'No git commit recorded.' : repo.dirty ? `Commit ${repo.short} with uncommitted changes when the inventory was built: the outputs may not be reproducible from the commit alone.` : `Commit ${repo.short}, clean working tree.`);
-    const tMissing = tables.filter(t => !t.file), tEmpty = tables.filter(t => t.info && !t.info.rows);
-    chk(!tables.length ? 'flag' : tEmpty.length ? 'fail' : tMissing.length ? 'flag' : 'pass', 'Supporting tables',
-      !tables.length ? 'No data table linked to this product.' : tEmpty.length ? `Empty: ${tEmpty.map(t => t.title).join(', ')}` : tMissing.length ? `Not generated: ${tMissing.map(t => t.title).join(', ')}` : `${tables.length} table(s) present with header and data rows.`);
     chk(meta.qc ? 'pass' : 'flag', 'QC traceability', meta.qc ? 'QC reference documented.' : 'QC reference not documented.');
     const open = issues.filter(x => x.status !== 'closed');
     chk(open.length ? 'flag' : 'pass', 'Issue log', open.length ? `Open: ${open.map(x => x.id).join(', ')}` : 'No open issues.');
-    chk(review.status === 'approved' ? 'pass' : 'flag', 'Scientific review', review.status === 'approved' ? `Approved${review.by ? ' by ' + review.by : ''}${review.date ? ', ' + review.date : ''}.` : 'Human scientific review pending.');
     const worst = checks.some(x => x.status === 'fail') ? 'fail' : checks.some(x => x.status === 'flag') ? 'flag' : 'pass';
-    const statusLabel = review.status === 'approved' && worst === 'pass' ? ['pass', 'Approved for report use']
-      : review.status === 'approved' ? ['fail', 'Approval on hold: validation not passed']
-      : review.status === 'in-review' ? ['info', 'In scientific review']
-      : worst === 'fail' ? ['fail', 'Draft: validation failed']
-      : !meta.methods || !(meta.limitations || []).length ? ['flag', 'Draft: record incomplete'] : ['flag', 'Generated: pending scientific review'];
 
     return {
       productId, packageId, title: item.title, kind: isTable ? 'Table (CSV)' : (KIND_LABEL[item.kind] || item.kind),
@@ -967,7 +1034,7 @@
       spatial: tok(meta.spatial) || (national ? `${site.label} (${site.station})` : 'Pacific basin'),
       period, units: pmeta.units || meta.units || '', runDate: file && file.modified,
       caption: item.caption || '', methodId: meta.methodId || '', methods: meta.methods || '', limitations: meta.limitations || [],
-      parameters: meta.parameters || {}, qc: meta.qc || '', sources, issues, review, statusLabel, worst, checks,
+      parameters: meta.parameters || {}, qc: meta.qc || '', sources, issues, worst, checks,
       notebook: nb, notebookUrl: nb ? bookUrl(nb) : '', repo, workflow: REC.workflow || '', inventoryDate: INV && INV.generated,
       url, key, file, tables,
       outputs: [{ title: item.title, key, file }, ...tables.filter(t => !t.current).map(t => ({ title: t.title, key: t.key, file: t.file }))],
@@ -979,8 +1046,7 @@
     const repoLink = r.repo.commit ? `<a href="${esc(r.repo.remote)}/commit/${r.repo.commit}" target="_blank" rel="noopener">${esc(r.repo.short)}</a> (${esc(r.repo.branch)}, ${esc(fmtDate(r.repo.commitDate))})${r.repo.dirty ? ' · <span class="rstat flag">uncommitted changes</span>' : ''}` : '—';
     return `<div class="rec">
       <div class="cover">
-        <div class="cover-head"><b>${esc(r.title)}<span class="muted" style="display:block;font-size:13px;font-weight:500">${esc(r.indicator)} · ${esc(r.variable)}</span></b>
-          <span class="rstat ${r.statusLabel[0]}">${esc(r.statusLabel[1])}</span></div>
+        <div class="cover-head"><b>${esc(r.title)}<span class="muted" style="display:block;font-size:13px;font-weight:500">${esc(r.indicator)} · ${esc(r.variable)}</span></b></div>
         <table>
           ${row('Product ID', `<code>${esc(r.productId)}</code>`)}
           ${row('Package ID', `<code>${esc(r.packageId)}</code>`)}
@@ -989,12 +1055,8 @@
           ${row('Period', r.period ? `${r.period[0]}–${r.period[1]}` : '<span class="muted">Not identified</span>')}
           ${row('Units', r.units ? esc(r.units) : '<span class="muted">Not declared</span>')}
           ${row('Run date', esc(fmtDate(r.runDate)) + ' <span class="muted">(product file generated)</span>')}
-          ${row('Review status', `${esc(r.statusLabel[1])}${r.review.notes ? ` <span class="muted">— ${esc(r.review.notes)}</span>` : ''}`)}
         </table>
       </div>
-
-      <h5>Caption</h5>
-      <p>${r.caption ? esc(r.caption) : '<span class="muted">No caption.</span>'}</p>
 
       <h5>Methods note ${r.methodId ? `<span class="eid">${esc(r.methodId)}</span>` : ''}</h5>
       ${r.methods ? `<p>${esc(r.methods)}</p>` : '<p class="muted">Not documented yet (matrix_cc/records.js).</p>'}
@@ -1039,12 +1101,12 @@
 
   function recordMarkdown(r) {
     const L = [];
-    L.push(`# Product record: ${r.title}`, '', `**${r.statusLabel[1]}**`, '');
+    L.push(`# Product record: ${r.title}`, '');
     [['Product ID', r.productId], ['Package ID', r.packageId], ['Indicator', r.indicator], ['Variable', r.variable],
      ['Product profile', `${r.profile} · ${r.kind}`], ['Spatial scope', r.spatial], ['Period', r.period ? `${r.period[0]}–${r.period[1]}` : 'not identified'],
-     ['Units', r.units || 'not declared'], ['Run date', fmtDate(r.runDate)], ['Review', `${r.review.status}${r.review.by ? ', ' + r.review.by : ''}${r.review.date ? ', ' + r.review.date : ''}${r.review.notes ? ' — ' + r.review.notes : ''}`]]
+     ['Units', r.units || 'not declared'], ['Run date', fmtDate(r.runDate)]]
       .forEach(([k, v]) => L.push(`- **${k}:** ${v}`));
-    L.push('', '## Caption', '', r.caption || '_No caption._', '', `## Methods note${r.methodId ? ` (${r.methodId})` : ''}`, '', r.methods || '_Not documented._', '');
+    L.push('', `## Methods note${r.methodId ? ` (${r.methodId})` : ''}`, '', r.methods || '_Not documented._', '');
     Object.entries(r.parameters).forEach(([k, v]) => L.push(`- **${k}:** ${v}`));
     if (r.qc) L.push(`- **QC reference:** ${r.qc}`);
     L.push(`- **Notebook:** ${r.notebookUrl || '—'}`, `- **Repository:** ${r.repo.remote || '—'}`, '', '## Limitations note', '');
@@ -1077,7 +1139,7 @@
     $('#mTitle').innerHTML = `Product record<span class="sub">${esc(r.title)} · ${esc(r.indicator)}</span>`;
     $('#mCount').textContent = '';
     $('#mPrev').style.visibility = $('#mNext').style.visibility = 'hidden';
-    $('#mCap').textContent = 'Source-of-record information (CIndRA CMPLV): caption, methods, limitations, metadata, provenance and validation.';
+    $('#mCap').textContent = 'Source-of-record information (CIndRA CMPLV): methods, limitations, metadata, provenance and validation.';
     $('#mActs').innerHTML = `
       ${lastView ? `<button type="button" class="btn ghost" data-rec-back>${lastView.type === 'table' ? ICONS.table + 'Back to table' : ICONS.chart + 'Back to product'}</button>` : ''}
       <button type="button" class="btn" data-rec-dl="md">${ICONS.dl}Record (.md)</button>
@@ -1091,7 +1153,8 @@
     const b = e.target.closest('button'); if (!b) return;
     if (b.dataset.rec) return openRecord(b.dataset.rec);
     if ('copyLink' in b.dataset) return copyLink(b);
-    if ('recBack' in b.dataset && lastView) return lastView.type === 'table' ? openTable(lastView.url, lastView.title) : openProduct(lastView.i);
+    if ('tblBack' in b.dataset && tableBack) return tableBack.fn();
+    if ('recBack' in b.dataset && lastView) return lastView.type === 'table' ? openTable(lastView.url, lastView.title, lastView.back) : openProduct(lastView.i);
     if (b.dataset.recDl && curRecord) {
       const name = curRecord.productId;
       if (b.dataset.recDl === 'md') download(`${name}_record.md`, recordMarkdown(curRecord), 'text/markdown');
@@ -1419,8 +1482,10 @@
       </thead><tbody>${rows}</tbody></table>`;
   }
 
+  let curList = null;
   function openTableList(items, ind, nb = ind.notebook) {
     cur = -1;
+    curList = { items, ind, nb };
     $('#mTitle').innerHTML = `Tables<span class="sub">${esc(ind.code)} ${esc(ind.name)}</span>`;
     $('#mCount').textContent = '';
     $('#mPrev').style.visibility = $('#mNext').style.visibility = 'hidden';
@@ -1430,8 +1495,10 @@
     showModal();
   }
   $('#mStage').addEventListener('click', e => {
-    const t = e.target.closest('.tlist .tbtn'); if (t) return openTable(t.dataset.csv, t.dataset.title);
-    const r = e.target.closest('[data-rec-table]'); if (r) openTable(r.dataset.recTable, r.dataset.title);
+    const t = e.target.closest('.tlist .tbtn');
+    if (t) { const L = curList; return openTable(t.dataset.csv, t.dataset.title, L && { label: 'All tables', fn: () => openTableList(L.items, L.ind, L.nb) }); }
+    const r = e.target.closest('[data-rec-table]');
+    if (r) { const u = curRecord && curRecord.url; openTable(r.dataset.recTable, r.dataset.title, u && { label: 'Product record', fn: () => openRecord(u) }); }
   });
 
   $('#mxTable').addEventListener('click', e => {

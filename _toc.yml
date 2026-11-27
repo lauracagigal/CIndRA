@@ -57,6 +57,7 @@ parts:
           - file: notebooks/projections/National/tropical_cyclones/tropical_cyclones
             sections:
               - file: notebooks/projections/National/tropical_cyclones/a_tropical_cyclones
+              - file: notebooks/projections/National/tropical_cyclones/b_tc_highresmip_site
           - file: notebooks/projections/National/sea_surface_temperature/sea_surface_temperature
             sections:
               - file: notebooks/projections/National/sea_surface_temperature/a_Mean_Temperature
@@ -116,6 +117,9 @@ parts:
           - file: notebooks/projections/Regional/rainfall/rainfall
             sections:
               - file: notebooks/projections/Regional/rainfall/regional_indicators
+          - file: notebooks/projections/Regional/tropical_cyclones/tropical_cyclones
+            sections:
+              - file: notebooks/projections/Regional/tropical_cyclones/tc_highresmip
           - file: notebooks/projections/Regional/sea_surface_temperature/sea_surface_temperature
             sections:
               - file: notebooks/projections/Regional/sea_surface_temperature/regional_indicators

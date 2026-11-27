@@ -9,6 +9,10 @@ The notebooks document indicator-specific references alongside their calculation
 - Copernicus Marine Service (CMEMS) L4 satellite-altimetry sea-level anomalies (SEALEVEL_GLO_PHY_L4_MY_008_047).
 - ERA5 monthly fields for supported Regional rainfall and temperature backgrounds.
 
+Literature values used directly in the projection notebooks:
+
+- Tropical-cyclone poleward shift (+1.13° of genesis latitude) used to shift historical tracks in the national tropical-cyclone projections: Li, Z. & Zhou, W. (2024). Poleward migration of tropical cyclones over the western North Pacific in the CMIP6-HighResMIP models constrained by observations. *npj Climate and Atmospheric Science* 7, 161. [doi:10.1038/s41612-024-00704-3](https://doi.org/10.1038/s41612-024-00704-3).
+
 See `assistant/skills/data-sources/SKILL.md` in the repository for URLs, units, cache conventions and attribution guidance.
 
 ## Data completeness and quality criteria
